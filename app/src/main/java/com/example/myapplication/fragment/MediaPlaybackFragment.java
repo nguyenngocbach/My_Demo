@@ -34,8 +34,8 @@ public class MediaPlaybackFragment extends Fragment {
         iconPlay = view.findViewById(R.id.iconPlay);
         iconNext = view.findViewById(R.id.iconNext);
         iconDislike = view.findViewById(R.id.iconDislike);
-        iconRePeat = view.findViewById(R.id.icon_repeat);
-        iconShuffle = view.findViewById(R.id.icon_shuffle);
+//        iconRePeat = view.findViewById(R.id.icon_repeat);
+//        iconShuffle = view.findViewById(R.id.icon_shuffle);
         txtAuthor = view.findViewById(R.id.txtAuthor);
         txtTitel = view.findViewById(R.id.txtTitle);
         txtTime = view.findViewById(R.id.txt_startTime);

@@ -4,15 +4,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.example.myapplication.Model.Song;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MusicManager  {
-    private List<Song> mSongs;
+public class MusicManager  implements Serializable {
+    private List<Song> mSongs =new ArrayList<>();;
     private MediaPlayer mPlayer;
     private int currentSong=0;
     private Context mContext;
@@ -22,7 +24,7 @@ public class MusicManager  {
     public MusicManager(Context context){
         mContext=context;
         getAllSong();
-        //Log.d("bachdz",mSongs.size()+"");
+        Log.d("bachdz",mSongs.size()+"");
         mPlayer= new MediaPlayer();
     }
 
@@ -111,19 +113,18 @@ public class MusicManager  {
 
     private void getAllSong() {
         String[] allColoumSong= new String[]{
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-                MediaStore.Audio.Media.DURATION
+                MediaStore.Audio.AudioColumns._ID,
+                MediaStore.Audio.AudioColumns.DATA,
+                MediaStore.Audio.AudioColumns.ARTIST,
+                MediaStore.Audio.AudioColumns.TITLE,
+                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+                MediaStore.Audio.AudioColumns.DURATION
         };
 
         //Log.d("bachdz","getAllSong" + MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         Cursor cursor= mContext.getContentResolver().
                 query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColoumSong, null, null, null, null);
         cursor.moveToFirst();
-        mSongs= new ArrayList<>();
         if (cursor!=null){
             while (!cursor.isAfterLast()){
 

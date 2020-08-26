@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/horizontal_Screen"
+    >
+    <include layout="@layout/toolbar_layout"
+        android:id="@+id/toolbar"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        >
+        <FrameLayout
+            android:id="@+id/allSongFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            />
+
+        <FrameLayout
+            android:id="@+id/musicPlayer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

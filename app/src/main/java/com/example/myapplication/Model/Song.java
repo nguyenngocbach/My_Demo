@@ -64,4 +64,16 @@ public class Song {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "id='" + id + '\'' +
+                ", path='" + path + '\'' +
+                ", author='" + author + '\'' +
+                ", title='" + title + '\'' +
+                ", display_Name='" + display_Name + '\'' +
+                ", duration='" + duration + '\'' +
+                '}';
+    }
 }
