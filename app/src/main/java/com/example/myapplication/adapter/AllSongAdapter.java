@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
+import com.example.myapplication.listenner.MusicListenner;
 
 import java.util.List;
 
@@ -21,14 +22,14 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     private Context mContext;
     private List<Song> mSongs;
+    private MusicListenner listenner;
 
     public int cerrentSong=0;
 
-
-
-    public AllSongAdapter(Context mContext, List<Song> mSongs) {
+    public AllSongAdapter(Context mContext, List<Song> mSongs, MusicListenner listenner) {
         this.mContext = mContext;
         this.mSongs = mSongs;
+        this.listenner = listenner;
     }
 
     @Override
@@ -52,10 +53,17 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         boolean check= position==cerrentSong ? true: false;
         holder.txtStt.setText(""+(position+1));
         holder.onBind(mSongs.get(position),check);
+
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listenner.selectMusic(position);
+            }
+        });
     }
 
     @Override
@@ -84,7 +92,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
                 txtStt.setVisibility(View.INVISIBLE);
                 iconPlayMusic.setVisibility(View.VISIBLE);
             }
-            Log.d("bachdz", song.toString());
+            //Log.d("bachdz", song.toString());
         }
     }
 

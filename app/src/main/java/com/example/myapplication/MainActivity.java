@@ -22,11 +22,12 @@ import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.Service.MusicService;
 import com.example.myapplication.fragment.AllSongFragment;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
+import com.example.myapplication.listenner.MusicListenner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MusicListenner , AllSongFragment.AllSongFragmentListenner , MediaPlaybackFragment.MediaPlayFragmentListenner {
 
     private static final int MY_PERMISSION_REQUEST = 123;
     private static final String KEY_MUSIC_MANAGER ="com.example.myapplication.musicManager" ;
@@ -35,22 +36,24 @@ public class MainActivity extends AppCompatActivity {
     private MusicManager musicManager;
     private FragmentManager fragmentManager;
 
-
-
     private boolean isVertical=false;
     private boolean check=false;
+    private Song song;
 
     private ServiceConnection mConnection= new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MusicService.LocalMusic localMusic = (MusicService.LocalMusic) iBinder;
             musicService= localMusic.getInstanceService();
-            musicManager= musicService.getMusicManager();
+            if (musicManager==null){
+                musicManager= musicService.getMusicManager();
+            }
             if (isVertical){
                 AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-                Log.d("bachdz","onServiceConnected"+ musicManager.getmSongs().size());
+                Log.d("bachdz",musicManager+"  onServiceConnected"+ musicManager.getmSongs().size());
                 allSongFragment.setSongManager(musicManager);
                 allSongFragment.setData(musicManager.getmSongs());
+                allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
             }
             //Log.d("bachdz","onServiceConnected");
         }
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState!=null){
             check=true;
             musicManager= (MusicManager) savedInstanceState.getSerializable(KEY_MUSIC_MANAGER);
+            Log.d("bachdz",check+ " savedInstanceState" + musicManager);
         }
 
         // if check == true thì ta set các giá trị cho 2 fragment luôn
@@ -106,6 +110,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d("bachdz","onStart");
+        if (check){
+            AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+            allSongFragment.setData(musicManager.getmSongs());
+            if (!isVertical){
+                Log.d("bachNgoc", musicManager+ "");
+                MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+                allSongFragment.setVisible();
+                mediaPlaybackFragment.setMusicManager(musicManager);
+            }
+            else allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+        }
     }
 
     @Override
@@ -121,8 +136,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        outState.putSerializable(KEY_MUSIC_MANAGER,musicManager);
         super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable(KEY_MUSIC_MANAGER,musicManager);
+        outState.putString("bachdz","Nguyen Ngoc Bach");
+        Log.d("bachdz", "outState " + musicManager);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -142,5 +164,81 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+
+    @Override
+    public void selectMusic(int i) {
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setSelection(i);
+        allSongFragment.isPlayMusic(true);
+        //???????????
+        //????????????
+
+        Log.d("bachNgoc", musicManager+ "");
+        if (musicManager!=null) {
+            if (musicManager.isMusicPlaying()) {
+                Log.d("bachNgoc", musicManager.isMusicPlaying() + "");
+                musicManager.onResetMusic();
+            }
+            musicManager.setCurrentSong(i);
+            musicManager.onPlay();
+        }
+        if (!isVertical){
+            MediaPlaybackFragment player= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+            //player.setTile(musicManager.getSinpleSong(i));
+            player.setMusicManager(musicManager);
+        }
+
+    }
+
+    @Override
+    public void show() {
+        MediaPlaybackFragment mediaPlaybackFragment;
+        if (isVertical){
+            mediaPlaybackFragment=  MediaPlaybackFragment.getInstance(musicManager);
+            FragmentTransaction ft= fragmentManager.beginTransaction();
+            ft.replace(R.id.musicPlayer, mediaPlaybackFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
+        else {
+            mediaPlaybackFragment= new MediaPlaybackFragment();
+            FragmentTransaction ft= fragmentManager.beginTransaction();
+            ft.replace(R.id.musicPlayer, mediaPlaybackFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
+    }
+
+
+
+    @Override
+    public void onLike() {
+
+    }
+
+    @Override
+    public void onPrevious() {
+
+    }
+
+    @Override
+    public void onPlay() {
+
+    }
+
+    @Override
+    public void onNext() {
+
+    }
+
+    @Override
+    public void onDisLike() {
+
+    }
+
+    public boolean isVertical() {
+        return isVertical;
     }
 }

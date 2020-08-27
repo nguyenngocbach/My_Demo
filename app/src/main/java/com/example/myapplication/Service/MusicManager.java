@@ -102,6 +102,11 @@ public class MusicManager  implements Serializable {
         mPlayer.start();
     }
 
+    public void onResetMusic(){
+        mPlayer.pause();
+        mPlayer.reset();
+    }
+
     public void onStop(){
         mPlayer.pause();
         status=STOP;

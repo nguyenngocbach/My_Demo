@@ -25,6 +25,7 @@
             android:id="@+id/avatar"
             android:layout_width="55dp"
             android:layout_height="55dp"
+            android:src="@drawable/xe_em"
             android:scaleType="centerCrop"
             android:layout_marginStart="5dp"
             />
