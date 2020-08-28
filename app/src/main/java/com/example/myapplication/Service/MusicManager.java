@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicManager  implements Serializable {
+    private static MusicManager INSTANCE;
     private List<Song> mSongs =new ArrayList<>();;
     private MediaPlayer mPlayer;
     private int currentSong=0;
@@ -26,6 +27,13 @@ public class MusicManager  implements Serializable {
         getAllSong();
         Log.d("bachdz",mSongs.size()+"");
         mPlayer= new MediaPlayer();
+    }
+
+    public static MusicManager getInstance(Context mContext){
+        if (INSTANCE==null){
+            INSTANCE= new MusicManager(mContext);
+        }
+        return INSTANCE;
     }
 
 

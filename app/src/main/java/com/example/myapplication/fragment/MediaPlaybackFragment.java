@@ -76,8 +76,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         iconPlay = view.findViewById(R.id.iconPlay);
         iconNext = view.findViewById(R.id.iconNext);
         iconDislike = view.findViewById(R.id.iconDislike);
-//        iconRePeat = view.findViewById(R.id.icon_repeat);
-//        iconShuffle = view.findViewById(R.id.icon_shuffle);
+        iconRePeat = view.findViewById(R.id.icon_repeat);
+        iconShuffle = view.findViewById(R.id.icon_shuffle);
         txtAuthor = view.findViewById(R.id.txtAuthor);
         txtTitel = view.findViewById(R.id.txtTitle);
         txtTime = view.findViewById(R.id.txt_startTime);
@@ -91,8 +91,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         iconPlay.setOnClickListener(this);
         iconNext.setOnClickListener(this);
         iconDislike.setOnClickListener(this);
-//        iconRePeat.setOnClickListener(this);
-//        iconShuffle.setOnClickListener(this);
+        iconRePeat.setOnClickListener(this);
+        iconShuffle.setOnClickListener(this);
         if (!activity.isVertical()) imgMusic.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         imgMusic.setOnClickListener(new View.OnClickListener() {
@@ -186,6 +186,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 listenner.onLike();
                 break;
             case R.id.iconPrevious:
+                musicManager.onPrevious();
+                setTile(musicManager.getSongIsPlay());
+                setSeekBar();
                 listenner.onPrevious();
                 break;
             case R.id.iconPlay:
@@ -199,14 +202,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 break;
             case R.id.iconNext:
+                musicManager.onNext();
+                setTile(musicManager.getSongIsPlay());
+                setSeekBar();
                 listenner.onNext();
                 break;
             case R.id.iconDislike:
                 listenner.onDisLike();
                 break;
-//            case R.id.icon_shuffle:
-//                getActivity().onBackPressed();
-//                break;
+            case R.id.icon_shuffle:
+                getActivity().onBackPressed();
+                break;
         }
     }
 

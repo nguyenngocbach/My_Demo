@@ -48,12 +48,26 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
             if (musicManager==null){
                 musicManager= musicService.getMusicManager();
             }
-            if (isVertical){
-                AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-                Log.d("bachdz",musicManager+"  onServiceConnected"+ musicManager.getmSongs().size());
-                allSongFragment.setSongManager(musicManager);
-                allSongFragment.setData(musicManager.getmSongs());
-                allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+            if (!check){
+                if (isVertical){
+                    AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+                    Log.d("bachdz",musicManager+"  onServiceConnected"+ musicManager.getmSongs().size());
+                    allSongFragment.setSongManager(musicManager);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+                    allSongFragment.setTitle(musicManager.getSongIsPlay());
+                }
+                else {
+                    AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+                    MediaPlaybackFragment playbackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.setSongManager(musicManager);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+                    allSongFragment.setTitle(musicManager.getSongIsPlay());
+                    allSongFragment.setVisible();
+                    playbackFragment.setMusicManager(musicManager);
+                }
             }
             //Log.d("bachdz","onServiceConnected");
         }
@@ -64,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
             musicManager=null;
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
         if (check){
             AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
             allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
             if (!isVertical){
                 Log.d("bachNgoc", musicManager+ "");
                 MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
@@ -211,6 +228,29 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
         }
     }
 
+    private void setInitially() {
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        MediaPlaybackFragment playbackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        Log.d("bachdz",""+ musicManager);
+        if (isVertical){
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
+        }
+        else {
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
+
+            playbackFragment.setMusicManager(musicManager);
+        }
+
+    }
+
 
 
     @Override
@@ -220,6 +260,8 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
 
     @Override
     public void onPrevious() {
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setData(musicManager.getmSongs());
 
     }
 
@@ -230,7 +272,14 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
 
     @Override
     public void onNext() {
+//        if (musicManager!=null){
+//            musicManager.onNext();
+//        }
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setData(musicManager.getmSongs());
 
+//        MediaPlaybackFragment fragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+//        fragment.setTile(song);
     }
 
     @Override
@@ -241,4 +290,6 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
     public boolean isVertical() {
         return isVertical;
     }
+
+
 }
