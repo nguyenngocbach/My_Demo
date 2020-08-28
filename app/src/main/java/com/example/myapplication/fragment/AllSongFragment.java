@@ -86,6 +86,10 @@ public class AllSongFragment extends Fragment {
                 else {
                     musicManager.onResumeMusic();
                     imgPlay.setImageResource(R.drawable.ic_pause_24);
+                    if (musicManager.getStatus()==0){
+                        musicManager.onPlay();
+                        musicManager.setStatus(1);
+                    }
                 }
             }
         });

@@ -16,7 +16,7 @@
         />
 
     <FrameLayout
-        android:id="@+id/musicPlayer"
+        android:id="@+id/musicPlayer_ok"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

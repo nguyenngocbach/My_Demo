@@ -27,7 +27,8 @@ import com.example.myapplication.listenner.MusicListenner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MusicListenner , AllSongFragment.AllSongFragmentListenner , MediaPlaybackFragment.MediaPlayFragmentListenner {
+public class MainActivity extends AppCompatActivity implements MusicListenner , AllSongFragment.AllSongFragmentListenner
+        , MediaPlaybackFragment.MediaPlayFragmentListenner {
 
     private static final int MY_PERMISSION_REQUEST = 123;
     private static final String KEY_MUSIC_MANAGER ="com.example.myapplication.musicManager" ;
@@ -106,16 +107,17 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
             ft.commit();
         }
         else {
-            AllSongFragment allSongFragment= new AllSongFragment();
-            FragmentTransaction ft= fragmentManager.beginTransaction();
-            ft.replace(R.id.allSongFragment,allSongFragment);
-            ft.commit();
-
             MediaPlaybackFragment mediaPlaybackFragment= new MediaPlaybackFragment();
             FragmentTransaction layer= fragmentManager.beginTransaction();
             layer.replace(R.id.musicPlayer,mediaPlaybackFragment);
             layer.addToBackStack(null);
             layer.commit();
+
+            AllSongFragment allSongFragment= new AllSongFragment();
+            FragmentTransaction ft= fragmentManager.beginTransaction();
+            ft.replace(R.id.allSongFragment,allSongFragment);
+            ft.commit();
+
         }
 
         Log.d("bachdz","onCreate");
@@ -215,14 +217,14 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
         if (isVertical){
             mediaPlaybackFragment=  MediaPlaybackFragment.getInstance(musicManager);
             FragmentTransaction ft= fragmentManager.beginTransaction();
-            ft.replace(R.id.musicPlayer, mediaPlaybackFragment);
+            ft.replace(R.id.musicPlayer_ok, mediaPlaybackFragment);
             ft.addToBackStack(null);
             ft.commit();
         }
         else {
             mediaPlaybackFragment= new MediaPlaybackFragment();
             FragmentTransaction ft= fragmentManager.beginTransaction();
-            ft.replace(R.id.musicPlayer, mediaPlaybackFragment);
+            ft.replace(R.id.musicPlayer_ok, mediaPlaybackFragment);
             ft.addToBackStack(null);
             ft.commit();
         }
@@ -287,9 +289,23 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
 
     }
 
+    @Override
+    public void onSeekBar() {
+        AllSongFragment songFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        //songFragment.setSongManager(musicManager);
+        songFragment.setTitle(musicManager.getSongIsPlay());
+    }
+
     public boolean isVertical() {
         return isVertical;
     }
 
-
+    public boolean isCheck() {
+        return check;
+    }
+//
+//    @Override
+//    public void musicRun() {
+//
+//    }
 }

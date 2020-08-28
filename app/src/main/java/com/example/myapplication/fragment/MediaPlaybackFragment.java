@@ -39,6 +39,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         @Override
         public void run() {
             setUI();
+            int index=(Integer.parseInt(musicManager.getSongIsPlay().getDuration()));
+            if (seekBar.getProgress()== index){
+                musicManager.onNext();
+                setSeekBar();
+                setTile(musicManager.getSongIsPlay());
+                listenner.onSeekBar();
+            }
             handler.postDelayed(this,300);
         }
     };
@@ -139,6 +146,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             musicManager= (MusicManager) getArguments().getSerializable(KEY_MEDIA_FRAGMENT);
             setTile(musicManager.getSongIsPlay());
             setSeekBar();
+            setStatusIcon(musicManager.isMusicPlaying());
         }
     }
 
@@ -146,7 +154,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         musicManager=manager;
         setSeekBar();
         setTile(musicManager.getSongIsPlay());
+        setStatusIcon(musicManager.isMusicPlaying());
     }
+
+    public void setStatusIcon(boolean musicPlaying) {
+        if (musicPlaying) {
+            iconPlay.setImageResource(R.drawable.custom_play_pause);
+        }
+        else {
+            iconPlay.setImageResource(R.drawable.costom_play);
+        }
+    }
+
     private void setSeekBar(){
         seekBar.setMax(Integer.parseInt(musicManager.getSongIsPlay().getDuration()));
         handler.postDelayed(runnable,300);
@@ -195,9 +214,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (musicManager.isMusicPlaying()){
                     musicManager.onStop();
                     iconPlay.setImageResource(R.drawable.costom_play);
+                    if (musicManager.getStatus()==0){
+                        musicManager.onPlay();
+                        musicManager.setStatus(1);
+                    }
                 }
                 else {
                     musicManager.onResumeMusic();
+                    if (musicManager.getStatus()==0){
+                        musicManager.onPlay();
+                        musicManager.setStatus(1);
+                    }
                     iconPlay.setImageResource(R.drawable.custom_play_pause);
                 }
                 break;
@@ -227,6 +254,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         void onNext();
 
         void onDisLike();
+
+        void onSeekBar();
     }
 
 }

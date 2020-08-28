@@ -138,7 +138,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/iconPrevious"
             app:layout_constraintTop_toTopOf="@+id/iconLike"
-            app:srcCompat="@drawable/custom_play_pause" />
+            app:srcCompat="@drawable/costom_play" />
 
         <ImageView
             android:id="@+id/iconNext"
