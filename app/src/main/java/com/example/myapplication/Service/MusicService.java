@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -46,11 +47,13 @@ public class MusicService extends Service {
             //
             NotificationManager manager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             manager.createNotificationChannel(channel);
+            RemoteViews notification_remote_small= new RemoteViews(getPackageName(),R.layout.notifiation_small);
+            RemoteViews notification_remote_big= new RemoteViews(getPackageName(),R.layout.notifiation_big);
             NotificationCompat.Builder builder= new NotificationCompat.Builder(this,ID_CHANNEL)
                     .setSmallIcon(R.drawable.ic_baseline_library_music_24)
-                    .setContentTitle("Music OK")
-                    .setContentText("Nguyeexn Ngoc Bach");
-
+                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                    .setCustomContentView(notification_remote_small)
+                    .setCustomBigContentView(notification_remote_big);
             manager.notify(111,builder.build());
         }
         //NotificationCompat.Builder buil

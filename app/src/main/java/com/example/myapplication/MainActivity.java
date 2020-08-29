@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
     private boolean check=false;
     private Song song;
 
+    MediaPlaybackFragment mediaPlayer;
+    FragmentTransaction ffffttt;
+
     private ServiceConnection mConnection= new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -140,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
             }
             else allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
         }
+        if ( ffffttt!=null &&  isVertical){
+            Log.d("YeuEm","ok ++"+ ffffttt);
+        }
     }
 
     @Override
@@ -213,22 +219,23 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
 
     @Override
     public void show() {
-        MediaPlaybackFragment mediaPlaybackFragment;
         if (isVertical){
-            mediaPlaybackFragment=  MediaPlaybackFragment.getInstance(musicManager);
-            FragmentTransaction ft= fragmentManager.beginTransaction();
-            ft.replace(R.id.musicPlayer_ok, mediaPlaybackFragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            mediaPlayer=  MediaPlaybackFragment.getInstance(musicManager);
+            ffffttt= fragmentManager.beginTransaction();
+            ffffttt.replace(R.id.musicPlayer_ok, mediaPlayer);
+            ffffttt.addToBackStack(null);
+            ffffttt.commit();
         }
         else {
-            mediaPlaybackFragment= new MediaPlaybackFragment();
-            FragmentTransaction ft= fragmentManager.beginTransaction();
-            ft.replace(R.id.musicPlayer_ok, mediaPlaybackFragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            mediaPlayer= new MediaPlaybackFragment();
+            ffffttt= fragmentManager.beginTransaction();
+            ffffttt.replace(R.id.musicPlayer_ok, mediaPlayer);
+            ffffttt.addToBackStack(null);
+            ffffttt.commit();
         }
     }
+
+
 
     private void setInitially() {
         AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
@@ -260,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
 
     }
 
+
     @Override
     public void onPrevious() {
         AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
@@ -290,6 +298,16 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+//        if ( ffffttt!=null && isVertical){
+//            Log.d("YeuEm","ok ++"+ ffffttt);
+//            //ffffttt.remove(mediaPlayer);
+//            ffffttt.replace(R.id.musicPlayer_ok,new AllSongFragment());
+//        }
+    }
+
+    @Override
     public void onSeekBar() {
         AllSongFragment songFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         //songFragment.setSongManager(musicManager);
@@ -303,9 +321,10 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
     public boolean isCheck() {
         return check;
     }
-//
+
 //    @Override
 //    public void musicRun() {
 //
 //    }
+
 }
