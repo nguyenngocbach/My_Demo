@@ -1,5 +1,5 @@
 package com.example.myapplication.listenner;
 
-public interface MusicListenner {
+public interface IMusicListenner {
     void selectMusic(int i);
 }

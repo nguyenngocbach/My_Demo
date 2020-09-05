@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,32 +21,33 @@ import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.adapter.AllSongAdapter;
-import com.example.myapplication.listenner.MusicListenner;
+import com.example.myapplication.listenner.IMusicListenner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AllSongFragment extends Fragment {
 
-    private RecyclerView recyclerView;
+    private RecyclerView mMusicRecyclerView;
     private List<Song> mSongs = new ArrayList<>();
-    private AllSongAdapter adapter;
+    private AllSongAdapter mAdapter;
+    private ImageView mPlayImageView;
+    private ImageView mMusicImageView;
+    private TextView mTitleTextView;
+    private TextView mAuthorTextView;
+    private LinearLayout mItemMusic;
+    private AllSongFragmentListenner mAllSongListenner;
 
-    private ImageView imgPlay, imgImage;
-    private TextView txtTitle, txtAuthor;
-    private LinearLayout layout;
-    private AllSongFragmentListenner listenner;
-
-    private MainActivity mainActivity;
-    private MusicManager musicManager;
+    private MainActivity mMainActivity;
+    private MusicManager mMusicManager;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof MainActivity) {
-            mainActivity = (MainActivity) context;
-            listenner= (AllSongFragmentListenner) context;
-            musicManager = mainActivity.getMusicManager();
+            mMainActivity = (MainActivity) context;
+            mAllSongListenner = (AllSongFragmentListenner) context;
+            mMusicManager = mMainActivity.getmMusicManager();
         }
     }
 
@@ -55,40 +55,39 @@ public class AllSongFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.all_song_fragment, container, false);
-        recyclerView = view.findViewById(R.id.recycler_song);
+        mMusicRecyclerView = view.findViewById(R.id.recycler_song);
         final LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(RecyclerView.VERTICAL);
-        recyclerView.setLayoutManager(manager);
-        adapter = new AllSongAdapter(getContext(), mSongs, (MusicListenner) getActivity());
-        recyclerView.setAdapter(adapter);
-        mainActivity = (MainActivity) getContext();
-        imgImage = view.findViewById(R.id.avatar);
-        imgPlay = view.findViewById(R.id.icon_play_music);
-        txtTitle = view.findViewById(R.id.nameMusic);
-        txtAuthor = view.findViewById(R.id.nameAirsts);
-        layout = view.findViewById(R.id.linearLayout);
+        mMusicRecyclerView.setLayoutManager (manager) ;
+        mAdapter = new AllSongAdapter (getContext(), mSongs, (IMusicListenner) getActivity()) ;
+        mMusicRecyclerView.setAdapter (mAdapter) ;
+        mMainActivity = (MainActivity) getContext();
+        mMusicImageView = view.findViewById (R.id.avatar) ;
+        mPlayImageView = view.findViewById (R.id.icon_play_music) ;
+        mTitleTextView = view.findViewById (R.id.nameMusic) ;
+        mAuthorTextView = view.findViewById (R.id.nameAirsts) ;
+        mItemMusic = view.findViewById (R.id.linearLayout) ;
 
-        layout.setOnClickListener(new View.OnClickListener() {
+        mItemMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listenner.show();
+                mAllSongListenner.show();
             }
         });
 
-        imgPlay.setOnClickListener(new View.OnClickListener() {
+        mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Log.d("Ngoc", musicManager.isMusicPlaying()+"");
-                if (musicManager.isMusicPlaying()){
-                    musicManager.onStop();
-                    imgPlay.setImageResource(R.drawable.ic_baseline_play_arrow);
-                }
-                else {
-                    musicManager.onResumeMusic();
-                    imgPlay.setImageResource(R.drawable.ic_pause_24);
-                    if (musicManager.getStatus()==0){
-                        musicManager.onPlay();
-                        musicManager.setStatus(1);
+                if (mMusicManager.isMusicPlaying()) {
+                    mMusicManager.onStopMusic();
+                    mPlayImageView.setImageResource(R.drawable.ic_baseline_play_arrow);
+                } else {
+                    mMusicManager.onResumeMusic();
+                    mPlayImageView.setImageResource(R.drawable.ic_pause_24);
+                    if (mMusicManager.getmStatus() == 0) {
+                        mMusicManager.onPlayMusic();
+                        mMusicManager.setmStatus(1);
                     }
                 }
             }
@@ -100,37 +99,37 @@ public class AllSongFragment extends Fragment {
         if (mSongs != null) mSongs.clear();
         mSongs.addAll(s);
         Log.d("bachdz", "All Song " + s.size() + mSongs.size());
-        adapter.setCerrentSong(musicManager.getCurrentSong());
-        adapter.notifyDataSetChanged();
+        mAdapter.setmCerrentSong(mMusicManager.getmCurrentSong());
+        mAdapter.notifyDataSetChanged();
     }
 
-    public void isPlayMusic(boolean s){
-        if (s) imgPlay.setImageResource(R.drawable.ic_pause_24);
-        else imgPlay.setImageResource(R.drawable.ic_baseline_play_arrow);
+    public void isPlayMusic(boolean musicRunning) {
+        if (musicRunning) mPlayImageView.setImageResource(R.drawable.ic_pause_24);
+        else mPlayImageView.setImageResource(R.drawable.ic_baseline_play_arrow);
     }
 
-    public void setSongManager(MusicManager manager) {
-        this.musicManager = manager;
+    public void setSongManager(MusicManager musicManager) {
+        this.mMusicManager = musicManager;
     }
 
-    public void setVisible(){
-        layout.setVisibility(View.GONE);
+    public void setVisible() {
+        mItemMusic.setVisibility(View.GONE);
     }
 
-    public void setSelection(int cerrent) {
-        musicManager.setCurrentSong(cerrent);
+    public void setSelection(int cerrentMusic) {
+        mMusicManager.setmCurrentSong(cerrentMusic);
         if (mSongs != null) {
             mSongs.clear();
         }
-        mSongs.addAll(musicManager.getmSongs());
-        adapter.setCerrentSong(cerrent);
-        setTitle(musicManager.getSinpleSong(cerrent));
-        adapter.notifyDataSetChanged();
+        mSongs.addAll(mMusicManager.getmSongs());
+        mAdapter.setmCerrentSong(cerrentMusic);
+        setTitle(mMusicManager.getSinpleSong(cerrentMusic));
+        mAdapter.notifyDataSetChanged();
     }
 
     public void setTitle(Song song) {
-        txtAuthor.setText(song.getAuthor());
-        txtTitle.setText(song.getTitle());
+        mAuthorTextView.setText(song.getAuthor());
+        mTitleTextView.setText(song.getTitle());
     }
 
     public interface AllSongFragmentListenner {

@@ -1,7 +1,6 @@
 package com.example.myapplication.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,27 +13,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
-import com.example.myapplication.listenner.MusicListenner;
+import com.example.myapplication.listenner.IMusicListenner;
 
 import java.util.List;
 
 public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHolder> {
 
+    public int mCerrentSong = 0;
     private Context mContext;
     private List<Song> mSongs;
-    private MusicListenner listenner;
+    private IMusicListenner mListenner;
 
-    public int cerrentSong=0;
-
-    public AllSongAdapter(Context mContext, List<Song> mSongs, MusicListenner listenner) {
+    public AllSongAdapter(Context mContext, List<Song> mSongs, IMusicListenner listenner) {
         this.mContext = mContext;
         this.mSongs = mSongs;
-        this.listenner = listenner;
+        this.mListenner = listenner;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position==cerrentSong) return 1;
+        if (position == mCerrentSong) return 1;
         return 0;
     }
 
@@ -43,25 +41,24 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view;
-        if (viewType==1){
-            view= LayoutInflater.from(mContext).inflate(R.layout.song_line_play,parent,false);
-        }
-        else {
-            view= LayoutInflater.from(mContext).inflate(R.layout.song_line,parent,false);
+        if (viewType == 1) {
+            view = LayoutInflater.from(mContext).inflate(R.layout.song_line_play, parent, false);
+        } else {
+            view = LayoutInflater.from(mContext).inflate(R.layout.song_line, parent, false);
         }
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        boolean check= position==cerrentSong ? true: false;
-        holder.txtStt.setText(""+(position+1));
-        holder.onBind(mSongs.get(position),check);
+        boolean check = (position == mCerrentSong) ? true : false;
+        holder.mIndexMusic.setText("" + (position + 1));
+        holder.onBind(mSongs.get(position), check);
 
-        holder.layout.setOnClickListener(new View.OnClickListener() {
+        holder.mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listenner.selectMusic(position);
+                mListenner.selectMusic(position);
             }
         });
     }
@@ -71,36 +68,46 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return mSongs.size();
     }
 
+    private String getDuration(String time) {
+        Long total = Long.parseLong(time);
+        int minutes = (int) ((total / 1000) / 60);
+        int second = (int) ((total / 1000) % 60);
+        return (minutes < 10 ? "0" + minutes : minutes + "") + ":" + (second < 10 ? "0" + second : second + "");
+    }
+
+    public int getmCerrentSong() {
+        return mCerrentSong;
+    }
+
+    public void setmCerrentSong(int mCerrentSong) {
+        this.mCerrentSong = mCerrentSong;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtStt,txtTitle, txtAuthor;
-        ImageView iconPlayMusic, iconMore;
-        LinearLayout layout;
+        TextView mIndexMusic;
+        TextView mTitleTextView;
+        TextView mAuthorTextView;
+        ImageView mPlayMusicIcon;
+        ImageView mMoreIcon;
+        LinearLayout mItemMuiscLayout;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            txtStt= itemView.findViewById(R.id.txt_stt);
-            txtTitle= itemView.findViewById(R.id.nameMusic);
-            txtAuthor= itemView.findViewById(R.id.nameAirsts);
-            iconPlayMusic= itemView.findViewById(R.id.icon_play_music);
-            iconMore= itemView.findViewById(R.id.icon_more);
-            layout= itemView.findViewById(R.id.click_item);
+            mIndexMusic = itemView.findViewById(R.id.txt_stt);
+            mTitleTextView = itemView.findViewById(R.id.nameMusic);
+            mAuthorTextView = itemView.findViewById(R.id.nameAirsts);
+            mPlayMusicIcon = itemView.findViewById(R.id.icon_play_music);
+            mMoreIcon = itemView.findViewById(R.id.icon_more);
+            mItemMuiscLayout = itemView.findViewById(R.id.click_item);
         }
 
-        public void onBind(Song song,boolean check) {
-            txtTitle.setText(song.getTitle());
-            txtAuthor.setText(song.getAuthor());
-            if (check){
-                txtStt.setVisibility(View.INVISIBLE);
-                iconPlayMusic.setVisibility(View.VISIBLE);
+        public void onBind(Song song, boolean check) {
+            mTitleTextView.setText(song.getTitle());
+            mAuthorTextView.setText(getDuration(song.getDuration()));
+            if (check) {
+                mIndexMusic.setVisibility(View.INVISIBLE);
+                mPlayMusicIcon.setVisibility(View.VISIBLE);
             }
-            //Log.d("bachdz", song.toString());
         }
-    }
-
-    public int getCerrentSong() {
-        return cerrentSong;
-    }
-
-    public void setCerrentSong(int cerrentSong) {
-        this.cerrentSong = cerrentSong;
     }
 }

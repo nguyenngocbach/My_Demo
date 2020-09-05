@@ -6,7 +6,6 @@ import android.media.MediaPlayer;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.myapplication.MainActivity;
 import com.example.myapplication.Model.Song;
 
 import java.io.IOException;
@@ -18,21 +17,13 @@ public class MusicManager implements Serializable {
     private static MusicManager INSTANCE;
     private List<Song> mSongs = new ArrayList<>();
     private MediaPlayer mPlayer;
-    private int currentSong = 0;
+    private int mCurrentSong = 0;
     private Context mContext;
     //private RunningListenner listenner;
 
     private int INITIALLY = 0;
     private int STOP = 3;
-    private int status = INITIALLY;
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
+    private int mStatus = INITIALLY;
 
     public MusicManager(Context context) {
         mContext = context;
@@ -53,14 +44,21 @@ public class MusicManager implements Serializable {
         return INSTANCE;
     }
 
+    public int getmStatus() {
+        return mStatus;
+    }
 
-    public void onPlay() {
-        if (status == STOP) {
+    public void setmStatus(int mStatus) {
+        this.mStatus = mStatus;
+    }
+
+    public void onPlayMusic() {
+        if (mStatus == STOP) {
             mPlayer.reset();
-            status = 0;
+            mStatus = 0;
         }
         try {
-            mPlayer.setDataSource(mSongs.get(currentSong).getPath());
+            mPlayer.setDataSource(mSongs.get(mCurrentSong).getPath());
             mPlayer.prepare();
             mPlayer.start();
         } catch (IOException e) {
@@ -69,37 +67,37 @@ public class MusicManager implements Serializable {
     }
 
 
-    public void onPrevious() {
+    public void onPreviousMusic() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         }
-        if (currentSong == 0) {
-            currentSong = mSongs.size() - 1;
-        } else currentSong--;
+        if (mCurrentSong == 0) {
+            mCurrentSong = mSongs.size() - 1;
+        } else mCurrentSong--;
         mPlayer.reset();
-        onPlay();
+        onPlayMusic();
         ;
     }
 
-    public void onNext() {
+    public void onNextMusic() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         }
-        if (currentSong == (mSongs.size() - 1)) {
-            currentSong = 0;
-        } else currentSong++;
+        if (mCurrentSong == (mSongs.size() - 1)) {
+            mCurrentSong = 0;
+        } else mCurrentSong++;
         mPlayer.reset();
-        onPlay();
+        onPlayMusic();
     }
 
 
-    public int getCurrentSong() {
-        return currentSong;
+    public int getmCurrentSong() {
+        return mCurrentSong;
 
     }
 
-    public void setCurrentSong(int currentSong) {
-        this.currentSong = currentSong;
+    public void setmCurrentSong(int mCurrentSong) {
+        this.mCurrentSong = mCurrentSong;
     }
 
     public void selectMusic(int position) {
@@ -107,13 +105,13 @@ public class MusicManager implements Serializable {
             mPlayer.pause();
         }
         mPlayer.reset();
-        currentSong = position;
-        onPlay();
+        mCurrentSong = position;
+        onPlayMusic();
     }
 
     public void setRunning() {
         if (mPlayer.getCurrentPosition() == Integer.parseInt(getSongIsPlay().getDuration())) {
-            onNext();
+            onNextMusic();
 //            if (listenner!=null){
 //                Log.d("Running", "Instance");
 //                //listenner.musicRun();
@@ -140,12 +138,12 @@ public class MusicManager implements Serializable {
         mPlayer.reset();
     }
 
-    public void onStop() {
+    public void onStopMusic() {
         mPlayer.pause();
-        status = STOP;
+        mStatus = STOP;
     }
 
-    public void setSeek(int position) {
+    public void setSeekMusic(int position) {
         mPlayer.seekTo(position);
     }
 
@@ -165,14 +163,12 @@ public class MusicManager implements Serializable {
         cursor.moveToFirst();
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
-
                 int _ID = cursor.getColumnIndex(allColoumSong[0]);
                 int DATA = cursor.getColumnIndex(allColoumSong[1]);
                 int ARTIST = cursor.getColumnIndex(allColoumSong[2]);
                 int TITLE = cursor.getColumnIndex(allColoumSong[3]);
                 int DISPLAY_NAME = cursor.getColumnIndex(allColoumSong[4]);
                 int DURATION = cursor.getColumnIndex(allColoumSong[5]);
-
 
                 String id = cursor.getString(_ID);
                 String data = cursor.getString(DATA);
@@ -197,7 +193,7 @@ public class MusicManager implements Serializable {
     }
 
     public Song getSongIsPlay() {
-        return mSongs.get(currentSong);
+        return mSongs.get(mCurrentSong);
     }
 
     public int getTimeCurrents() {
