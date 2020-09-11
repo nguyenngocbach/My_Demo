@@ -202,13 +202,6 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
             //player.setTile(musicManager.getSinpleSong(i));
             player.setmMusicManager(mMusicManager);
-
-
-
-
-            
-
-
         }
 
     }
