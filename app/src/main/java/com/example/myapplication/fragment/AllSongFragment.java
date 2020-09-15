@@ -81,10 +81,10 @@ public class AllSongFragment extends Fragment {
                 //Log.d("Ngoc", musicManager.isMusicPlaying()+"");
                 if (mMusicManager.isMusicPlaying()) {
                     mMusicManager.onStopMusic();
-                    mPlayImageView.setImageResource(R.drawable.ic_baseline_play_arrow);
+                    mPlayImageView.setImageResource(R.drawable.ic_play_black);
                 } else {
                     mMusicManager.onResumeMusic();
-                    mPlayImageView.setImageResource(R.drawable.ic_pause_24);
+                    mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
                     if (mMusicManager.getmStatus() == 0) {
                         mMusicManager.onPlayMusic();
                         mMusicManager.setmStatus(1);
@@ -104,8 +104,12 @@ public class AllSongFragment extends Fragment {
     }
 
     public void isPlayMusic(boolean musicRunning) {
-        if (musicRunning) mPlayImageView.setImageResource(R.drawable.ic_pause_24);
-        else mPlayImageView.setImageResource(R.drawable.ic_baseline_play_arrow);
+        Log.d("isPlay","check "+ musicRunning);
+        if (musicRunning) {
+            mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
+        } else {
+            mPlayImageView.setImageResource(R.drawable.ic_play_black);
+        }
     }
 
     public void setSongManager(MusicManager musicManager) {

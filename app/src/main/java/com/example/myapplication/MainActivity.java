@@ -1,8 +1,11 @@
 package com.example.myapplication;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -23,6 +26,7 @@ import com.example.myapplication.Service.MusicService;
 import com.example.myapplication.fragment.AllSongFragment;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
 import com.example.myapplication.listenner.IMusicListenner;
+import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements IMusicListenner, AllSongFragment.AllSongFragmentListenner
         , MediaPlaybackFragment.IMediaPlayFragmentListenner {
@@ -40,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     private MediaPlaybackFragment mMediaFragment;
     private FragmentTransaction mFragmentTransaction;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
+    private NavigationView mNavigationView;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -101,6 +108,13 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             FragmentTransaction allSongTranasction = mFragmentManager.beginTransaction();
             allSongTranasction.replace(R.id.allSongFragment, mAllSongFragment);
             allSongTranasction.commit();
+
+            mDrawerLayout= findViewById(R.id.vertical_Screen);
+            mNavigationView= findViewById(R.id.navigationVew);
+            Toolbar toolbar= findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            mToggle=
+                    new ActionBarDrawerToggle(this,mDrawerLayout,toolbar,(R.string.open_navigation),(R.string.close_navigetion));
         } else {
             MediaPlaybackFragment mediaPlaybackFragment = new MediaPlaybackFragment();
             FragmentTransaction mMediaPlayTransaction = mFragmentManager.beginTransaction();
@@ -260,6 +274,8 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     @Override
     public void onPlay() {
+        AllSongFragment mAllSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        mAllSongFragment.isPlayMusic(!mMusicManager.isMusicPlaying());
     }
 
     @Override

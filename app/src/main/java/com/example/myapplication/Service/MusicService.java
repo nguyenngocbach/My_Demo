@@ -2,6 +2,7 @@ package com.example.myapplication.Service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -48,6 +49,8 @@ public class MusicService extends Service {
             RemoteViews notification_big = new RemoteViews(getPackageName(), R.layout.notifiation_big);
             if (notification_small != null) {
                 //ImageView imageView= notification_small.setOnClickFillInIntent(R.id.iconPrevious,new Intent());
+                //PendingIntent pending= new PendingIntent(this,0, intent,);
+                //notification_small.setOnClickPendingIntent(R.id.icon_next, pending);
             }
 
             NotificationCompat.Builder bulderNotification = new NotificationCompat.Builder(this, ID_CHANNEL)
@@ -58,6 +61,7 @@ public class MusicService extends Service {
             mNotificationManager.notify(10, bulderNotification.build());
         }
 
+        Log.d("bachdz","Service "+getApplicationContext()+"");
         return START_STICKY;
     }
 

@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="67.5dp"
     android:orientation="horizontal"
     android:gravity="center"
     android:id="@+id/click_item"
     >
     <FrameLayout
-        android:layout_width="70dp"
+        android:layout_width="75dp"
         android:layout_height="70dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginStart="3dp"
         >
         <TextView
             android:id="@+id/txt_stt"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="1"
-            android:textSize="22dp"
+            android:textSize="13dp"
             android:gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="11.5dp"
             />
         <ImageView
             android:id="@+id/icon_play_music"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
             android:src="@drawable/ic_baseline"
-            android:padding="15dp"
+            android:padding="5dp"
             android:visibility="invisible"
+
             />
     </FrameLayout>
     <LinearLayout
@@ -34,33 +38,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_weight="1"
-        android:gravity="center"
         >
         <TextView
             android:id="@+id/nameMusic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hedddddo"
-            android:textSize="18dp"
+            android:textSize="17dp"
             android:maxLines="1"
-            android:layout_marginBottom="4dp"
+            android:textColor="@color/black_color"
+            android:paddingTop="5dp"
+            android:layout_marginBottom="1.5dp"
             />
         <TextView
             android:id="@+id/nameAirsts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textSize="15dp"
+            android:textSize="13dp"
             android:text="heelo"
             />
     </LinearLayout>
     <ImageView
         android:id="@+id/icon_more"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:padding="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:paddingEnd="5dp"
+        android:layout_marginBottom="7dp"
         android:src="@drawable/ic_baseline_more"
-        android:layout_marginEnd="10dp"
         />
 
 </LinearLayout>

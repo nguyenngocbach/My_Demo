@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.example.myapplication.Model.Song;
+import com.example.myapplication.listenner.IMusicListenner;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -20,8 +21,10 @@ public class MusicManager implements Serializable {
     private int mCurrentSong = 0;
     private Context mContext;
     //private RunningListenner listenner;
+    private IMusicListenner listenner;
 
     private int INITIALLY = 0;
+
     private int STOP = 3;
     private int mStatus = INITIALLY;
 
@@ -34,6 +37,7 @@ public class MusicManager implements Serializable {
 //            listenner = (RunningListenner) context;
 //        }
         Log.d("bachdz", mSongs.size() + "");
+        //listenner= (IMusicListenner) context;
         mPlayer = new MediaPlayer();
     }
 
@@ -192,8 +196,10 @@ public class MusicManager implements Serializable {
         return mSongs.get(position);
     }
 
+    ///
+    //
     public Song getSongIsPlay() {
-        return mSongs.get(mCurrentSong);
+        return  mSongs.get(mCurrentSong);
     }
 
     public int getTimeCurrents() {

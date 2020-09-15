@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="63dp"
-    android:background="#FA6232"
+    android:layout_height="68dp"
+    android:background="@color/ogin"
     >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:gravity="center"
         >
         <TextView
             android:id="@+id/title_toolbar"
@@ -15,18 +16,21 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Music"
-            android:textSize="20dp"
+            android:paddingStart="1dp"
+            android:textSize="24dp"
+            android:layout_marginStart="5dp"
             android:textColor="@color/white_color"
             android:gravity="center_vertical"
             android:textStyle="bold"
+            android:paddingBottom="12dp"
             />
         <ImageView
             android:id="@+id/icon_toolbar"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_baseline_search_24"
-            android:padding="10dp"
-            android:layout_marginEnd="10dp"
+            android:padding="8dp"
+            android:layout_marginEnd="3dp"
             />
     </LinearLayout>
 </androidx.appcompat.widget.Toolbar>

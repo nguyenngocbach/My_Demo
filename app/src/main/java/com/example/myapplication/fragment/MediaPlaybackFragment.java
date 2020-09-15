@@ -222,6 +222,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMediaListenner.onPrevious();
                 break;
             case R.id.iconPlay:
+                mMediaListenner.onPlay();
                 if (mMusicManager.isMusicPlaying()) {
                     mMusicManager.onStopMusic();
                     mPlayIcon.setImageResource(R.drawable.costom_play);

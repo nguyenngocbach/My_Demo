@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="help_feelback"><![CDATA[Help & feelback]]></string>
+    <string name="listen_now">Listen Now</string>
+    <string name="recent">Recent</string>
+    <string name="music_lubrary">Music Lubrary</string>
+    <string name="open_navigation">Open Navigation</string>
+    <string name="close_navigetion">Close Navigation</string>
 </resources>
