@@ -22,13 +22,14 @@ import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.Service.MusicService;
 import com.example.myapplication.fragment.AllSongFragment;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
+import com.example.myapplication.listenner.IMusicListenner;
 import com.example.myapplication.listenner.MusicListenner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MusicListenner , AllSongFragment.AllSongFragmentListenner
-        , MediaPlaybackFragment.MediaPlayFragmentListenner {
+public class MainActivity extends AppCompatActivity implements IMusicListenner, AllSongFragment.AllSongFragmentListenner
+        , MediaPlaybackFragment.IMediaPlayFragmentListenner {
 
     private static final int MY_PERMISSION_REQUEST = 123;
     private static final String KEY_MUSIC_MANAGER ="com.example.myapplication.musicManager" ;
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MusicListenner , 
                     allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
                     allSongFragment.setTitle(musicManager.getSongIsPlay());
                     allSongFragment.setVisible();
-                    playbackFragment.setMusicManager(musicManager);
+                   // playbackFragment.setMusicManager(musicManager);
                 }
             }
             //Log.d("bachdz","onServiceConnected");

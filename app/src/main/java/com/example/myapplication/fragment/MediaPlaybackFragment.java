@@ -61,6 +61,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     };
 
+    public void setMusicManager(MusicManager musicManager){
+        this.mMusicManager= musicManager;
+    }
+
     public static MediaPlaybackFragment getInstance(MusicManager m) {
         if (sMediaPlaybackFragment == null) {
             sMediaPlaybackFragment = new MediaPlaybackFragment();
@@ -253,6 +257,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
         }
     }
+
+
 
     public interface IMediaPlayFragmentListenner {
 
