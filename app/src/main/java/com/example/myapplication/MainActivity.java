@@ -1,11 +1,8 @@
 package com.example.myapplication;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -25,63 +22,64 @@ import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.Service.MusicService;
 import com.example.myapplication.fragment.AllSongFragment;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
-import com.example.myapplication.listenner.IMusicListenner;
-import com.google.android.material.navigation.NavigationView;
+import com.example.myapplication.listenner.MusicListenner;
 
-public class MainActivity extends AppCompatActivity implements IMusicListenner, AllSongFragment.AllSongFragmentListenner
-        , MediaPlaybackFragment.IMediaPlayFragmentListenner {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements MusicListenner , AllSongFragment.AllSongFragmentListenner
+        , MediaPlaybackFragment.MediaPlayFragmentListenner {
 
     private static final int MY_PERMISSION_REQUEST = 123;
-    private static final String KEY_MUSIC_MANAGER = "com.example.myapplication.musicManager";
-    private Intent mIntent;
-    private MusicService mMusicService;
-    private MusicManager mMusicManager;
-    private FragmentManager mFragmentManager;
+    private static final String KEY_MUSIC_MANAGER ="com.example.myapplication.musicManager" ;
+    private Intent intent;
+    private MusicService musicService;
+    private MusicManager musicManager;
+    private FragmentManager fragmentManager;
 
-    private boolean isVertical = false;
-    private boolean mCheck = false;
+    private boolean isVertical=false;
+    private boolean check=false;
     private Song song;
 
-    private MediaPlaybackFragment mMediaFragment;
-    private FragmentTransaction mFragmentTransaction;
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mToggle;
-    private NavigationView mNavigationView;
+    MediaPlaybackFragment mediaPlayer;
+    FragmentTransaction ffffttt;
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection= new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MusicService.LocalMusic localMusic = (MusicService.LocalMusic) iBinder;
-            mMusicService = localMusic.getInstanceService();
-            if (mMusicManager == null) {
-                mMusicManager = mMusicService.getmMusicManager();
+            musicService= localMusic.getInstanceService();
+            if (musicManager==null){
+                musicManager= musicService.getMusicManager();
             }
-            if (!mCheck) {
-                if (isVertical) {
-                    AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-                    Log.d("bachdz", mMusicManager + "  onServiceConnected" + mMusicManager.getmSongs().size());
-                    allSongFragment.setSongManager(mMusicManager);
-                    allSongFragment.setData(mMusicManager.getmSongs());
-                    allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-                    allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-                } else {
-                    AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-                    MediaPlaybackFragment playbackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-                    allSongFragment.setData(mMusicManager.getmSongs());
-                    allSongFragment.setSongManager(mMusicManager);
-                    allSongFragment.setData(mMusicManager.getmSongs());
-                    allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-                    allSongFragment.setTitle(mMusicManager.getSongIsPlay());
+            if (!check){
+                if (isVertical){
+                    AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+                    Log.d("bachdz",musicManager+"  onServiceConnected"+ musicManager.getmSongs().size());
+                    allSongFragment.setSongManager(musicManager);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+                    allSongFragment.setTitle(musicManager.getSongIsPlay());
+                }
+                else {
+                    AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+                    MediaPlaybackFragment playbackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.setSongManager(musicManager);
+                    allSongFragment.setData(musicManager.getmSongs());
+                    allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+                    allSongFragment.setTitle(musicManager.getSongIsPlay());
                     allSongFragment.setVisible();
-                    playbackFragment.setmMusicManager(mMusicManager);
+                    playbackFragment.setMusicManager(musicManager);
                 }
             }
+            //Log.d("bachdz","onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mMusicService = null;
-            mMusicManager = null;
+            musicService=null;
+            musicManager=null;
         }
     };
 
@@ -90,77 +88,74 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState != null) {
-            mCheck = true;
-            mMusicManager = (MusicManager) savedInstanceState.getSerializable(KEY_MUSIC_MANAGER);
-            Log.d("bachdz", mCheck + " savedInstanceState" + mMusicManager);
+        if (savedInstanceState!=null){
+            check=true;
+            musicManager= (MusicManager) savedInstanceState.getSerializable(KEY_MUSIC_MANAGER);
+            Log.d("bachdz",check+ " savedInstanceState" + musicManager);
         }
 
+        // if check == true thì ta set các giá trị cho 2 fragment luôn
+        // còn là false thì ta phải set giá tri cho 2 fragment in mConnection.
 
-        mFragmentManager = getSupportFragmentManager();
-        mIntent = new Intent(MainActivity.this, MusicService.class);
-        startService(mIntent);
-        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+        fragmentManager= getSupportFragmentManager();
+        intent= new Intent(MainActivity.this, MusicService.class);
+        startService(intent);
+        bindService(intent,mConnection,BIND_AUTO_CREATE);
 
-        if (findViewById(R.id.vertical_Screen) != null) isVertical = true;
-        if (isVertical) {
-            AllSongFragment mAllSongFragment = new AllSongFragment();
-            FragmentTransaction allSongTranasction = mFragmentManager.beginTransaction();
-            allSongTranasction.replace(R.id.allSongFragment, mAllSongFragment);
-            allSongTranasction.commit();
+        if (findViewById(R.id.vertical_Screen)!=null) isVertical=true;
+        if (isVertical){
+            AllSongFragment allSongFragment= new AllSongFragment();
+            FragmentTransaction ft= fragmentManager.beginTransaction();
+            ft.replace(R.id.allSongFragment,allSongFragment);
+            ft.commit();
+        }
+        else {
+            MediaPlaybackFragment mediaPlaybackFragment= new MediaPlaybackFragment();
+            FragmentTransaction layer= fragmentManager.beginTransaction();
+            layer.replace(R.id.musicPlayer,mediaPlaybackFragment);
+            layer.addToBackStack(null);
+            layer.commit();
 
-            mDrawerLayout= findViewById(R.id.vertical_Screen);
-            mNavigationView= findViewById(R.id.navigationVew);
-            Toolbar toolbar= findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            mToggle=
-                    new ActionBarDrawerToggle(this,mDrawerLayout,toolbar,(R.string.open_navigation),(R.string.close_navigetion));
-        } else {
-            MediaPlaybackFragment mediaPlaybackFragment = new MediaPlaybackFragment();
-            FragmentTransaction mMediaPlayTransaction = mFragmentManager.beginTransaction();
-            mMediaPlayTransaction.replace(R.id.musicPlayer, mediaPlaybackFragment);
-            mMediaPlayTransaction.addToBackStack(null);
-            mMediaPlayTransaction.commit();
-
-            AllSongFragment allSongFragment = new AllSongFragment();
-            FragmentTransaction mAllSongTransaction = mFragmentManager.beginTransaction();
-            mAllSongTransaction.replace(R.id.allSongFragment, allSongFragment);
-            mAllSongTransaction.commit();
+            AllSongFragment allSongFragment= new AllSongFragment();
+            FragmentTransaction ft= fragmentManager.beginTransaction();
+            ft.replace(R.id.allSongFragment,allSongFragment);
+            ft.commit();
 
         }
 
-        Log.d("bachdz", "onCreate");
+        Log.d("bachdz","onCreate");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("bachdz", "onStart");
-        if (mCheck) {
-            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-            allSongFragment.setData(mMusicManager.getmSongs());
-            allSongFragment.setSongManager(mMusicManager);
-            allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-            if (!isVertical) {
-                Log.d("bachNgoc", mMusicManager + "");
-                MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        Log.d("bachdz","onStart");
+        if (check){
+            AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
+            if (!isVertical){
+                Log.d("bachNgoc", musicManager+ "");
+                MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
                 allSongFragment.setVisible();
-                mediaPlaybackFragment.setmMusicManager(mMusicManager);
-            } else allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
+                mediaPlaybackFragment.setMusicManager(musicManager);
+            }
+            else allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
         }
-        if (mFragmentTransaction != null && isVertical) {
-            Log.d("YeuEm", "ok ++" + mFragmentTransaction);
+        if ( ffffttt!=null &&  isVertical){
+            Log.d("YeuEm","ok ++"+ ffffttt);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("bachdz", "onResume");
+        Log.d("bachdz","onResume");
     }
 
-    public MusicManager getmMusicManager() {
-        return mMusicManager;
+    public MusicManager getMusicManager() {
+        return musicManager;
     }
 
 
@@ -171,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(KEY_MUSIC_MANAGER, mMusicManager);
-        outState.putString("bachdz", "Nguyen Ngoc Bach");
-        Log.d("bachdz", "outState " + mMusicManager);
+        outState.putSerializable(KEY_MUSIC_MANAGER,musicManager);
+        outState.putString("bachdz","Nguyen Ngoc Bach");
+        Log.d("bachdz", "outState " + musicManager);
         super.onSaveInstanceState(outState);
     }
 
@@ -199,83 +194,90 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     @Override
     public void selectMusic(int i) {
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         allSongFragment.setSelection(i);
         allSongFragment.isPlayMusic(true);
+        //???????????
+        //????????????
 
-        Log.d("bachNgoc", mMusicManager + "");
-        if (mMusicManager != null) {
-            if (mMusicManager.isMusicPlaying()) {
-                Log.d("bachNgoc", mMusicManager.isMusicPlaying() + "");
-                mMusicManager.onResetMusic();
+        Log.d("bachNgoc", musicManager+ "");
+        if (musicManager!=null) {
+            if (musicManager.isMusicPlaying()) {
+                Log.d("bachNgoc", musicManager.isMusicPlaying() + "");
+                musicManager.onResetMusic();
             }
-            mMusicManager.setmCurrentSong(i);
-            mMusicManager.onPlayMusic();
+            musicManager.setCurrentSong(i);
+            musicManager.onPlay();
         }
-        if (!isVertical) {
-            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        if (!isVertical){
+            MediaPlaybackFragment player= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
             //player.setTile(musicManager.getSinpleSong(i));
-            player.setmMusicManager(mMusicManager);
+            player.setMusicManager(musicManager);
         }
 
     }
 
     @Override
     public void show() {
-        if (isVertical) {
-            mMediaFragment = MediaPlaybackFragment.getInstance(mMusicManager);
-            mFragmentTransaction = mFragmentManager.beginTransaction();
-            mFragmentTransaction.replace(R.id.musicPlayer_ok, mMediaFragment);
-            mFragmentTransaction.addToBackStack(null);
-            mFragmentTransaction.commit();
-        } else {
-            mMediaFragment = new MediaPlaybackFragment();
-            mFragmentTransaction = mFragmentManager.beginTransaction();
-            mFragmentTransaction.replace(R.id.musicPlayer_ok, mMediaFragment);
-            mFragmentTransaction.addToBackStack(null);
-            mFragmentTransaction.commit();
+        if (isVertical){
+            mediaPlayer=  MediaPlaybackFragment.getInstance(musicManager);
+            ffffttt= fragmentManager.beginTransaction();
+            ffffttt.replace(R.id.musicPlayer_ok, mediaPlayer);
+            ffffttt.addToBackStack(null);
+            ffffttt.commit();
+        }
+        else {
+            mediaPlayer= new MediaPlaybackFragment();
+            ffffttt= fragmentManager.beginTransaction();
+            ffffttt.replace(R.id.musicPlayer_ok, mediaPlayer);
+            ffffttt.addToBackStack(null);
+            ffffttt.commit();
         }
     }
+
 
 
     private void setInitially() {
-        AllSongFragment allSongFragment = (AllSongFragment)
-                getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        MediaPlaybackFragment playbackFragment = (MediaPlaybackFragment)
-                getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-        Log.d("bachdz", "" + mMusicManager);
-        if (isVertical) {
-            allSongFragment.setData(mMusicManager.getmSongs());
-            allSongFragment.setSongManager(mMusicManager);
-            allSongFragment.setData(mMusicManager.getmSongs());
-            allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-            allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-        } else {
-            allSongFragment.setData(mMusicManager.getmSongs());
-            allSongFragment.setSongManager(mMusicManager);
-            allSongFragment.setData(mMusicManager.getmSongs());
-            allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-            allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-            playbackFragment.setmMusicManager(mMusicManager);
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        MediaPlaybackFragment playbackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        Log.d("bachdz",""+ musicManager);
+        if (isVertical){
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
+        }
+        else {
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.setSongManager(musicManager);
+            allSongFragment.setData(musicManager.getmSongs());
+            allSongFragment.isPlayMusic(musicManager.isMusicPlaying());
+            allSongFragment.setTitle(musicManager.getSongIsPlay());
+
+            playbackFragment.setMusicManager(musicManager);
         }
 
     }
+
 
 
     @Override
     public void onLike() {
+
     }
+
 
     @Override
     public void onPrevious() {
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        allSongFragment.setData(mMusicManager.getmSongs());
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setData(musicManager.getmSongs());
+
     }
 
     @Override
     public void onPlay() {
-        AllSongFragment mAllSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        mAllSongFragment.isPlayMusic(!mMusicManager.isMusicPlaying());
+
     }
 
     @Override
@@ -283,8 +285,8 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 //        if (musicManager!=null){
 //            musicManager.onNext();
 //        }
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        allSongFragment.setData(mMusicManager.getmSongs());
+        AllSongFragment allSongFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setData(musicManager.getmSongs());
 
 //        MediaPlaybackFragment fragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
 //        fragment.setTile(song);
@@ -298,13 +300,18 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     @Override
     protected void onStop() {
         super.onStop();
+//        if ( ffffttt!=null && isVertical){
+//            Log.d("YeuEm","ok ++"+ ffffttt);
+//            //ffffttt.remove(mediaPlayer);
+//            ffffttt.replace(R.id.musicPlayer_ok,new AllSongFragment());
+//        }
     }
 
     @Override
     public void onSeekBar() {
-        AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        AllSongFragment songFragment= (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         //songFragment.setSongManager(musicManager);
-        songFragment.setTitle(mMusicManager.getSongIsPlay());
+        songFragment.setTitle(musicManager.getSongIsPlay());
     }
 
     public boolean isVertical() {
@@ -312,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     }
 
     public boolean isCheck() {
-        return mCheck;
+        return check;
     }
 
 //    @Override
