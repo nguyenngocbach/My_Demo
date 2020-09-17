@@ -42,7 +42,7 @@
         android:layout_height="30dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/custom_play_pause"
+        android:src="@drawable/costom_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_next"
         app:layout_constraintTop_toTopOf="parent" />

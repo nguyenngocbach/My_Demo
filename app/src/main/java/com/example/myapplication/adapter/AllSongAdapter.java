@@ -68,6 +68,10 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return mSongs.size();
     }
 
+    /**
+     * @param time tổng thời gian của bàn hát
+     * @return format về đinh dạnh phút / giây
+     */
     private String getDuration(String time) {
         Long total = Long.parseLong(time);
         int minutes = (int) ((total / 1000) / 60);

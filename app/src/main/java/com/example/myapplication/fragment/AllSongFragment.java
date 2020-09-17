@@ -26,8 +26,13 @@ import com.example.myapplication.listenner.IMusicListenner;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Hiện thị một Danh Sach Music cho người dung thấy
+ *
+ */
 public class AllSongFragment extends Fragment {
 
+    private static AllSongFragment sInstance;
     private RecyclerView mMusicRecyclerView;
     private List<Song> mSongs = new ArrayList<>();
     private AllSongAdapter mAdapter;
@@ -41,13 +46,29 @@ public class AllSongFragment extends Fragment {
     private MainActivity mMainActivity;
     private MusicManager mMusicManager;
 
+    public AllSongFragment(){
+
+    }
+
+    public static AllSongFragment getInstance(){
+        if (sInstance==null){
+            sInstance=new AllSongFragment();
+        }
+        return sInstance;
+    }
+
+    /**
+     * @param context là còn context của Activity chứa các Fragment này.
+     *  khới tạo một số biến như Interface ...
+     *  qua Context này.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof MainActivity) {
             mMainActivity = (MainActivity) context;
             mAllSongListenner = (AllSongFragmentListenner) context;
-            mMusicManager = mMainActivity.getmMusicManager();
+            mMusicManager = mMainActivity.getMusicManager();
         }
     }
 
@@ -67,7 +88,6 @@ public class AllSongFragment extends Fragment {
         mTitleTextView = view.findViewById (R.id.nameMusic) ;
         mAuthorTextView = view.findViewById (R.id.nameAirsts) ;
         mItemMusic = view.findViewById (R.id.linearLayout) ;
-
         mItemMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,6 +115,11 @@ public class AllSongFragment extends Fragment {
         return view;
     }
 
+    /**
+     * @param s là một List<Song> để gián cho List<Song> của adapter.
+     *        set lại vị trị của ban hát đang chạy
+     *       reset lại adapter.
+     */
     public void setData(List<Song> s) {
         if (mSongs != null) mSongs.clear();
         mSongs.addAll(s);
@@ -103,6 +128,11 @@ public class AllSongFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+
+    /**
+     * @param musicRunning kiểm tra bài hát đang chay hay đang dung để
+     *                     sét Icon của bài nhạc.
+     */
     public void isPlayMusic(boolean musicRunning) {
         Log.d("isPlay","check "+ musicRunning);
         if (musicRunning) {
@@ -116,10 +146,17 @@ public class AllSongFragment extends Fragment {
         this.mMusicManager = musicManager;
     }
 
+    /**
+     * ẩn một ViewGround trong AllSongFragment khi nó quay ngang.
+     */
     public void setVisible() {
         mItemMusic.setVisibility(View.GONE);
     }
 
+    /**
+     * @param cerrentMusic vị trị mà người dụng click vào ban hát
+     *                     nó sẽ sưa lại giao diên củâ AllSongFragment
+     */
     public void setSelection(int cerrentMusic) {
         mMusicManager.setmCurrentSong(cerrentMusic);
         if (mSongs != null) {
@@ -131,6 +168,9 @@ public class AllSongFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * @param song
+     */
     public void setTitle(Song song) {
         mAuthorTextView.setText(song.getAuthor());
         mTitleTextView.setText(song.getTitle());

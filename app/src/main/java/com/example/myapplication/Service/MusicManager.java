@@ -14,13 +14,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class này để điều khiển các tương tác giữa người dung đế các
+ * bài hát nhữ Next, Previous, Play Music.
+ */
 public class MusicManager implements Serializable {
     private static MusicManager INSTANCE;
     private List<Song> mSongs = new ArrayList<>();
     private MediaPlayer mPlayer;
     private int mCurrentSong = 0;
     private Context mContext;
-    //private RunningListenner listenner;
     private IMusicListenner listenner;
 
     private int INITIALLY = 0;
@@ -31,16 +34,14 @@ public class MusicManager implements Serializable {
     public MusicManager(Context context) {
         mContext = context;
         getAllSong();
-        Log.d("Running", "Running 0");
-//        if (context instanceof MainActivity) {
-//            Log.d("Running", "Running");
-//            listenner = (RunningListenner) context;
-//        }
-        Log.d("bachdz", mSongs.size() + "");
         //listenner= (IMusicListenner) context;
         mPlayer = new MediaPlayer();
     }
 
+    /**
+     * @param mContext tham số để khởi tạo MusicManager.
+     * @return một biến MusciManager duy nhất.
+     */
     public static MusicManager getInstance(Context mContext) {
         if (INSTANCE == null) {
             INSTANCE = new MusicManager(mContext);
@@ -56,6 +57,9 @@ public class MusicManager implements Serializable {
         this.mStatus = mStatus;
     }
 
+    /**
+     * hàm này để phát nhạc
+     */
     public void onPlayMusic() {
         if (mStatus == STOP) {
             mPlayer.reset();
@@ -71,6 +75,9 @@ public class MusicManager implements Serializable {
     }
 
 
+    /**
+     * quay lại bàn nhạc
+     */
     public void onPreviousMusic() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
@@ -83,6 +90,9 @@ public class MusicManager implements Serializable {
         ;
     }
 
+    /**
+     * next bài hát
+     */
     public void onNextMusic() {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
@@ -95,15 +105,24 @@ public class MusicManager implements Serializable {
     }
 
 
+    /**
+     * @return lấy vị trị mà bài hát đang chạy
+     */
     public int getmCurrentSong() {
         return mCurrentSong;
 
     }
 
+    /**
+     * @param mCurrentSong lấy bài hát của vi trị trên
+     */
     public void setmCurrentSong(int mCurrentSong) {
         this.mCurrentSong = mCurrentSong;
     }
 
+    /**
+     * @param position vị tri mà người dụng chon để chay bài hát.
+     */
     public void selectMusic(int position) {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
@@ -124,6 +143,9 @@ public class MusicManager implements Serializable {
     }
 
 
+    /**
+     * @return true thi bài nhạc đang chay con false thi ngược lại
+     */
     public boolean isMusicPlaying() {
         if (mPlayer.isPlaying()) return true;
         else return false;
@@ -137,20 +159,33 @@ public class MusicManager implements Serializable {
         mPlayer.start();
     }
 
+    /**
+     * re lại bài hát
+     */
     public void onResetMusic() {
         mPlayer.pause();
         mPlayer.reset();
     }
 
+    /**
+     * dưng lại bài hát
+     */
     public void onStopMusic() {
         mPlayer.pause();
         mStatus = STOP;
     }
 
+    /**
+     * @param position vị tri người dung muôn tua đến
+     *                 tua bài hát.
+     */
     public void setSeekMusic(int position) {
         mPlayer.seekTo(position);
     }
 
+    /**
+     * get tất cả các bài hát từ Database trên thiết bị di động.
+     */
     private void getAllSong() {
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
@@ -202,6 +237,9 @@ public class MusicManager implements Serializable {
         return  mSongs.get(mCurrentSong);
     }
 
+    /**
+     * @return get vị trị mà bài hát đang chay trong bài hát.
+     */
     public int getTimeCurrents() {
         return mPlayer.getCurrentPosition();
     }

@@ -46,6 +46,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private MainActivity mActivity;
 
     private Handler mHandler = new Handler();
+    /**
+     * để lặp lại set giời gian chạy thực cho bài hát.
+     */
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -65,6 +68,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         this.mMusicManager= musicManager;
     }
 
+    public static MediaPlaybackFragment getInstance(){
+        if (sMediaPlaybackFragment == null) {
+            sMediaPlaybackFragment = new MediaPlaybackFragment();
+        }
+        return sMediaPlaybackFragment;
+    }
+
     public static MediaPlaybackFragment getInstance(MusicManager m) {
         if (sMediaPlaybackFragment == null) {
             sMediaPlaybackFragment = new MediaPlaybackFragment();
@@ -76,6 +86,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
 
+    /**
+     * @param context của  Activity chưa các Fragment này.
+     *                gián giá trị cho Ifnterface để callback
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -129,6 +143,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (b) {
                     if (mMusicManager != null) {
+                        //set thời gian thưc của ban hát ban đang chạy
                         seekBar.setProgress(mMusicManager.getTimeCurrents());
                         mMusicManager.setSeekMusic(i);
                         mTimeTextView.setText(getDuration(i + ""));
@@ -150,13 +165,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
 
+    /**
+     * @param savedInstanceState lấy các dữ liện mà ta lựu trong Bundle.
+     */
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            String str = savedInstanceState.getString("bachdz");
-            Log.d("bachdz", "Fragment " + str);
-        }
+//        if (savedInstanceState != null) {
+//            String str = savedInstanceState.getString("bachdz");
+//            Log.d("bachdz", "Fragment " + str);
+//        }
         if (getArguments() != null) {
             mMusicManager = (MusicManager) getArguments().getSerializable(KEY_MEDIA_FRAGMENT);
             setTile(mMusicManager.getSongIsPlay());
@@ -165,6 +183,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * @param manager gán MusicManager cho bến ở trên.
+     */
     public void setmMusicManager(MusicManager manager) {
         mMusicManager = manager;
         setSeekBar();
@@ -172,6 +193,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         setStatusIcon(mMusicManager.isMusicPlaying());
     }
 
+    /**
+     * @param musicPlaying if true thi set icon Play false thì ngược lại.
+     */
     public void setStatusIcon(boolean musicPlaying) {
         if (musicPlaying) {
             mPlayIcon.setImageResource(R.drawable.custom_play_pause);
@@ -180,6 +204,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * set Max của SeekBar và chay đung giơi gian thực của bài hát.
+     */
     private void setSeekBar() {
         mSeekBar.setMax(Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
         mHandler.postDelayed(runnable, 300);
@@ -191,7 +218,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mTitelTextView.setText(song.getTitle());
     }
 
-    // Set Seekbar
+    /**
+     * @param time tổng thời gian của bàn hát
+     * @return format về đinh dạnh phút / giây và tra về kiểu String
+     */
     private String getDuration(String time) {
         Long total = Long.parseLong(time);
         int minutes = (int) ((total / 1000) / 60);
@@ -199,6 +229,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         return (minutes < 10 ? "0" + minutes : minutes + "") + ":" + (second < 10 ? "0" + second : second + "");
     }
 
+    /**
+     * set Thời gian thực vào các textView và SeekBar sẽ chay theo thời gian thực
+     */
     private void setUI() {
         if (mMusicManager != null) {
             String totalT = getDuration(mMusicManager.getSongIsPlay().getDuration());
@@ -209,6 +242,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * @param view overide các veiw và set OnclickListenner
+     */
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -259,7 +295,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
 
-
+    /**
+     * Interface để callback lại cho MainActivity.
+     */
     public interface IMediaPlayFragmentListenner {
 
         void onLike();

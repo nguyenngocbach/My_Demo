@@ -1,79 +1,79 @@
 package com.example.myapplication.Model;
 
 public class Song {
-    private String id;
-    private String path;
-    private String author;
-    private String title;
-    private String display_Name;
-    private String duration;
+    private String mID;
+    private String mPath;
+    private String mAuthor;
+    private String mTitle;
+    private String mDsplayName;
+    private String mDuration;
 
     public Song(String id, String path, String author, String title, String display_Name, String duration) {
-        this.id = id;
-        this.path = path;
-        this.author = author;
-        this.title = title;
-        this.display_Name = display_Name;
-        this.duration = duration;
+        this.mID = id;
+        this.mPath = path;
+        this.mAuthor = author;
+        this.mTitle = title;
+        this.mDsplayName = display_Name;
+        this.mDuration = duration;
     }
 
     public String getId() {
-        return id;
+        return mID;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.mID = id;
     }
 
     public String getDisplay_Name() {
-        return display_Name;
+        return mDsplayName;
     }
 
     public void setDisplay_Name(String display_Name) {
-        this.display_Name = display_Name;
+        this.mDsplayName = display_Name;
     }
 
     public String getPath() {
-        return path;
+        return mPath;
     }
 
     public void setPath(String path) {
-        this.path = path;
+        this.mPath = path;
     }
 
     public String getDuration() {
-        return duration;
+        return mDuration;
     }
 
     public void setDuration(String duration) {
-        this.duration = duration;
+        this.mDuration = duration;
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.mTitle = title;
     }
 
     public String getAuthor() {
-        return author;
+        return mAuthor;
     }
 
     public void setAuthor(String author) {
-        this.author = author;
+        this.mAuthor = author;
     }
 
     @Override
     public String toString() {
         return "Song{" +
-                "id='" + id + '\'' +
-                ", path='" + path + '\'' +
-                ", author='" + author + '\'' +
-                ", title='" + title + '\'' +
-                ", display_Name='" + display_Name + '\'' +
-                ", duration='" + duration + '\'' +
+                "mID='" + mID + '\'' +
+                ", mPath='" + mPath + '\'' +
+                ", mAuthor='" + mAuthor + '\'' +
+                ", mTitle='" + mTitle + '\'' +
+                ", mDsplayName='" + mDsplayName + '\'' +
+                ", mDuration='" + mDuration + '\'' +
                 '}';
     }
 }

@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/ahear_view"
     >
     <LinearLayout
         android:id="@+id/listen_now"
@@ -10,7 +11,7 @@
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="#66D1D1CC"
+        android:background="@color/background_aheader"
         android:layout_marginTop="3dp"
         >
         <ImageView
@@ -55,6 +56,7 @@
             android:layout_height="wrap_content"
             android:text="@string/recent"
             android:textStyle="bold"
+            android:textColor="@color/grey_color"
             android:textSize="16dp"
             android:layout_marginStart="30dp"
             />
@@ -82,13 +84,14 @@
             android:layout_height="wrap_content"
             android:text="@string/music_lubrary"
             android:textStyle="bold"
+            android:textColor="@color/grey_color"
             android:textSize="16dp"
             android:layout_marginStart="30dp"
             />
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.75dp"
         android:background="#40403F"
         android:layout_marginTop="3dp"
         />

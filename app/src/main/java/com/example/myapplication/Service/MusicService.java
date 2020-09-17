@@ -2,6 +2,7 @@ package com.example.myapplication.Service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,18 +16,23 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.myapplication.R;
+import com.example.myapplication.unit.Coast;
 
 public class MusicService extends Service {
 
     private static final String ID_CHANNEL = "1999";
-    private MusicManager musicManager;
-
+    private static final int ID_NOTIFICATION = 111;
+    private MusicManager mMusicManager;
+    private RemoteViews mNotificationRemoteSmall;
+    private RemoteViews mNotificationRemoteBig;
+    private NotificationManager mNotifiacationManager;
+    private NotificationCompat.Builder mBuilder;
     private IBinder iBinder = new LocalMusic();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("bachdz","onCreate");
+        Log.d("bachdz", "onCreate");
     }
 
     @Nullable
@@ -38,26 +44,50 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // đã chạy MusicManager trong service nhé.
-        musicManager= new MusicManager(this);
+        mMusicManager = new MusicManager(this);
+        mMusicManager = MusicManager.getInstance(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             //
-            NotificationChannel channel=
+            NotificationChannel channel =
                     new NotificationChannel(ID_CHANNEL, "App_Music_OF_Bach", NotificationManager.IMPORTANCE_LOW);
             channel.setLightColor(Color.RED);
             //
-            NotificationManager manager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.createNotificationChannel(channel);
-            RemoteViews notification_remote_small= new RemoteViews(getPackageName(),R.layout.notifiation_small);
-            RemoteViews notification_remote_big= new RemoteViews(getPackageName(),R.layout.notifiation_big);
-            NotificationCompat.Builder builder= new NotificationCompat.Builder(this,ID_CHANNEL)
+            mNotifiacationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotifiacationManager.createNotificationChannel(channel);
+            mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
+            mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
+            if (mNotificationRemoteBig != null) {
+                mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
+                mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
+                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Coast.ACTION_PREVIOUS));
+                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Coast.ACTION_PLAY));
+                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Coast.ACTION_NEXT));
+            }
+            if (mNotificationRemoteSmall != null) {
+                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Coast.ACTION_PREVIOUS));
+                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Coast.ACTION_PLAY));
+                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Coast.ACTION_NEXT));
+            }
+            mBuilder = new NotificationCompat.Builder(this, ID_CHANNEL)
                     .setSmallIcon(R.drawable.ic_baseline_library_music_24)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                    .setCustomContentView(notification_remote_small)
-                    .setCustomBigContentView(notification_remote_big);
-            manager.notify(111,builder.build());
+                    .setCustomContentView(mNotificationRemoteSmall)
+                    .setCustomBigContentView(mNotificationRemoteBig);
+            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            startForeground(ID_NOTIFICATION, mBuilder.build());
         }
-        //NotificationCompat.Builder buil
         return START_STICKY;
+    }
+
+    /**
+     * @param icon_previous  ID của cái View
+     * @param actionPrevious Action Name của BroadCast
+     * @return chả về một PendingIntent để chuyền message cho BroadCase
+     */
+    private PendingIntent onButtonNotificationClick(int icon_previous, String actionPrevious) {
+        Intent intent = new Intent(actionPrevious);
+        Log.d("broadcast", "44444444444");
+        return PendingIntent.getBroadcast(this, icon_previous, intent, 0);
     }
 
 
@@ -66,19 +96,55 @@ public class MusicService extends Service {
         return super.onUnbind(intent);
     }
 
-    public class LocalMusic extends Binder {
-        public MusicService getInstanceService(){
-            return MusicService.this;
-        }
-    }
-
     public MusicManager getMusicManager() {
-        return musicManager;
+        return mMusicManager;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("bachdz","onDestroy");
+        Log.d("bachdz", "onDestroy");
+    }
+
+    public class LocalMusic extends Binder {
+        public MusicService getInstanceService() {
+            return MusicService.this;
+        }
+
+        /**
+         * set lại các giai trị của Notification
+         */
+        public void setNextMusicNotification() {
+            mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
+            mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+        }
+
+        /**
+         * set lại các giai trị của Notification
+         */
+        public void setPreviousMusicNotification() {
+            mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
+            mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+        }
+
+        /**
+         * set lại các giai trị của Notification
+         */
+        public void setPlayMusic() {
+            if (mMusicManager.isMusicPlaying()) {
+                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            }else {
+                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+            }
+            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+        }
     }
 }
