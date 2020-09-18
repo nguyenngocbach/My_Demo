@@ -3,6 +3,7 @@ package com.example.myapplication.Service;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -231,8 +232,6 @@ public class MusicManager implements Serializable {
         return mSongs.get(position);
     }
 
-    ///
-    //
     public Song getSongIsPlay() {
         return  mSongs.get(mCurrentSong);
     }
@@ -243,8 +242,5 @@ public class MusicManager implements Serializable {
     public int getTimeCurrents() {
         return mPlayer.getCurrentPosition();
     }
-//
-//    public interface RunningListenner {
-//        void musicRun();
-//    }
+
 }

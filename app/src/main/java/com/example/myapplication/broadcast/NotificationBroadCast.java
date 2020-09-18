@@ -39,5 +39,9 @@ public class NotificationBroadCast extends BroadcastReceiver {
             Log.d("broadcast", Coast.ACTION_PLAY);
             mBroadCastListener.onOnPlayMusicBroadCast();
         }
+        if (intent.getAction().equals(Coast.ACTION_AUTONEXT)){
+            Log.d("broadcast", Coast.ACTION_AUTONEXT);
+            mBroadCastListener.onPlayMusicAutoNextBroadCast();
+        }
     }
 }

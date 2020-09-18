@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
                     allSongFragment.setData(mMusicManager.getmSongs());
                     allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
                     allSongFragment.setTitle(mMusicManager.getSongIsPlay());
+                    allSongFragment.setImageMusic();
 
                 } else {
                     AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
@@ -196,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
                 }
             });
         } else {
-            MediaPlaybackFragment mediaPlaybackFragment = MediaPlaybackFragment.getInstance();
+            MediaPlaybackFragment mediaPlaybackFragment = MediaPlaybackFragment.getInstance(mMusicManager);
             FragmentTransaction layer = mFragmentManager.beginTransaction();
             layer.replace(R.id.musicPlayer, mediaPlaybackFragment);
             layer.addToBackStack(null);
@@ -308,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             allSongFragment.setData(mMusicManager.getmSongs());
             allSongFragment.setSongManager(mMusicManager);
             allSongFragment.setTitle(mMusicManager.getSongIsPlay());
+            allSongFragment.setImageMusic();
             if (!isVertical) {
                 Log.d("bachNgoc", mMusicManager + "");
                 MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
@@ -328,11 +331,6 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     public MusicManager getMusicManager() {
         return mMusicManager;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
@@ -367,12 +365,9 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         allSongFragment.setSelection(i);
         allSongFragment.isPlayMusic(true);
-        //???????????
-        //????????????
-        Log.d("bachNgoc", mMusicManager + "");
+        allSongFragment.setImageMusic();
         if (mMusicManager != null) {
             if (mMusicManager.isMusicPlaying()) {
-                Log.d("bachNgoc", mMusicManager.isMusicPlaying() + "");
                 mMusicManager.onResetMusic();
             }
             mMusicManager.setmCurrentSong(i);
@@ -380,10 +375,31 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         }
         if (!isVertical) {
             MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-            //player.setTile(musicManager.getSinpleSong(i));
             player.setMusicManager(mMusicManager);
         }
         mLocalMusic.setNextMusicNotification();
+    }
+
+    @Override
+    public void selectMoreMusic(final int i, View view) {
+        PopupMenu mPopupMen= new PopupMenu(MainActivity.this,view);
+        mPopupMen.getMenuInflater().inflate(R.menu.more_menu,mPopupMen.getMenu());
+
+        mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.like_music:
+                        Toast.makeText(mMusicService,"You like "+ mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.dislike_music:
+                        Toast.makeText(mMusicService,"You dislike " +mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+        mPopupMen.show();
     }
 
     /**
@@ -397,13 +413,20 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
             mTransaction.addToBackStack(null);
             mTransaction.commit();
+
         } else {
-            mMediaPlayer = new MediaPlaybackFragment();
+            mMediaPlayer =MediaPlaybackFragment.getInstance(mMusicManager);
             mTransaction = mFragmentManager.beginTransaction();
             mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
             mTransaction.addToBackStack(null);
             mTransaction.commit();
+
         }
+    }
+
+    @Override
+    public void setIconNotification() {
+        mLocalMusic.setPlayMusic();
     }
 
     private void setInitially() {
@@ -422,7 +445,6 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             allSongFragment.setData(mMusicManager.getmSongs());
             allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
             allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-
             playbackFragment.setMusicManager(mMusicManager);
         }
 
@@ -444,6 +466,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     public void onPrevious() {
         AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         allSongFragment.setData(mMusicManager.getmSongs());
+        allSongFragment.setImageMusic();
         mLocalMusic.setPreviousMusicNotification();
     }
 
@@ -455,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     public void onPlay() {
         AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         mAllSongFragment.isPlayMusic(!mMusicManager.isMusicPlaying());
-        mLocalMusic.setPlayMusic();
+        mLocalMusic.setPlayMusicNoti();
     }
 
     /**
@@ -469,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 //        }
         AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
         allSongFragment.setData(mMusicManager.getmSongs());
+        allSongFragment.setImageMusic();
 //        MediaPlaybackFragment fragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
 //        fragment.setTile(song);
         mLocalMusic.setNextMusicNotification();
@@ -512,11 +536,13 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         mAllSongFragment.setData(mMusicManager.getmSongs());
         mAllSongFragment.setTitle(mMusicManager.getSongIsPlay());
         mAllSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
+        mAllSongFragment.setImageMusic();
         MediaPlaybackFragment mMediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
         if (mMediaPlaybackFragment!=null){
             Log.d("icon",""+mMediaPlaybackFragment);
             mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
             mMediaPlaybackFragment.setTile(mMusicManager.getSongIsPlay());
+            mMediaPlaybackFragment.setImagePlayer();
         }
         mLocalMusic.setNextMusicNotification();
     }
@@ -532,11 +558,13 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         mAllSongFragment.setData(mMusicManager.getmSongs());
         mAllSongFragment.setTitle(mMusicManager.getSongIsPlay());
         mAllSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
+        mAllSongFragment.setImageMusic();
         MediaPlaybackFragment mMediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
         if (mMediaPlaybackFragment!=null){
             Log.d("icon",""+mMediaPlaybackFragment);
             mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
             mMediaPlaybackFragment.setTile(mMusicManager.getSongIsPlay());
+            mMediaPlaybackFragment.setImagePlayer();
         }
         mLocalMusic.setPreviousMusicNotification();
     }
@@ -558,9 +586,21 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         MediaPlaybackFragment mMediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
         if (mMediaPlaybackFragment!=null){
             mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
+
         }
         mLocalMusic.setPlayMusic();
     }
 
-
+    @Override
+    public void onPlayMusicAutoNextBroadCast() {
+        mMusicManager.onNextMusic();
+        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
+        allSongFragment.setSelection(mMusicManager.getmCurrentSong());
+        allSongFragment.isPlayMusic(true);
+        if (!isVertical) {
+            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+            player.setMusicManager(mMusicManager);
+        }
+        mLocalMusic.setNextMusicNotification();
+    }
 }

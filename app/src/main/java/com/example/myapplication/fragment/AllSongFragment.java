@@ -16,12 +16,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.adapter.AllSongAdapter;
 import com.example.myapplication.listenner.IMusicListenner;
+import com.example.myapplication.unit.Coast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +112,7 @@ public class AllSongFragment extends Fragment {
                         mMusicManager.setmStatus(1);
                     }
                 }
+                mAllSongListenner.setIconNotification();
             }
         });
         return view;
@@ -128,6 +131,13 @@ public class AllSongFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    public void setImageMusic(){
+        byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
+        Glide.with(getContext())
+                .load(sourceImage)
+                .placeholder(R.drawable.xe_em)
+                .into(mMusicImageView);
+    }
 
     /**
      * @param musicRunning kiểm tra bài hát đang chay hay đang dung để
@@ -178,5 +188,6 @@ public class AllSongFragment extends Fragment {
 
     public interface AllSongFragmentListenner {
         void show();
+        void setIconNotification();
     }
 }

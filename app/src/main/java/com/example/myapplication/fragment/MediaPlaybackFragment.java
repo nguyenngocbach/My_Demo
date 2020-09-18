@@ -5,20 +5,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.Service.MusicManager;
+import com.example.myapplication.unit.Coast;
 
 public class MediaPlaybackFragment extends Fragment implements View.OnClickListener {
 
@@ -129,6 +134,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mDislikeIcon.setOnClickListener(this);
         mRePeatIcon.setOnClickListener(this);
         mShuffleIcon.setOnClickListener(this);
+
+
         if (!mActivity.isVertical()) mMusicImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         mMusicImageView.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +188,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             setSeekBar();
             setStatusIcon(mMusicManager.isMusicPlaying());
         }
+        setImagePlayer();
     }
 
     /**
@@ -242,6 +250,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    public void setImagePlayer(){
+        byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
+        Glide.with(getContext())
+                .load(sourceImage)
+                .placeholder(R.drawable.xe_em)
+                .into(mMusicImageView);
+        Glide.with(getContext())
+                .load(sourceImage)
+                .placeholder(R.drawable.xe_em)
+                .into(mAvatarImageView);
+    }
+
     /**
      * @param view overide các veiw và set OnclickListenner
      */
@@ -249,8 +269,27 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.icon_more:
+                PopupMenu mPopupMen= new PopupMenu(getContext(),view);
+                mPopupMen.getMenuInflater().inflate(R.menu.more_menu,mPopupMen.getMenu());
+
+                mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        switch (menuItem.getItemId()){
+                            case R.id.like_music:
+                                //Toast.makeText(this,"You like "+ mMusicManager.getSongIsPlay().getTitle(), Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.dislike_music:
+                                //Toast.makeText(this,"You dislike " +mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                mPopupMen.show();
                 break;
             case R.id.icon_queue:
+                getActivity().onBackPressed();
                 break;
             case R.id.iconLike:
                 mMediaListenner.onLike();
@@ -260,6 +299,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setTile(mMusicManager.getSongIsPlay());
                 setSeekBar();
                 mMediaListenner.onPrevious();
+                setImagePlayer();
                 break;
             case R.id.iconPlay:
                 mMediaListenner.onPlay();
@@ -284,12 +324,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setTile(mMusicManager.getSongIsPlay());
                 setSeekBar();
                 mMediaListenner.onNext();
+                setImagePlayer();
                 break;
             case R.id.iconDislike:
                 mMediaListenner.onDisLike();
                 break;
             case R.id.icon_shuffle:
-                getActivity().onBackPressed();
                 break;
         }
     }

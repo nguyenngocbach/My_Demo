@@ -50,7 +50,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         boolean check = (position == mCerrentSong) ? true : false;
         holder.mIndexMusic.setText("" + (position + 1));
         holder.onBind(mSongs.get(position), check);
@@ -59,6 +59,12 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
             @Override
             public void onClick(View view) {
                 mListenner.selectMusic(position);
+            }
+        });
+        holder.mMoreIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListenner.selectMoreMusic(position, holder.mMoreIcon);
             }
         });
     }

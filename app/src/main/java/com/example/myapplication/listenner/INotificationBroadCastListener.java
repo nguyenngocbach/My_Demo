@@ -8,4 +8,5 @@ public interface INotificationBroadCastListener {
     void onNextMusicBroadCast();
     void onPreviousMusicBroadCast();
     void onOnPlayMusicBroadCast();
+    void onPlayMusicAutoNextBroadCast();
 }
