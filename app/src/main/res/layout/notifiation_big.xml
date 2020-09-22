@@ -12,7 +12,7 @@
         android:layout_height="116dp"
         android:layout_margin="2dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/xe_em"
+        android:src="@drawable/anh_ngoc_trinh"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

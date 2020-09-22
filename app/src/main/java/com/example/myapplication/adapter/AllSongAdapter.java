@@ -18,22 +18,25 @@ import com.example.myapplication.listenner.IMusicListenner;
 import java.util.List;
 
 public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHolder> {
-
+    // LINE_NORMAL là  bài hát không đc chọn.
+    private static final int LINE_NORMAL=0;
+    // LINE_CHOOSE là bài hát được chọn và đang chạy nhạc
+    private static final int LINE_CHOOSE=1;
     public int mCerrentSong = 0;
     private Context mContext;
     private List<Song> mSongs;
-    private IMusicListenner mListenner;
+    private IMusicListenner mListener;
 
     public AllSongAdapter(Context mContext, List<Song> mSongs, IMusicListenner listenner) {
         this.mContext = mContext;
         this.mSongs = mSongs;
-        this.mListenner = listenner;
+        this.mListener = listenner;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == mCerrentSong) return 1;
-        return 0;
+        if (position == mCerrentSong) return LINE_CHOOSE;
+        return LINE_NORMAL;
     }
 
     @NonNull
@@ -41,7 +44,8 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view;
-        if (viewType == 1) {
+        //nếu type = LINE_CHOOSE sẽ set cái dong đấy là bài được chọn còn ngược lại.
+        if (viewType == LINE_CHOOSE) {
             view = LayoutInflater.from(mContext).inflate(R.layout.song_line_play, parent, false);
         } else {
             view = LayoutInflater.from(mContext).inflate(R.layout.song_line, parent, false);
@@ -52,21 +56,24 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         boolean check = (position == mCerrentSong) ? true : false;
+        // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
         holder.mIndexMusic.setText("" + (position + 1));
+        //chuyền một bài hát đang chay vào hàm dưới để title và author
         holder.onBind(mSongs.get(position), check);
-
-        holder.mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListenner.selectMusic(position);
-            }
-        });
-        holder.mMoreIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListenner.selectMoreMusic(position, holder.mMoreIcon);
-            }
-        });
+        // todo comment
+//        // ko để
+//        holder.mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mListener.selectMusic(position);
+//            }
+//        });
+//        holder.mMoreIcon.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mListener.selectMoreMusic(position, holder.mMoreIcon);
+//            }
+//        });
     }
 
     @Override
@@ -74,7 +81,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return mSongs.size();
     }
 
-    /**
+    /** BacnhNN
      * @param time tổng thời gian của bàn hát
      * @return format về đinh dạnh phút / giây
      */
@@ -94,6 +101,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        // todo ko cam m
         TextView mIndexMusic;
         TextView mTitleTextView;
         TextView mAuthorTextView;
@@ -109,6 +117,21 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
             mPlayMusicIcon = itemView.findViewById(R.id.icon_play_music);
             mMoreIcon = itemView.findViewById(R.id.icon_more);
             mItemMuiscLayout = itemView.findViewById(R.id.click_item);
+            mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int mPosition = getLayoutPosition();
+                    mListener.selectMusic(mPosition);
+                }
+            });
+
+            mMoreIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int mPosition = getLayoutPosition();
+                    mListener.selectMoreMusic(mPosition, mMoreIcon);
+                }
+            });
         }
 
         public void onBind(Song song, boolean check) {

@@ -13,47 +13,55 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.bumptech.glide.Glide;
-import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.unit.Coast;
+import com.example.myapplication.unit.LogSetting;
 
 public class MusicService extends Service {
 
     private static final String ID_CHANNEL = "1999";
     private static final int ID_NOTIFICATION = 111;
+    private static final String LOG_REALTIME= "log_realtime";
+    private int TIME_REPEAT=300;
     private MusicManager mMusicManager;
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotifiacationManager;
     private NotificationCompat.Builder mBuilder;
-    private Handler mHandler = new Handler();
     private IBinder iBinder = new LocalMusic();
+    private SeekBar mSeekBar;
 
+    private Handler mHandler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             int index = (Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
-            if (mMusicManager.getTimeCurrents() == index) {
+            mSeekBar.setMax(index);
+            if (LogSetting.sLogRealTime) {
+                Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "---" + (index) + "--" + mSeekBar.getProgress());
+            }
+            if (mSeekBar.getProgress() / 100 == index / 100) {
                 mMusicManager.onNextMusic();
-                Log.d("bcahdz",mMusicManager.getTimeCurrents()+"");
-                Intent intent= new Intent(Coast.ACTION_AUTONEXT);
+                if (LogSetting.sLogRealTime) {
+                    Log.d(LOG_REALTIME, "Next Bai");
+                }
+                Intent intent = new Intent(Coast.ACTION_AUTONEXT);
                 sendBroadcast(intent);
             }
-            mHandler.postDelayed(this, 300);
+            mSeekBar.setProgress(mMusicManager.getTimeCurrents());
+            mHandler.postDelayed(this, TIME_REPEAT);
         }
     };
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("bachdz", "onCreate");
     }
 
     @Nullable
@@ -65,9 +73,12 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // đã chạy MusicManager trong service nhé.
-        mMusicManager = new MusicManager(this);
         mMusicManager = MusicManager.getInstance(this);
-        mHandler.postDelayed(runnable, 300);
+        mSeekBar = new SeekBar(this);
+        mHandler.postDelayed(runnable, TIME_REPEAT);
+        if (LogSetting.sLogRealTime) {
+            Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "");
+        }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             //
             NotificationChannel channel =
@@ -102,11 +113,13 @@ public class MusicService extends Service {
         return START_STICKY;
     }
 
-    private void loadImage(){
+    // ham set Anh.
+    private void loadImage() {
         byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
-        Bitmap imageBitmap= BitmapFactory.decodeByteArray(sourceImage,0,sourceImage.length);
-        mNotificationRemoteSmall.setImageViewBitmap(R.id.icon_music,imageBitmap);
-        mNotificationRemoteBig.setImageViewBitmap(R.id.icon_music,imageBitmap);
+        if ((sourceImage == null)) return;
+        Bitmap imageBitmap = BitmapFactory.decodeByteArray(sourceImage, 0, sourceImage.length);
+        mNotificationRemoteSmall.setImageViewBitmap(R.id.icon_music, imageBitmap);
+        mNotificationRemoteBig.setImageViewBitmap(R.id.icon_music, imageBitmap);
     }
 
     /**
@@ -116,7 +129,6 @@ public class MusicService extends Service {
      */
     private PendingIntent onButtonNotificationClick(int icon_previous, String actionPrevious) {
         Intent intent = new Intent(actionPrevious);
-        Log.d("broadcast", "44444444444");
         return PendingIntent.getBroadcast(this, icon_previous, intent, 0);
     }
 
@@ -133,7 +145,6 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("bachdz", "onDestroy");
     }
 
     public class LocalMusic extends Binder {
@@ -172,7 +183,7 @@ public class MusicService extends Service {
             if (mMusicManager.isMusicPlaying()) {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            }else {
+            } else {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             }
@@ -183,7 +194,7 @@ public class MusicService extends Service {
             if (!mMusicManager.isMusicPlaying()) {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            }else {
+            } else {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             }

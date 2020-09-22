@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Music</string>
     <string name="help_feelback"><![CDATA[Help & feelback]]></string>
     <string name="listen_now">Listen Now</string>
     <string name="recent">Recent</string>

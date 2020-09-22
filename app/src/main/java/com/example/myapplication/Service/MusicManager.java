@@ -1,14 +1,17 @@
 package com.example.myapplication.Service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.example.myapplication.Model.Song;
 import com.example.myapplication.listenner.IMusicListenner;
+import com.example.myapplication.unit.Coast;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,7 +28,7 @@ public class MusicManager implements Serializable {
     private MediaPlayer mPlayer;
     private int mCurrentSong = 0;
     private Context mContext;
-    private IMusicListenner listenner;
+    private Handler mHandler = new Handler();
 
     private int INITIALLY = 0;
 
@@ -35,7 +38,6 @@ public class MusicManager implements Serializable {
     public MusicManager(Context context) {
         mContext = context;
         getAllSong();
-        //listenner= (IMusicListenner) context;
         mPlayer = new MediaPlayer();
     }
 
@@ -136,10 +138,6 @@ public class MusicManager implements Serializable {
     public void setRunning() {
         if (mPlayer.getCurrentPosition() == Integer.parseInt(getSongIsPlay().getDuration())) {
             onNextMusic();
-//            if (listenner!=null){
-//                Log.d("Running", "Instance");
-//                //listenner.musicRun();
-//            }
         }
     }
 
@@ -188,6 +186,7 @@ public class MusicManager implements Serializable {
      * get tất cả các bài hát từ Database trên thiết bị di động.
      */
     private void getAllSong() {
+        // allColoumsSong chưa các trường data muốn lấy.
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
                 MediaStore.Audio.AudioColumns.DATA,
@@ -196,13 +195,14 @@ public class MusicManager implements Serializable {
                 MediaStore.Audio.AudioColumns.DISPLAY_NAME,
                 MediaStore.Audio.AudioColumns.DURATION
         };
-
-        //Log.d("bachdz","getAllSong" + MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+        // query các trường trên để lấy thông tin các bàn hát
         Cursor cursor = mContext.getContentResolver().
                 query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColoumSong, null, null, null, null);
+        // chuyển con trỏ đến đâu bảng
         cursor.moveToFirst();
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
+                // lấy các gia trị theo các trương của bảng
                 int _ID = cursor.getColumnIndex(allColoumSong[0]);
                 int DATA = cursor.getColumnIndex(allColoumSong[1]);
                 int ARTIST = cursor.getColumnIndex(allColoumSong[2]);
@@ -233,7 +233,7 @@ public class MusicManager implements Serializable {
     }
 
     public Song getSongIsPlay() {
-        return  mSongs.get(mCurrentSong);
+        return mSongs.get(mCurrentSong);
     }
 
     /**
