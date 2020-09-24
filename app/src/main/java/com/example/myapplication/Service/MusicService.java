@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -20,16 +21,20 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.myapplication.R;
+import com.example.myapplication.fragment.MediaPlaybackFragment;
 import com.example.myapplication.unit.Coast;
 import com.example.myapplication.unit.LogSetting;
+
+import java.io.Serializable;
 
 public class MusicService extends Service {
 
     private static final String ID_CHANNEL = "1999";
     private static final int ID_NOTIFICATION = 111;
-    private static final String LOG_REALTIME= "log_realtime";
-    private int TIME_REPEAT=300;
+    private static final String LOG_REALTIME = "log_realtime";
+    private int TIME_REPEAT = 300;
     private MusicManager mMusicManager;
+    private MediaPlaybackFragment mMediaPlaybackFragment;
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotifiacationManager;
@@ -41,21 +46,23 @@ public class MusicService extends Service {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            int index = (Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
-            mSeekBar.setMax(index);
-            if (LogSetting.sLogRealTime) {
-                Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "---" + (index) + "--" + mSeekBar.getProgress());
-            }
-            if (mSeekBar.getProgress() / 100 == index / 100) {
-                mMusicManager.onNextMusic();
+            if (mMusicManager.getmCurrentSong() != -1) {
+                int index = (Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
+                mSeekBar.setMax(index);
                 if (LogSetting.sLogRealTime) {
-                    Log.d(LOG_REALTIME, "Next Bai");
+                    Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "---" + (index) + "--" + mSeekBar.getProgress());
                 }
-                Intent intent = new Intent(Coast.ACTION_AUTONEXT);
-                sendBroadcast(intent);
+                if (mSeekBar.getProgress() / 100 == index / 100) {
+                    mMusicManager.onNextMusic();
+                    if (LogSetting.sLogRealTime) {
+                        Log.d(LOG_REALTIME, "Next Bai");
+                    }
+                    Intent intent = new Intent(Coast.ACTION_AUTONEXT);
+                    sendBroadcast(intent);
+                }
+                mSeekBar.setProgress(mMusicManager.getTimeCurrents());
+                mHandler.postDelayed(this, TIME_REPEAT);
             }
-            mSeekBar.setProgress(mMusicManager.getTimeCurrents());
-            mHandler.postDelayed(this, TIME_REPEAT);
         }
     };
 
@@ -76,6 +83,10 @@ public class MusicService extends Service {
         mMusicManager = MusicManager.getInstance(this);
         mSeekBar = new SeekBar(this);
         mHandler.postDelayed(runnable, TIME_REPEAT);
+        mMediaPlaybackFragment = new MediaPlaybackFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MediaPlaybackFragment.KEY_MEDIA_FRAGMENT, mMusicManager);
+        mMediaPlaybackFragment.setArguments(bundle);
         if (LogSetting.sLogRealTime) {
             Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "");
         }
@@ -89,6 +100,9 @@ public class MusicService extends Service {
             mNotifiacationManager.createNotificationChannel(channel);
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
+            if (mMusicManager.getCurrentBegin()) {
+                mMusicManager.setmCurrentSong(0);
+            }
             if (mNotificationRemoteBig != null) {
                 mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
                 mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
@@ -110,7 +124,7 @@ public class MusicService extends Service {
             mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
             startForeground(ID_NOTIFICATION, mBuilder.build());
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     // ham set Anh.
@@ -147,7 +161,7 @@ public class MusicService extends Service {
         super.onDestroy();
     }
 
-    public class LocalMusic extends Binder {
+    public class LocalMusic extends Binder implements Serializable {
         public MusicService getInstanceService() {
             return MusicService.this;
         }
@@ -199,6 +213,10 @@ public class MusicService extends Service {
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             }
             mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+        }
+
+        public MediaPlaybackFragment getMediaPlaybachFragment() {
+            return mMediaPlaybackFragment;
         }
     }
 }

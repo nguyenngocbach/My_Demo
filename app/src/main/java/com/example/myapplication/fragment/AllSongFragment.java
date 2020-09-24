@@ -133,11 +133,13 @@ public class AllSongFragment extends Fragment {
      * hàm để set anh cho từng bài hát
      */
     public void setImageMusic() {
-        byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
-        Glide.with(getContext())
-                .load(sourceImage)
-                .placeholder(R.drawable.anh_ngoc_trinh)
-                .into(mMusicImageView);
+      //  if (mMusicManager.getmCurrentSong() != -1) {
+            byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
+            Glide.with(getContext())
+                    .load(sourceImage)
+                    .placeholder(R.drawable.anh_ngoc_trinh)
+                    .into(mMusicImageView);
+    //    }
     }
 
     /**
@@ -182,13 +184,16 @@ public class AllSongFragment extends Fragment {
      * @param song
      */
     public void setTitle(Song song) {
-        mAuthorTextView.setText(song.getAuthor());
-        mTitleTextView.setText(song.getTitle());
+        if (mMusicManager.getmCurrentSong() != -1) {
+            mAuthorTextView.setText(song.getAuthor());
+            mTitleTextView.setText(song.getTitle());
+        }
     }
 
     public interface AllSongFragmentListenner {
         // để hiện MediaPlayerFragemnt nên.
         void show();
+
         // set lại icon cho notification chay nhạc hay dưng.
         void setIconNotification();
     }

@@ -1,17 +1,12 @@
 package com.example.myapplication.Service;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.myapplication.Model.Song;
-import com.example.myapplication.listenner.IMusicListenner;
-import com.example.myapplication.unit.Coast;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -26,14 +21,17 @@ public class MusicManager implements Serializable {
     private static MusicManager INSTANCE;
     private List<Song> mSongs = new ArrayList<>();
     private MediaPlayer mPlayer;
-    private int mCurrentSong = 0;
+    private int mCurrentSong = -1;
     private Context mContext;
     private Handler mHandler = new Handler();
 
-    private int INITIALLY = 0;
+    // next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
+    private int mInitially = 0;
 
-    private int STOP = 3;
-    private int mStatus = INITIALLY;
+    // khí bài hát đang chạy nó bị dừng.
+    private int mStop = 3;
+    // về trang thái lúc ban đâu là next , previous bài hát.
+    private int mStatus = mInitially;
 
     public MusicManager(Context context) {
         mContext = context;
@@ -64,7 +62,7 @@ public class MusicManager implements Serializable {
      * hàm này để phát nhạc
      */
     public void onPlayMusic() {
-        if (mStatus == STOP) {
+        if (mStatus == mStop) {
             mPlayer.reset();
             mStatus = 0;
         }
@@ -97,6 +95,7 @@ public class MusicManager implements Serializable {
      * next bài hát
      */
     public void onNextMusic() {
+        mStatus= mInitially;
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         }
@@ -133,6 +132,7 @@ public class MusicManager implements Serializable {
         mPlayer.reset();
         mCurrentSong = position;
         onPlayMusic();
+        mStatus= mInitially;
     }
 
     public void setRunning() {
@@ -171,7 +171,7 @@ public class MusicManager implements Serializable {
      */
     public void onStopMusic() {
         mPlayer.pause();
-        mStatus = STOP;
+        mStatus = mStop;
     }
 
     /**
@@ -233,7 +233,12 @@ public class MusicManager implements Serializable {
     }
 
     public Song getSongIsPlay() {
-        return mSongs.get(mCurrentSong);
+        try{
+            return mSongs.get(mCurrentSong);
+        }catch (Exception e){
+
+        }
+        return null;
     }
 
     /**
@@ -241,6 +246,11 @@ public class MusicManager implements Serializable {
      */
     public int getTimeCurrents() {
         return mPlayer.getCurrentPosition();
+    }
+
+    public boolean getCurrentBegin(){
+        if (mCurrentSong==-1) return true;
+        else return false;
     }
 
 }

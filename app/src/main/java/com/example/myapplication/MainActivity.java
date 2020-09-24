@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -18,7 +19,9 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
     private static final String KEY_MUSIC_MANAGER = "com.example.myapplication.musicManager";
     private static final String ID_CHANNEL = "1999";
     private static final String TAG_MAIN  = "BachNN_MAIN";
+    private static final String KEY_MUSIC_IBINDER ="com.example.myapplication.mIBinder" ;
+    private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 123;
     private MediaPlaybackFragment mMediaPlayer;
     private FragmentTransaction mTransaction;
     private Intent mIntent;
@@ -112,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
                     allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
                     allSongFragment.setTitle(mMusicManager.getSongIsPlay());
                     allSongFragment.setVisible();
-                    // playbackFragment.setMusicManager(musicManager);
                 }
             }
         }
@@ -131,10 +135,49 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         if (savedInstanceState != null) {
             mCheck = true;
             mMusicManager = (MusicManager) savedInstanceState.getSerializable(KEY_MUSIC_MANAGER);
+            mLocalMusic= (MusicService.LocalMusic) savedInstanceState.getSerializable(KEY_MUSIC_IBINDER);
+            Log.d(TAG_MAIN,"" + mLocalMusic);
         }
 
-        // if check == true thì ta set các giá trị cho 2 fragment luôn
-        // còn là false thì ta phải set giá tri cho 2 fragment in mConnection.
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.d(TAG_MAIN,"okkk");
+            if (LogSetting.sLife){
+                Log.d(TAG_MAIN,"okkk");
+            }
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL_STORAGE);
+        }
+        else {
+            creatFragment();
+        }
+
+//        // if check == true thì ta set các giá trị cho 2 fragment luôn
+//        // còn là false thì ta phải set giá tri cho 2 fragment in mConnection.
+//        mFragmentManager = getSupportFragmentManager();
+//        mToolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(mToolbar);
+//
+//        // start service.
+//        mIntent = new Intent(MainActivity.this, MusicService.class);
+//        startService(mIntent);
+//        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+//
+//        mDatabase = new DataManager(this);
+//        // register BroadCast.
+//        mBroadCast = new NotificationBroadCast(this);
+//        IntentFilter mFilter = new IntentFilter();
+//        mFilter.addAction(Coast.ACTION_NEXT);
+//        mFilter.addAction(Coast.ACTION_PLAY);
+//        mFilter.addAction(Coast.ACTION_PREVIOUS);
+//        mFilter.addAction(Coast.ACTION_AUTONEXT);
+//        this.registerReceiver(mBroadCast, mFilter);
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadCast, mFilter);
+    }
+
+    private void creatFragment() {
+
         mFragmentManager = getSupportFragmentManager();
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -156,12 +199,12 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadCast, mFilter);
 
         if (findViewById(R.id.vertical_Screen) != null) mIsVertical = true;
+        if (findViewById(R.id.vertical_Screen) != null) mIsVertical = true;
         if (mIsVertical) {
             AllSongFragment allSongFragment = new AllSongFragment();
             FragmentTransaction ft = mFragmentManager.beginTransaction();
             ft.replace(R.id.allSongFragment, allSongFragment);
             ft.commit();
-
             //DrawerLayout and Navigation
             mDrawerLayout = findViewById(R.id.vertical_Screen);
             mToggle = new ActionBarDrawerToggle(MainActivity.this
@@ -201,14 +244,13 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
                 public void onDrawerClosed(@NonNull View drawerView) {
 
                 }
-
                 @Override
                 public void onDrawerStateChanged(int newState) {
 
                 }
             });
         } else {
-            MediaPlaybackFragment mediaPlaybackFragment = MediaPlaybackFragment.getInstance(mMusicManager);
+            MediaPlaybackFragment mediaPlaybackFragment = mLocalMusic.getMediaPlaybachFragment();
             FragmentTransaction layer = mFragmentManager.beginTransaction();
             layer.replace(R.id.musicPlayer, mediaPlaybackFragment);
             layer.addToBackStack(null);
@@ -263,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Music Library", Toast.LENGTH_SHORT).show();
                 setChangeAheader(2);
+
                 mDrawerLayout.closeDrawers();
             }
         });
@@ -342,23 +385,29 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable(KEY_MUSIC_IBINDER,mLocalMusic);
         outState.putSerializable(KEY_MUSIC_MANAGER, mMusicManager);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSION_REQUEST: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(this, "No permission granted", Toast.LENGTH_SHORT).show();
-                    finish();
+        if (requestCode == REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
+            if (LogSetting.sLife){
+                Log.d(TAG_MAIN,"One");
+            }
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (LogSetting.sLife){
+                    Log.d(TAG_MAIN,"Two");
                 }
-                return;
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    creatFragment();
+                    if (LogSetting.sLife){
+                        Log.d(TAG_MAIN,"One");
+                    }
+                }
+            } else {
+                finish();
             }
         }
     }
@@ -416,15 +465,26 @@ public class MainActivity extends AppCompatActivity implements IMusicListenner, 
      */
     @Override
     public void show() {
+        Handler handler= new Handler();
+
         if (mIsVertical) {
-            mMediaPlayer = MediaPlaybackFragment.getInstance(mMusicManager);
+            mMediaPlayer =  mLocalMusic.getMediaPlaybachFragment();
             mTransaction = mFragmentManager.beginTransaction();
             mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
             mTransaction.addToBackStack(null);
             mTransaction.commit();
 
         } else {
-            mMediaPlayer = MediaPlaybackFragment.getInstance(mMusicManager);
+            mMediaPlayer =  mLocalMusic.getMediaPlaybachFragment();
+            Bundle bundle= new Bundle();
+            bundle.putSerializable(MediaPlaybackFragment.KEY_MEDIA_FRAGMENT,mMusicManager);
+            mMediaPlayer.setArguments(bundle);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            },300);
             mTransaction = mFragmentManager.beginTransaction();
             mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
             mTransaction.addToBackStack(null);

@@ -3,6 +3,7 @@ package com.example.myapplication.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,14 +21,15 @@ import com.example.myapplication.Model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.unit.Coast;
+import com.example.myapplication.unit.LogSetting;
 
 public class MediaPlaybackFragment extends Fragment implements View.OnClickListener {
 
-    private static final String KEY_MEDIA_FRAGMENT = "com.example.myapplication.fragment.musicManager";
+    public static final String KEY_MEDIA_FRAGMENT = "com.example.myapplication.fragment.musicManager";
     // static de lam j
     // phai bo di
     // loi rat lon co
-    private static MediaPlaybackFragment sMediaPlaybackFragment;
+
     private int TIME_REPEAT= 300;
     private ImageView mMusicImageView;
     private ImageView mAvatarImageView;
@@ -67,23 +69,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mHandler.postDelayed(this, TIME_REPEAT);
         }
     };
-
-    public static MediaPlaybackFragment getInstance() {
-        if (sMediaPlaybackFragment == null) {
-            sMediaPlaybackFragment = new MediaPlaybackFragment();
-        }
-        return sMediaPlaybackFragment;
-    }
-
-    public static MediaPlaybackFragment getInstance(MusicManager m) {
-        if (sMediaPlaybackFragment == null) {
-            sMediaPlaybackFragment = new MediaPlaybackFragment();
-        }
-        Bundle mBundle = new Bundle();
-        mBundle.putSerializable(KEY_MEDIA_FRAGMENT, m);
-        sMediaPlaybackFragment.setArguments(mBundle);
-        return sMediaPlaybackFragment;
-    }
 
     public void setMusicManager(MusicManager musicManager) {
         this.mMusicManager = musicManager;
@@ -246,11 +231,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
         Glide.with(getContext())
                 .load(sourceImage)
-                .placeholder(R.drawable.anh_ngoc_trinh)
                 .into(mMusicImageView);
         Glide.with(getContext())
                 .load(sourceImage)
-                .placeholder(R.drawable.anh_ngoc_trinh)
                 .into(mAvatarImageView);
     }
 
