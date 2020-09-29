@@ -15,7 +15,8 @@
         android:src="@drawable/anh_ngoc_trinh"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,10 +30,10 @@
             android:layout_height="60dp"
             android:layout_marginTop="10dp"
             android:orientation="vertical"
-            android:paddingStart="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/icon_music"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingLeft="10dp">
 
             <TextView
                 android:id="@+id/noti_title"
@@ -50,7 +51,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="Nời Này Có Anh"
-                android:textSize="12dp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -71,11 +72,12 @@
                 android:id="@+id/icon_previous"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_marginEnd="25dp"
                 android:src="@drawable/ic_baseline_skip_previous_bkav"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/icon_play"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginRight="25dp"
+                android:contentDescription="@string/app_name"/>
 
             <ImageView
                 android:id="@+id/icon_play"
@@ -84,17 +86,19 @@
                 android:src="@drawable/costom_play"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/icon_next"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/app_name"/>
 
             <ImageView
                 android:id="@+id/icon_next"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_marginStart="25dp"
                 android:src="@drawable/ic_baseline_skip_next_bkav"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="25dp"
+                android:contentDescription="@string/app_name"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -1,6 +1,8 @@
 package com.example.myapplication.Model;
 
-public class Song {
+import java.io.Serializable;
+
+public class Song implements Serializable {
     private String mID;
     private String mPath;
     private String mAuthor;
@@ -16,6 +18,7 @@ public class Song {
         this.mDsplayName = display_Name;
         this.mDuration = duration;
     }
+
 
     public String getId() {
         return mID;

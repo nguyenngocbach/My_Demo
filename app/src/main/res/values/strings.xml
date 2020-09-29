@@ -3,7 +3,9 @@
     <string name="help_feelback"><![CDATA[Help & feelback]]></string>
     <string name="listen_now">Listen Now</string>
     <string name="recent">Recent</string>
+    <string name="favourite">Favourite</string>
     <string name="music_lubrary">Music Library</string>
     <string name="open_navigation">Open Navigation</string>
     <string name="close_navigetion">Close Navigation</string>
+    <string name="music">Music</string>
 </resources>

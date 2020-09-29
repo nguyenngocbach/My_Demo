@@ -20,6 +20,7 @@ import android.widget.SeekBar;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
 import com.example.myapplication.unit.Coast;
@@ -37,7 +38,7 @@ public class MusicService extends Service {
     private MediaPlaybackFragment mMediaPlaybackFragment;
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
-    private NotificationManager mNotifiacationManager;
+    private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
     private IBinder iBinder = new LocalMusic();
     private SeekBar mSeekBar;
@@ -49,12 +50,12 @@ public class MusicService extends Service {
             if (mMusicManager.getmCurrentSong() != -1) {
                 int index = (Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
                 mSeekBar.setMax(index);
-                if (LogSetting.sLogRealTime) {
+                if (LogSetting.sLife) {
                     Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "---" + (index) + "--" + mSeekBar.getProgress());
                 }
                 if (mSeekBar.getProgress() / 100 == index / 100) {
                     mMusicManager.onNextMusic();
-                    if (LogSetting.sLogRealTime) {
+                    if (LogSetting.sLife) {
                         Log.d(LOG_REALTIME, "Next Bai");
                     }
                     Intent intent = new Intent(Coast.ACTION_AUTONEXT);
@@ -81,13 +82,19 @@ public class MusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // đã chạy MusicManager trong service nhé.
         mMusicManager = MusicManager.getInstance(this);
+        // todo songthing bỏ set Current = 0 đi
+        if (mMusicManager.getCurrentBegin()) {
+            //mMusicManager.setmCurrentSong(0);
+        }
         mSeekBar = new SeekBar(this);
         mHandler.postDelayed(runnable, TIME_REPEAT);
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(MediaPlaybackFragment.KEY_MEDIA_FRAGMENT, mMusicManager);
+        bundle.putSerializable(MediaPlaybackFragment.KEY_MEDIA_FRAGMENT, mMusicManager.getSongIsPlay());
+        bundle.putSerializable(MainActivity.KEY_MUSIC_IBINDER, (Serializable) iBinder);
         mMediaPlaybackFragment.setArguments(bundle);
-        if (LogSetting.sLogRealTime) {
+        mMediaPlaybackFragment.setMusicManager(mMusicManager);
+        if (LogSetting.sLife) {
             Log.d(LOG_REALTIME, mMusicManager.getTimeCurrents() + "");
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -96,16 +103,13 @@ public class MusicService extends Service {
                     new NotificationChannel(ID_CHANNEL, "App_Music_OF_Bach", NotificationManager.IMPORTANCE_LOW);
             channel.setLightColor(Color.RED);
             //
-            mNotifiacationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotifiacationManager.createNotificationChannel(channel);
+            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.createNotificationChannel(channel);
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
-            if (mMusicManager.getCurrentBegin()) {
-                mMusicManager.setmCurrentSong(0);
-            }
-            if (mNotificationRemoteBig != null) {
-                mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
-                mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
+            if (mNotificationRemoteBig != null ) {
+//                mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
+//                mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Coast.ACTION_PREVIOUS));
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Coast.ACTION_PLAY));
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Coast.ACTION_NEXT));
@@ -115,13 +119,15 @@ public class MusicService extends Service {
                 mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Coast.ACTION_PLAY));
                 mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Coast.ACTION_NEXT));
             }
-            loadImage();
+            if (mMusicManager.getmCurrentSong() != -1) {
+                loadImage();
+            }
             mBuilder = new NotificationCompat.Builder(this, ID_CHANNEL)
                     .setSmallIcon(R.drawable.ic_baseline_library_music_24)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setCustomContentView(mNotificationRemoteSmall)
                     .setCustomBigContentView(mNotificationRemoteBig);
-            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
             startForeground(ID_NOTIFICATION, mBuilder.build());
         }
         return START_NOT_STICKY;
@@ -136,7 +142,7 @@ public class MusicService extends Service {
         mNotificationRemoteBig.setImageViewBitmap(R.id.icon_music, imageBitmap);
     }
 
-    /**
+    /** BachNN
      * @param icon_previous  ID của cái View
      * @param actionPrevious Action Name của BroadCast
      * @return chả về một PendingIntent để chuyền message cho BroadCase
@@ -166,7 +172,7 @@ public class MusicService extends Service {
             return MusicService.this;
         }
 
-        /**
+        /** BachNN
          * set lại các giai trị của Notification
          */
         public void setNextMusicNotification() {
@@ -175,10 +181,10 @@ public class MusicService extends Service {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             loadImage();
-            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
         }
 
-        /**
+        /** BachNN
          * set lại các giai trị của Notification
          */
         public void setPreviousMusicNotification() {
@@ -187,10 +193,10 @@ public class MusicService extends Service {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             loadImage();
-            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
         }
 
-        /**
+        /** BachNN
          * set lại các giai trị của Notification
          */
         public void setPlayMusic() {
@@ -201,7 +207,7 @@ public class MusicService extends Service {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             }
-            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
         }
 
         public void setPlayMusicNoti() {
@@ -212,7 +218,7 @@ public class MusicService extends Service {
                 mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
                 mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             }
-            mNotifiacationManager.notify(ID_NOTIFICATION, mBuilder.build());
+            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
         }
 
         public MediaPlaybackFragment getMediaPlaybachFragment() {

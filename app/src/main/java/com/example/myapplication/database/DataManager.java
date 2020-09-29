@@ -19,18 +19,18 @@ import java.util.List;
  */
 public class DataManager {
     private static final String TAG_DB = "BachNN";
-    private SongaFvouriteDatabaseHelper mHelper;
+    private SongaFvouriteDatabaseHelper mMusicHelper;
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
-    /**
+    /** BachNN
      * @param context khơi tao
      */
     public DataManager(Context context) {
         this.mContext = context;
         // khởi tạo SongaFvouriteDatabaseHelper là lớp còn của SQLiteOpenHelper class
-        mHelper = new SongaFvouriteDatabaseHelper(context);
-        mDatabase = mHelper.getWritableDatabase();
+        mMusicHelper = new SongaFvouriteDatabaseHelper(context);
+        mDatabase = mMusicHelper.getWritableDatabase();
     }
 
     public void addMusicFvourite(Song song) {
@@ -43,11 +43,11 @@ public class DataManager {
         cv.put(Coast._DURATION, song.getDuration());
         Long insert = mDatabase.insert(Coast.TABLE_NAME, null, cv);
         if (insert > 0) {
-            if (LogSetting.sLogDB) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_DB, "Thêm Thành Công");
             }
         } else {
-            if (LogSetting.sLogDB) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_DB, "Thêm Thất Bại");
             }
         }
@@ -57,11 +57,11 @@ public class DataManager {
     public void removeMusicFvourite(int id) {
         int delete = mDatabase.delete(Coast.TABLE_NAME, Coast._ID + "=" + id, null);
         if (delete > 0) {
-            if (LogSetting.sLogDB) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_DB, "Xóa Thành Công");
             }
         } else {
-            if (LogSetting.sLogDB) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_DB, "Xóa Thất Bại");
             }
         }

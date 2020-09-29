@@ -5,19 +5,22 @@ import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.Model.Song;
+import com.example.myapplication.unit.LogSetting;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/** BachNN
  * Class này để điều khiển các tương tác giữa người dung đế các
  * bài hát nhữ Next, Previous, Play Music.
  */
-public class MusicManager implements Serializable {
+public class MusicManager {
     private static MusicManager INSTANCE;
     private List<Song> mSongs = new ArrayList<>();
     private MediaPlayer mPlayer;
@@ -27,9 +30,9 @@ public class MusicManager implements Serializable {
 
     // next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
     private int mInitially = 0;
-
     // khí bài hát đang chạy nó bị dừng.
     private int mStop = 3;
+    private int mRandom=5;
     // về trang thái lúc ban đâu là next , previous bài hát.
     private int mStatus = mInitially;
 
@@ -39,7 +42,7 @@ public class MusicManager implements Serializable {
         mPlayer = new MediaPlayer();
     }
 
-    /**
+    /** BachNN
      * @param mContext tham số để khởi tạo MusicManager.
      * @return một biến MusciManager duy nhất.
      */
@@ -58,7 +61,7 @@ public class MusicManager implements Serializable {
         this.mStatus = mStatus;
     }
 
-    /**
+    /** BachNN
      * hàm này để phát nhạc
      */
     public void onPlayMusic() {
@@ -76,7 +79,7 @@ public class MusicManager implements Serializable {
     }
 
 
-    /**
+    /** BachNN
      * quay lại bàn nhạc
      */
     public void onPreviousMusic() {
@@ -88,10 +91,9 @@ public class MusicManager implements Serializable {
         } else mCurrentSong--;
         mPlayer.reset();
         onPlayMusic();
-        ;
     }
 
-    /**
+    /** BachNN
      * next bài hát
      */
     public void onNextMusic() {
@@ -107,7 +109,7 @@ public class MusicManager implements Serializable {
     }
 
 
-    /**
+    /** BachNN
      * @return lấy vị trị mà bài hát đang chạy
      */
     public int getmCurrentSong() {
@@ -115,14 +117,14 @@ public class MusicManager implements Serializable {
 
     }
 
-    /**
+    /** BachNN
      * @param mCurrentSong lấy bài hát của vi trị trên
      */
     public void setmCurrentSong(int mCurrentSong) {
         this.mCurrentSong = mCurrentSong;
     }
 
-    /**
+    /** BachNN
      * @param position vị tri mà người dụng chon để chay bài hát.
      */
     public void selectMusic(int position) {
@@ -142,12 +144,11 @@ public class MusicManager implements Serializable {
     }
 
 
-    /**
+    /** BachNN
      * @return true thi bài nhạc đang chay con false thi ngược lại
      */
     public boolean isMusicPlaying() {
-        if (mPlayer.isPlaying()) return true;
-        else return false;
+        return (mPlayer.isPlaying()) ? true : false;
     }
 
     public void onPauseMusic() {
@@ -158,7 +159,7 @@ public class MusicManager implements Serializable {
         mPlayer.start();
     }
 
-    /**
+    /** BachNN
      * re lại bài hát
      */
     public void onResetMusic() {
@@ -166,7 +167,7 @@ public class MusicManager implements Serializable {
         mPlayer.reset();
     }
 
-    /**
+    /** BachNN
      * dưng lại bài hát
      */
     public void onStopMusic() {
@@ -174,7 +175,7 @@ public class MusicManager implements Serializable {
         mStatus = mStop;
     }
 
-    /**
+    /** BachNN
      * @param position vị tri người dung muôn tua đến
      *                 tua bài hát.
      */
@@ -182,11 +183,10 @@ public class MusicManager implements Serializable {
         mPlayer.seekTo(position);
     }
 
-    /**
+    /** BachNN
      * get tất cả các bài hát từ Database trên thiết bị di động.
      */
     private void getAllSong() {
-        // allColoumsSong chưa các trường data muốn lấy.
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
                 MediaStore.Audio.AudioColumns.DATA,
@@ -199,6 +199,9 @@ public class MusicManager implements Serializable {
         Cursor cursor = mContext.getContentResolver().
                 query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColoumSong, null, null, null, null);
         // chuyển con trỏ đến đâu bảng
+        if (LogSetting.sLife){
+            Log.d(MainActivity.TAG_MAIN, "cursor : "+ cursor);
+        }
         cursor.moveToFirst();
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
@@ -217,6 +220,9 @@ public class MusicManager implements Serializable {
                 String displayName = cursor.getString(DISPLAY_NAME);
                 String duration = cursor.getString(DURATION);
                 mSongs.add(new Song(id, data, author, title, displayName, duration));
+                if (LogSetting.sLife){
+                    Log.d(MainActivity.TAG_MAIN, mSongs.size()+ "");
+                }
                 cursor.moveToNext();
             }
             cursor.close();
@@ -241,7 +247,7 @@ public class MusicManager implements Serializable {
         return null;
     }
 
-    /**
+    /**BachNN
      * @return get vị trị mà bài hát đang chay trong bài hát.
      */
     public int getTimeCurrents() {
@@ -249,8 +255,9 @@ public class MusicManager implements Serializable {
     }
 
     public boolean getCurrentBegin(){
-        if (mCurrentSong==-1) return true;
-        else return false;
+//        if(mCurrentSong==-1) return true;
+//        else return false;
+        return (mCurrentSong == -1) ? true :false;
     }
 
 }

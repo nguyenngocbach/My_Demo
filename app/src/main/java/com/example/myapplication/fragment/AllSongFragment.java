@@ -2,17 +2,18 @@ package com.example.myapplication.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,48 +30,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * BachNN
  * Hiện thị một Danh Sach Music cho người dung thấy
  */
-public class AllSongFragment extends Fragment {
+public class AllSongFragment extends BaseSongListFragment implements IMusicListenner{
 
-    //private static AllSongFragment sInstance;
-    private RecyclerView mMusicRecyclerView;
-    private List<Song> mSongs = new ArrayList<>();
-    private AllSongAdapter mAdapter;
-    private ImageView mPlayImageView;
-    private ImageView mMusicImageView;
-    private TextView mTitleTextView;
-    private TextView mAuthorTextView;
-    private LinearLayout mItemMusic;
-    private AllSongFragmentListenner mAllSongListenner;
-    private MainActivity mMainActivity;
-    private MusicManager mMusicManager;
+    protected RecyclerView mMusicRecyclerView;
+    protected List<Song> mSongs = new ArrayList<>();
+    protected AllSongAdapter mAdapter;
+    protected ImageView mPlayImageView;
+    protected ImageView mMusicImageView;
+    protected TextView mTitleTextView;
+    protected TextView mAuthorTextView;
+    protected LinearLayout mItemMusic;
+//    protected AllSongFragmentListenner mAllSongListener;
+//    protected MainActivity mMainActivity;
+//    protected MusicManager mMusicManager;
 
     public AllSongFragment() {
     }
 
-    // todo bo ham nay
-    // ko lam dc goi anh thanh
-//    public static AllSongFragment getInstance() {
-//        if (sInstance == null) {
-//            sInstance = new AllSongFragment();
-//        }
-//        return sInstance;
+//    /**
+//     * BachNN
+//     * @param context là còn context của Activity chứa các Fragment này.
+//     *                khới tạo một số biến như Interface ...
+//     *                qua Context này.
+//     */
+//    @Override
+//    public void onAttach(@NonNull Context context) {
+//        super.onAttach(context);
 //    }
 
-    /**
-     * @param context là còn context của Activity chứa các Fragment này.
-     *                khới tạo một số biến như Interface ...
-     *                qua Context này.
-     */
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof MainActivity) {
-            mMainActivity = (MainActivity) context;
-            mAllSongListenner = (AllSongFragmentListenner) context;
-            mMusicManager = mMainActivity.getMusicManager();
-        }
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+//            mMainActivity = (MainActivity) getActivity();
+//            mAllSongListener = (AllSongFragmentListenner)  getActivity();
+//            mMusicManager = mMainActivity.getMusicManager();
+            setData(mAllMusicProvider.getAllListSong());
     }
 
     @Nullable
@@ -78,10 +75,10 @@ public class AllSongFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.all_song_fragment, container, false);
         mMusicRecyclerView = view.findViewById(R.id.recycler_song);
-        final LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        manager.setOrientation(RecyclerView.VERTICAL);
-        mMusicRecyclerView.setLayoutManager(manager);
-        mAdapter = new AllSongAdapter(getContext(), mSongs, (IMusicListenner) getActivity());
+        final LinearLayoutManager managerLayout = new LinearLayoutManager(getContext());
+        managerLayout.setOrientation(RecyclerView.VERTICAL);
+        mMusicRecyclerView.setLayoutManager(managerLayout);
+        mAdapter = new AllSongAdapter(getContext(), mSongs, this);
         mMusicRecyclerView.setAdapter(mAdapter);
         mMainActivity = (MainActivity) getContext();
         mMusicImageView = view.findViewById(R.id.avatar);
@@ -92,7 +89,7 @@ public class AllSongFragment extends Fragment {
         mItemMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAllSongListenner.show();
+                mAllSongListener.show();
             }
         });
 
@@ -110,13 +107,15 @@ public class AllSongFragment extends Fragment {
                         mMusicManager.setmStatus(1);
                     }
                 }
-                mAllSongListenner.setIconNotification();
+                mAllSongListener.setIconNotification();
             }
         });
+
         return view;
     }
 
     /**
+     * BachNN
      * @param s là một List<Song> để gián cho List<Song> của adapter.
      *          set lại vị trị của ban hát đang chạy
      *          reset lại adapter.
@@ -125,24 +124,30 @@ public class AllSongFragment extends Fragment {
         if (mSongs != null) mSongs.clear();
         mSongs.addAll(s);
         // set lai vị trị bài hát đang chay cho List Song
-        mAdapter.setmCerrentSong(mMusicManager.getmCurrentSong());
+        if (mMusicManager!=null) {
+            mAdapter.setCurrentSong(mMusicManager.getmCurrentSong());
+            //mCurrentMusic=
+        }
         mAdapter.notifyDataSetChanged();
     }
 
     /**
+     * BachNN
      * hàm để set anh cho từng bài hát
      */
     public void setImageMusic() {
-      //  if (mMusicManager.getmCurrentSong() != -1) {
+        if (mMusicManager.getmCurrentSong() != -1) {
             byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
             Glide.with(getContext())
                     .load(sourceImage)
                     .placeholder(R.drawable.anh_ngoc_trinh)
                     .into(mMusicImageView);
-    //    }
+        }
     }
 
     /**
+     * BachNN
+     *
      * @param musicRunning kiểm tra bài hát đang chay hay đang dung để
      *                     sét Icon của bài nhạc.
      */
@@ -154,18 +159,25 @@ public class AllSongFragment extends Fragment {
         }
     }
 
-    public void setSongManager(MusicManager musicManager) {
-        this.mMusicManager = musicManager;
-    }
+//    public void setSongManager(MusicManager musicManager) {
+//        this.mMusicManager = musicManager;
+//    }
 
     /**
+     * BachNN
      * ẩn một ViewGround trong AllSongFragment khi nó quay ngang.
      */
     public void setVisible() {
         mItemMusic.setVisibility(View.GONE);
     }
 
+    public void setVisibleDisPlay() {
+        mItemMusic.setVisibility(View.VISIBLE);
+    }
+
     /**
+     * BachNN
+     *
      * @param cerrentMusic vị trị mà người dụng click vào ban hát
      *                     nó sẽ sưa lại giao diên củâ AllSongFragment
      */
@@ -175,12 +187,14 @@ public class AllSongFragment extends Fragment {
             mSongs.clear();
         }
         mSongs.addAll(mMusicManager.getmSongs());
-        mAdapter.setmCerrentSong(cerrentMusic);
+        mAdapter.setCurrentSong(cerrentMusic);
         setTitle(mMusicManager.getSinpleSong(cerrentMusic));
         mAdapter.notifyDataSetChanged();
     }
 
     /**
+     * BachNN
+     *
      * @param song
      */
     public void setTitle(Song song) {
@@ -190,6 +204,46 @@ public class AllSongFragment extends Fragment {
         }
     }
 
+    @Override
+    public void selectMusic(int i) {
+        setSelection(i);
+        isPlayMusic(true);
+        setImageMusic();
+        setVisibleDisPlay();
+        if (mMusicManager != null) {
+            if (mMusicManager.isMusicPlaying()) {
+                mMusicManager.onResetMusic();
+            }
+            mMusicManager.setmCurrentSong(i);
+            mMusicManager.onPlayMusic();
+        }
+    }
+
+    @Override
+    public void selectMoreMusic(final int i, View view) {
+        PopupMenu mPopupMen = new PopupMenu(getActivity(), view);
+        mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
+
+        mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.like_music:
+                        //new MainActivity.AddFavouriteMusic().execute(mMusicManager.getSinpleSong(i));
+                        Toast.makeText(getContext(), "You like " + mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case R.id.dislike_music:
+                        //new MainActivity.DeleteFavouriteMusic().execute(Integer.parseInt(mMusicManager.getSinpleSong(i).getId()));
+                        Toast.makeText(getContext(), "You dislike " + mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+        mPopupMen.show();
+    }
+
     public interface AllSongFragmentListenner {
         // để hiện MediaPlayerFragemnt nên.
         void show();
@@ -197,4 +251,5 @@ public class AllSongFragment extends Fragment {
         // set lại icon cho notification chay nhạc hay dưng.
         void setIconNotification();
     }
+
 }

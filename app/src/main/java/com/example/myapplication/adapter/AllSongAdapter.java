@@ -19,10 +19,10 @@ import java.util.List;
 
 public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHolder> {
     // LINE_NORMAL là  bài hát không đc chọn.
-    private static final int LINE_NORMAL=0;
+    private static final int LINE_NORMAL = 0;
     // LINE_CHOOSE là bài hát được chọn và đang chạy nhạc
-    private static final int LINE_CHOOSE=1;
-    public int mCerrentSong = 0;
+    private static final int LINE_CHOOSE = 1;
+    public int mCurrentSong = 0;
     private Context mContext;
     private List<Song> mSongs;
     private IMusicListenner mListener;
@@ -35,7 +35,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (position == mCerrentSong) return LINE_CHOOSE;
+        if (position == mCurrentSong) return LINE_CHOOSE;
         return LINE_NORMAL;
     }
 
@@ -55,25 +55,11 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        boolean check = (position == mCerrentSong) ? true : false;
+        boolean check = (position == mCurrentSong) ? true : false;
         // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
         holder.mIndexMusic.setText("" + (position + 1));
         //chuyền một bài hát đang chay vào hàm dưới để title và author
         holder.onBind(mSongs.get(position), check);
-        // todo comment
-//        // ko để
-//        holder.mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mListener.selectMusic(position);
-//            }
-//        });
-//        holder.mMoreIcon.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mListener.selectMoreMusic(position, holder.mMoreIcon);
-//            }
-//        });
     }
 
     @Override
@@ -81,7 +67,9 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return mSongs.size();
     }
 
-    /** BacnhNN
+    /**
+     * BacnhNN
+     *
      * @param time tổng thời gian của bàn hát
      * @return format về đinh dạnh phút / giây
      */
@@ -92,12 +80,12 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return (minutes < 10 ? "0" + minutes : minutes + "") + ":" + (second < 10 ? "0" + second : second + "");
     }
 
-    public int getmCerrentSong() {
-        return mCerrentSong;
+    public int getCurrentSong() {
+        return mCurrentSong;
     }
 
-    public void setmCerrentSong(int mCerrentSong) {
-        this.mCerrentSong = mCerrentSong;
+    public void setCurrentSong(int mCurrentSong) {
+        this.mCurrentSong = mCurrentSong;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

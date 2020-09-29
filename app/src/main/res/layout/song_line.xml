@@ -17,11 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="1"
-            android:textSize="13dp"
+            android:textSize="13sp"
             android:gravity="center"
-            android:layout_marginStart="8dp"
             android:layout_marginBottom="11.5dp"
-            />
+            android:layout_marginLeft="8dp" />
         <ImageView
             android:id="@+id/icon_play_music"
             android:layout_width="55dp"
@@ -30,6 +29,7 @@
             android:src="@drawable/ic_baseline"
             android:padding="5dp"
             android:visibility="invisible"
+            android:contentDescription="@string/app_name"
 
             />
     </FrameLayout>
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hedddddo"
-            android:textSize="17dp"
+            android:textSize="17sp"
             android:maxLines="1"
             android:textColor="@color/black_color"
             android:paddingTop="5dp"
@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textSize="13dp"
+            android:textSize="13sp"
             android:text="heelo"
             />
     </LinearLayout>
@@ -63,9 +63,9 @@
         android:id="@+id/icon_more"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:paddingEnd="5dp"
         android:layout_marginBottom="7dp"
         android:src="@drawable/ic_baseline_more"
-        />
+        android:paddingRight="5dp"
+        android:contentDescription="@string/app_name"/>
 
 </LinearLayout>

@@ -27,21 +27,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Music"
-                android:paddingStart="1dp"
-                android:textSize="20dp"
-                android:layout_marginStart="4dp"
+                android:text="@string/music"
+                android:textSize="20sp"
                 android:textColor="@color/white_color"
                 android:gravity="center_vertical"
                 android:textStyle="bold"
                 android:paddingBottom="16dp"
-                />
+                android:paddingLeft="1dp"
+                android:layout_marginLeft="4dp" />
             <ImageView
                 android:id="@+id/icon_toolbar"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:src="@drawable/ic_baseline_search_24"
                 android:padding="15dp"
+                android:contentDescription="@string/app_name"
                 />
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>

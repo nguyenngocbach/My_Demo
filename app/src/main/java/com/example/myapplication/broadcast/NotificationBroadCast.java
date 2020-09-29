@@ -10,18 +10,18 @@ import com.example.myapplication.listenner.INotificationBroadCastListener;
 import com.example.myapplication.unit.Coast;
 import com.example.myapplication.unit.LogSetting;
 
-/**
+/** BachNN
  * Nhận các Message từ Notification bắn ra
  */
 public class NotificationBroadCast extends BroadcastReceiver {
     private static final String TAG_BROADCAST = "Log_BroadCast";
-    private INotificationBroadCastListener mBroadCastListener;
+    private INotificationBroadCastListener mMusicBroadCastListener;
 
     public NotificationBroadCast(INotificationBroadCastListener mBroadCastListener) {
-        this.mBroadCastListener = mBroadCastListener;
+        this.mMusicBroadCastListener = mBroadCastListener;
     }
 
-    /**
+    /** BachNN
      * @param context
      * @param intent  ..
      *                nhân các thông báo từ các Action của Notification.
@@ -29,28 +29,28 @@ public class NotificationBroadCast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Coast.ACTION_PREVIOUS.equals(intent.getAction())) {
-            if (LogSetting.sLogBroadCast) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_BROADCAST, Coast.ACTION_PREVIOUS);
             }
-            mBroadCastListener.onPreviousMusicBroadCast();
+            mMusicBroadCastListener.onPreviousMusicBroadCast();
         }
         if (Coast.ACTION_NEXT.equals(intent.getAction())) {
-            if (LogSetting.sLogBroadCast) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_BROADCAST, Coast.ACTION_NEXT);
             }
-            mBroadCastListener.onNextMusicBroadCast();
+            mMusicBroadCastListener.onNextMusicBroadCast();
         }
         if (Coast.ACTION_PLAY.equals(intent.getAction())) {
-            if (LogSetting.sLogBroadCast) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_BROADCAST, Coast.ACTION_PLAY);
             }
-            mBroadCastListener.onOnPlayMusicBroadCast();
+            mMusicBroadCastListener.onOnPlayMusicBroadCast();
         }
         if (Coast.ACTION_AUTONEXT.equals(intent.getAction())) {
-            if (LogSetting.sLogBroadCast) {
+            if (LogSetting.sLife) {
                 Log.d(TAG_BROADCAST, Coast.ACTION_AUTONEXT);
             }
-            mBroadCastListener.onPlayMusicAutoNextBroadCast();
+            mMusicBroadCastListener.onPlayMusicAutoNextBroadCast();
         }
     }
 }

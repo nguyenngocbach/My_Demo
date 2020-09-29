@@ -8,6 +8,7 @@
         android:scaleType="centerCrop"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/ngoc_em_em"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,10 +29,10 @@
             android:id="@+id/icon_avata"
             android:layout_width="50dp"
             android:layout_height="55dp"
+            android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
             android:src="@drawable/ngoc_em_em"
-            android:layout_marginStart="5dp"
-            />
+            android:layout_marginLeft="5dp" />
         <LinearLayout
             android:orientation="vertical"
             android:layout_weight="1"
@@ -39,8 +40,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:paddingTop="2dp"
-            android:paddingStart="8dp"
-            >
+            android:paddingLeft="8dp">
             <TextView
                 android:id="@+id/txtTitle"
                 android:layout_width="match_parent"
@@ -55,7 +55,7 @@
                 android:id="@+id/txtAuthor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="13dp"
+                android:textSize="13sp"
                 android:text="Sơn tung - MTP"
                 />
         </LinearLayout>
@@ -65,18 +65,19 @@
             android:layout_width="30dp"
             android:layout_height="27dp"
             android:layout_marginTop="2dp"
-            android:layout_marginEnd="11dp"
             android:paddingTop="2dp"
-            android:paddingEnd="2dp"
-            android:src="@drawable/ic_queue_dark" />
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_queue_dark"
+            android:layout_marginRight="11dp"
+            android:paddingRight="2dp" />
         <ImageView
             android:id="@+id/icon_more"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginEnd="5dp"
             android:layout_marginTop="3dp"
             android:src="@drawable/ic_baseline_more"
-            />
+            android:contentDescription="@string/app_name"
+            android:layout_marginRight="5dp" />
     </LinearLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -97,21 +98,22 @@
             android:id="@+id/txt_startTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+
             android:textSize="12sp"
             android:text="00:00"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/seebar_ok" />
+            app:layout_constraintTop_toBottomOf="@id/seebar_ok"
+            android:layout_marginLeft="15dp" />
 
         <TextView
             android:id="@+id/txt_totalTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:layout_marginEnd="15dp"
             android:text="00:00"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/seebar_ok" />
+            app:layout_constraintTop_toBottomOf="@id/seebar_ok"
+            android:layout_marginRight="15dp" />
 
         <ImageView
             android:id="@+id/iconLike"
@@ -124,13 +126,14 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_startTime"
-            app:srcCompat="@drawable/ic_thumbs_up_default" />
+            app:srcCompat="@drawable/ic_thumbs_up_default"
+            android:contentDescription="@string/app_name"
+            />
 
         <ImageView
             android:id="@+id/iconPrevious"
             android:layout_width="@dimen/size_icon"
             android:layout_height="@dimen/size_icon"
-            android:layout_marginEnd="7dp"
             android:layout_marginBottom="5dp"
             android:padding="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -138,7 +141,9 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/iconLike"
             app:layout_constraintTop_toTopOf="@+id/iconLike"
-            app:srcCompat="@drawable/ic_baseline_skip_previous" />
+            android:src="@drawable/ic_baseline_skip_previous"
+            android:layout_marginRight="7dp"
+            android:contentDescription="@string/app_name"/>
 
         <ImageView
             android:id="@+id/iconPlay"
@@ -151,13 +156,15 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/iconPrevious"
             app:layout_constraintTop_toTopOf="@+id/iconLike"
-            app:srcCompat="@drawable/costom_play" />
+            app:srcCompat="@drawable/costom_play"
+            android:contentDescription="@string/app_name"
+
+            />
 
         <ImageView
             android:id="@+id/iconNext"
             android:layout_width="@dimen/size_icon"
             android:layout_height="@dimen/size_icon"
-            android:layout_marginStart="7dp"
             android:layout_marginBottom="5dp"
             android:padding="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -165,7 +172,10 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/iconPlay"
             app:layout_constraintTop_toBottomOf="@+id/txt_totalTime"
-            app:srcCompat="@drawable/ic_baseline_skip_next" />
+            android:src="@drawable/ic_baseline_skip_next"
+            android:layout_marginLeft="7dp"
+            android:contentDescription="@string/app_name"
+            />
 
         <ImageView
             android:id="@+id/iconDislike"
@@ -179,6 +189,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/iconNext"
             app:layout_constraintTop_toBottomOf="@+id/txt_totalTime"
+            android:contentDescription="@string/app_name"
             app:srcCompat="@drawable/ic_thumbs_down_default" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <ImageView
@@ -189,6 +200,7 @@
         android:layout_marginLeft="21dp"
         android:layout_marginBottom="115dp"
         android:padding="7dp"
+        android:contentDescription="@string/app_name"
         android:layout_gravity="bottom"
         />
     <ImageView
@@ -199,6 +211,7 @@
         android:layout_marginRight="21dp"
         android:layout_marginBottom="115dp"
         android:padding="7dp"
+        android:contentDescription="@string/app_name"
         android:layout_gravity="bottom|end"
         />
 </FrameLayout>

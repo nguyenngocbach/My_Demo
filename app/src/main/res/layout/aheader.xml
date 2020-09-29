@@ -20,7 +20,8 @@
             android:layout_height="30dp"
             android:padding="5dp"
             android:src="@drawable/custom_music_player"
-            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:contentDescription="@string/app_name"
             />
         <TextView
             android:id="@+id/txt_listen_now"
@@ -29,9 +30,8 @@
             android:text="@string/listen_now"
             android:textStyle="bold"
             android:textColor="@color/ogin"
-            android:textSize="16dp"
-            android:layout_marginStart="30dp"
-            />
+            android:textSize="16sp"
+            android:layout_marginLeft="30dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -47,8 +47,9 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_baseline_replay_10_24"
-            android:layout_marginStart="12dp"
             android:padding="5dp"
+            android:layout_marginLeft="12dp"
+            android:contentDescription="@string/app_name"
             />
         <TextView
             android:id="@+id/txt_recent"
@@ -57,9 +58,33 @@
             android:text="@string/recent"
             android:textStyle="bold"
             android:textColor="@color/grey_color"
-            android:textSize="16dp"
-            android:layout_marginStart="30dp"
+            android:textSize="16sp"
+            android:layout_marginLeft="30dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/favourite_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="3dp"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_baseline_replay_10_24"
+            android:padding="5dp"
+            android:layout_marginLeft="12dp"
+            android:contentDescription="@string/app_name"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/favourite"
+            android:textStyle="bold"
+            android:textColor="@color/grey_color"
+            android:textSize="16sp"
+            android:layout_marginLeft="30dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -75,9 +100,9 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_baseline_library_music_24"
-            android:layout_marginStart="12dp"
             android:padding="5dp"
-            />
+            android:contentDescription="@string/app_name"
+            android:layout_marginLeft="12dp" />
         <TextView
             android:id="@+id/txt_music_library"
             android:layout_width="match_parent"
@@ -85,11 +110,10 @@
             android:text="@string/music_lubrary"
             android:textStyle="bold"
             android:textColor="@color/grey_color"
-            android:textSize="16dp"
-            android:layout_marginStart="30dp"
-            />
+            android:textSize="16sp"
+            android:layout_marginLeft="30dp" />
     </LinearLayout>
-    <TextView
+    <View
         android:layout_width="match_parent"
         android:layout_height="0.75dp"
         android:background="#40403F"

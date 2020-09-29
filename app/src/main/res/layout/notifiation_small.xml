@@ -22,7 +22,8 @@
             android:src="@drawable/anh_ngoc_trinh"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/app_name"/>
     </LinearLayout>
 
     <ImageView
@@ -34,7 +35,8 @@
         android:src="@drawable/ic_baseline_skip_previous_bkav"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_play"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name"/>
 
     <ImageView
         android:id="@+id/icon_play"
@@ -45,7 +47,8 @@
         android:src="@drawable/costom_play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/icon_next"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name"/>
 
     <ImageView
         android:id="@+id/icon_next"
@@ -56,5 +59,6 @@
         android:src="@drawable/ic_baseline_skip_next_bkav"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name"/>
 </LinearLayout>

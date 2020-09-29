@@ -2,7 +2,7 @@ package com.example.myapplication.unit;
 
 import android.media.MediaMetadataRetriever;
 
-/**
+/** BachNN
  * khái báo các biện mà nhiêu lớp dung
  */
 public class Coast {
@@ -22,7 +22,7 @@ public class Coast {
     public static final String _DISPLAY_NAME = "_display_name";
     public static final String _DURATION = "_duration";
 
-    public static final String CREATE_SONG_TABLE = "CREATE TABLE  " + TABLE_NAME+" ( "+_ID+" TEXT ,"
+    public static final String CREATE_SONG_TABLE = "CREATE TABLE  " + TABLE_NAME+" ( "+_ID+" INTEGER PRIMARY KEY AUTOINCREMENT ,"
             +_PATH+" TEXT,"
             +_AUTHOR+" TEXT,"
             +_TITLE+" TEXT,"
