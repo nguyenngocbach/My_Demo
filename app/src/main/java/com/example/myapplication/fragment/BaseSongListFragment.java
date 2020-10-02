@@ -66,7 +66,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
             if (mIsVertical && mMusicService.getmCurrentSong() != -1) {
                 setVisibleDisPlay();
             } else {
-                setVisible();
+                //setVisible();
             }
         }
 
@@ -161,8 +161,10 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
                 if (mMusicService.isMusicPlaying()) {
                     mMusicService.onStopMusic();
                     mPlayImageView.setImageResource(R.drawable.ic_play_black);
+                    mMusicService.setChangeNotification();
                 } else {
                     mMusicService.onResumeMusic();
+                    mMusicService.setChangeNotification();
                     mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
                     if (mMusicService.getmStatus() == 0) {
                         mMusicService.onPlayMusic();
@@ -244,6 +246,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         mAdapter.setCurrentSong(cerrentMusic);
         setTitle(mMusicService.getSongIsPlay());
         mAdapter.notifyDataSetChanged();
+        mMusicService.setChangeNotification();
     }
 
     public void setUIAllView() {
@@ -283,6 +286,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
             mMusicService.setmCurrentSong(i);
             mMusicService.onPlayMusic();
         }
+        mMusicService.setChangeNotification();
     }
 
     @Override

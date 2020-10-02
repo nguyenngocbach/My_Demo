@@ -402,6 +402,20 @@ public class MusicService extends Service {
         mMediaPlaybackFragment.setUIMusic();
     }
 
+    public void setChangeNotification(){
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        if (isMusicPlaying()){
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        }else {
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+        }
+        loadImage();
+        mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
+    }
+
 
     public class LocalMusic extends Binder implements Serializable {
         public MusicService getInstanceService() {

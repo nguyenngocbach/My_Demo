@@ -474,15 +474,22 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     @Override
     public void onNextMusicBroadCast() {
         mMusicService.onNextMusic();
-        // todo viet mot ham set lai gian dien cho AllSongFragment.
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-//        mAllSongFragment.setData(mMusicService.getmSongs());
-//        mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
-//        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
-//        mAllSongFragment.setImageMusic();
-        mAllSongFragment.setUIAllView();
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
-        if (mMediaPlaybackFragment != null) {
+        if (!isVertical){
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.isPlayMusic(true);
+
+            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            player.setMusicService(mMusicService);
+            return;
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            mAllSongFragment.setUIAllView();
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
+            MediaPlaybackFragment mMediaPlaybackFragment =
+                    (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
             mMediaPlaybackFragment.setTile(mMusicService.getSongIsPlay());
             mMediaPlaybackFragment.setImagePlayer();
@@ -498,16 +505,29 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     @Override
     public void onPreviousMusicBroadCast() {
         mMusicService.onPreviousMusic();
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-        mAllSongFragment.setData(mMusicService.getmSongs());
-        mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
-        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
-        mAllSongFragment.setImageMusic();
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
-        if (mMediaPlaybackFragment != null) {
-            mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
-            mMediaPlaybackFragment.setTile(mMusicService.getSongIsPlay());
-            mMediaPlaybackFragment.setImagePlayer();
+        if (!isVertical){
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.isPlayMusic(true);
+
+            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            player.setMusicService(mMusicService);
+            return;
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            mAllSongFragment.setData(mMusicService.getmSongs());
+            mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
+            mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
+            mAllSongFragment.setImageMusic();
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+            MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            if (mMediaPlaybackFragment != null) {
+                mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
+                mMediaPlaybackFragment.setTile(mMusicService.getSongIsPlay());
+                mMediaPlaybackFragment.setImagePlayer();
+            }
         }
         mLocalMusic.setPreviousMusicNotification();
     }
@@ -524,26 +544,50 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         } else {
             mMusicService.onResumeMusic();
         }
-        // todo viet mot ham set lai giao dien la on
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
+        if (!isVertical){
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.isPlayMusic(true);
 
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
-        if (mMediaPlaybackFragment != null) {
-            mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
+            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            player.setMusicService(mMusicService);
+            return;
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
+        }
+
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
+            MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            if (mMediaPlaybackFragment != null) {
+                mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
+            }
         }
         mLocalMusic.setPlayMusic();
     }
 
     @Override
     public void onPlayMusicAutoNextBroadCast() {
-        // todo viet mot ham set lai giao dien la on
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-        allSongFragment.setSelection(mMusicService.getmCurrentSong());
-        allSongFragment.isPlayMusic(true);
-        if (!isVertical) {
+        if (!isVertical){
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.isPlayMusic(true);
+
             MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
             player.setMusicService(mMusicService);
+            return;
+        }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.isPlayMusic(true);
+        }
+        if (!isVertical) {
+            if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
+                MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+                player.setMusicService(mMusicService);
+            }
         }
         mLocalMusic.setNextMusicNotification();
     }

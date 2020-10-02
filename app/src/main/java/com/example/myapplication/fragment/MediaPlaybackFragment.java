@@ -272,6 +272,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.iconLike:
                 mMediaListener.onLike();
+                mMusicService.setChangeNotification();
                 break;
             case R.id.iconPrevious:
                 mMusicService.onPreviousMusic();
@@ -279,6 +280,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setSeekBar();
                 mMediaListener.onPrevious();
                 setImagePlayer();
+                mMusicService.setChangeNotification();
                 break;
             case R.id.iconPlay:
                 mMediaListener.onPlay();
@@ -298,6 +300,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     }
                     mPlayIcon.setImageResource(R.drawable.custom_play_pause);
                 }
+                mMusicService.setChangeNotification();
                 break;
             case R.id.iconNext:
                 mMusicService.onNextMusic();
@@ -305,6 +308,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setSeekBar();
                 mMediaListener.onNext();
                 setImagePlayer();
+                mMusicService.setChangeNotification();
                 break;
             case R.id.iconDislike:
                 mMediaListener.onDisLike();
