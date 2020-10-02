@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MusicService extends Service {
 
@@ -59,6 +60,9 @@ public class MusicService extends Service {
     // BachNN :khí bài hát đang chạy nó bị dừng.
     private int mStop = 3;
     private int mRandom = 5;
+    private int mShuff=6;
+    private int mNormal= 7;
+    private int mStatueRepeat=mNormal;
     // BachNN :về trang thái lúc ban đâu là next , previous bài hát.
     private int mStatus = mInitially;
 
@@ -221,12 +225,19 @@ public class MusicService extends Service {
      */
     public void onNextMusic() {
         mStatus = mInitially;
+        if (mStatueRepeat==mNormal){
+            if (mCurrentSong == (mSongs.size() - 1)) {
+                mCurrentSong = 0;
+            } else mCurrentSong++;
+        }else if (mStatueRepeat==mShuff){
+
+        }else {
+            Random random= new Random(mSongs.size());
+            mCurrentSong= random.nextInt();
+        }
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         }
-        if (mCurrentSong == (mSongs.size() - 1)) {
-            mCurrentSong = 0;
-        } else mCurrentSong++;
         mPlayer.reset();
         onPlayMusic();
     }
@@ -241,6 +252,23 @@ public class MusicService extends Service {
 
     }
 
+    public void setRandom(){
+        if (mStatueRepeat==mRandom){
+            mStatueRepeat=mNormal;
+        }
+        else mStatueRepeat=mRandom;
+    }
+
+    public void setShuff(){
+        if (mStatueRepeat==mShuff){
+            mStatueRepeat=mNormal;
+        }
+        else mStatueRepeat=mShuff;
+    }
+
+    public int getStatueRepeat(){
+        return mStatueRepeat;
+    }
     /**
      * BachNN
      *

@@ -314,6 +314,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMediaListener.onDisLike();
                 break;
             case R.id.icon_shuffle:
+                mMusicService.setShuff();
+                break;
+            case R.id.icon_repeat:
+                mMusicService.setRandom();
                 break;
         }
     }
