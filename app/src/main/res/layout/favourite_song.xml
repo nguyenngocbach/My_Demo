@@ -12,7 +12,7 @@
         android:layout_weight="1"
         />
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/linear_Layout"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_gravity="bottom"
@@ -37,7 +37,7 @@
             android:orientation="vertical"
             android:paddingLeft="10dp">
             <TextView
-                android:id="@+id/nameMusic"
+                android:id="@+id/name_Music"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Hedddddo"
@@ -47,7 +47,7 @@
                 android:layout_marginBottom="4dp"
                 />
             <TextView
-                android:id="@+id/nameAirsts"
+                android:id="@+id/name_Airsts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"

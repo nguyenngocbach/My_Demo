@@ -18,19 +18,14 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
-import com.example.myapplication.Model.Song;
+import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
-import com.example.myapplication.Service.MusicManager;
 import com.example.myapplication.Service.MusicService;
-import com.example.myapplication.unit.Coast;
+import com.example.myapplication.util.Util;
 
 public class MediaPlaybackFragment extends Fragment implements View.OnClickListener {
 
     public static final String KEY_MEDIA_FRAGMENT = "com.example.myapplication.fragment.musicManager";
-    // static de lam j
-    // phai bo di
-    // loi rat lon co
-
     private int TIME_REPEAT = 300;
     private ImageView mMusicImageView;
     private ImageView mAvatarImageView;
@@ -48,7 +43,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private TextView mTitleTextView;
     private TextView mAuthorTextView;
     private SeekBar mSeekBar;
-    private MusicManager mMusicManager;
+    private MusicService mMusicService;
     private IMediaPlayFragmentListenner mMediaListener;
     private MainActivity mActivity;
 
@@ -61,19 +56,19 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         @Override
         public void run() {
             setUI();
-            int index = (Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
+            int index = (Integer.parseInt(mMusicService.getSongIsPlay().getDuration()));
             mSeekBar.setMax(index);
             if (mSeekBar.getProgress() == index) {
                 setSeekBar();
-                setTile(mMusicManager.getSongIsPlay());
+                setTile(mMusicService.getSongIsPlay());
                 mMediaListener.onSeekBar();
             }
             mHandler.postDelayed(this, TIME_REPEAT);
         }
     };
 
-    public void setMusicManager(MusicManager musicManager) {
-        this.mMusicManager = musicManager;
+    public void setMusicService(MusicService musicService) {
+        this.mMusicService = musicService;
     }
 
     /**
@@ -106,8 +101,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mDislikeIcon = view.findViewById(R.id.iconDislike);
         mRePeatIcon = view.findViewById(R.id.icon_repeat);
         mShuffleIcon = view.findViewById(R.id.icon_shuffle);
-        mAuthorTextView = view.findViewById(R.id.txtAuthor);
-        mTitleTextView = view.findViewById(R.id.txtTitle);
+        mAuthorTextView = view.findViewById(R.id.txt_Author);
+        mTitleTextView = view.findViewById(R.id.txt_Title);
         mTimeTextView = view.findViewById(R.id.txt_startTime);
         mTotalTimeTextView = view.findViewById(R.id.txt_totalTime);
         mSeekBar = view.findViewById(R.id.seebar_ok);
@@ -122,23 +117,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mRePeatIcon.setOnClickListener(this);
         mShuffleIcon.setOnClickListener(this);
 
-        // set kiểu anh cho ảnh chính của MediaPlayFragment.
+        //BachNN : set kiểu anh cho ảnh chính của MediaPlayFragment.
         if (!mActivity.isVertical()) mMusicImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        mMusicImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (b) {
-                    if (mMusicManager != null) {
-                        //set thời gian thưc của ban hát ban đang chạy
-                        seekBar.setProgress(mMusicManager.getTimeCurrents());
-                        mMusicManager.setSeekMusic(i);
+                    if (mMusicService != null) {
+                        //BachNN : set thời gian thưc của ban hát ban đang chạy
+                        seekBar.setProgress(mMusicService.getTimeCurrents());
+                        mMusicService.setSeekMusic(i);
                         mTimeTextView.setText(getDuration(i + ""));
                     }
                 }
@@ -164,13 +154,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (getArguments() != null) {
+        if (mMusicService != null) {
             //Song song = (Song) getArguments().getSerializable(KEY_MEDIA_FRAGMENT);
-            MusicService.LocalMusic localMusic = (MusicService.LocalMusic) getArguments().getSerializable(MainActivity.KEY_MUSIC_IBINDER);
-            mMusicManager = localMusic.getInstanceService().getMusicManager();
-            setTile(mMusicManager.getSongIsPlay());
+//            MusicService.LocalMusic localMusic = (MusicService.LocalMusic) getArguments().getSerializable(MainActivity.KEY_MUSIC_IBINDER);
+//            mMusicManager = localMusic.getInstanceService().getMusicManager();
+            setTile(mMusicService.getSongIsPlay());
             setSeekBar();
-            setStatusIcon(mMusicManager.isMusicPlaying());
+            setStatusIcon(mMusicService.isMusicPlaying());
         }
         setImagePlayer();
     }
@@ -180,12 +170,24 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      *
      * @param manager gán MusicManager cho bến ở trên.
      */
-    public void setmMusicManager(MusicManager manager) {
-        mMusicManager = manager;
-        // set lai seekbar cua MediaPlayerFragment
+    public void setmMusicService(MusicService manager) {
+        mMusicService = manager;
+        //BachNN : set lai seekbar cua MediaPlayerFragment
         setSeekBar();
-        setTile(mMusicManager.getSongIsPlay());
-        setStatusIcon(mMusicManager.isMusicPlaying());
+        setTile(mMusicService.getSongIsPlay());
+        setStatusIcon(mMusicService.isMusicPlaying());
+    }
+
+
+    /**
+     * BachNN
+     * set lại toàn bộ các view trong Fragment này.
+     */
+    public void setUIMusic(){
+        setSeekBar();
+        setTile(mMusicService.getSongIsPlay());
+        setStatusIcon(mMusicService.isMusicPlaying());
+        setImagePlayer();
     }
 
     /**
@@ -206,7 +208,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * set Max của SeekBar và chay đung giơi gian thực của bài hát.
      */
     private void setSeekBar() {
-        mSeekBar.setMax(Integer.parseInt(mMusicManager.getSongIsPlay().getDuration()));
+        mSeekBar.setMax(Integer.parseInt(mMusicService.getSongIsPlay().getDuration()));
         mHandler.postDelayed(runnable, TIME_REPEAT);
     }
 
@@ -234,17 +236,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * set Thời gian thực vào các textView và SeekBar sẽ chay theo thời gian thực
      */
     private void setUI() {
-        if (mMusicManager != null) {
-            String totalT = getDuration(mMusicManager.getSongIsPlay().getDuration());
+        if (mMusicService != null) {
+            String totalT = getDuration(mMusicService.getSongIsPlay().getDuration());
             mTotalTimeTextView.setText(totalT);
-            String realTime = getDuration(mMusicManager.getTimeCurrents() + "");
+            String realTime = getDuration(mMusicService.getTimeCurrents() + "");
             mTimeTextView.setText(realTime);
-            mSeekBar.setProgress(mMusicManager.getTimeCurrents());
+            mSeekBar.setProgress(mMusicService.getTimeCurrents());
         }
     }
 
     public void setImagePlayer() {
-        byte[] sourceImage = Coast.getByteImageSong(mMusicManager.getSongIsPlay().getPath());
+        if (mMusicService==null) return;
+        byte[] sourceImage = Util.getByteImageSong(mMusicService.getSongIsPlay().getPath());
         Glide.with(getContext())
                 .load(sourceImage)
                 .into(mMusicImageView);
@@ -271,34 +274,34 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMediaListener.onLike();
                 break;
             case R.id.iconPrevious:
-                mMusicManager.onPreviousMusic();
-                setTile(mMusicManager.getSongIsPlay());
+                mMusicService.onPreviousMusic();
+                setTile(mMusicService.getSongIsPlay());
                 setSeekBar();
                 mMediaListener.onPrevious();
                 setImagePlayer();
                 break;
             case R.id.iconPlay:
                 mMediaListener.onPlay();
-                if (mMusicManager.isMusicPlaying()) {
-                    mMusicManager.onStopMusic();
+                if (mMusicService.isMusicPlaying()) {
+                    mMusicService.onStopMusic();
                     mPlayIcon.setImageResource(R.drawable.costom_play);
-                    if (mMusicManager.getmStatus() == 0) {
-                        mMusicManager.onPlayMusic();
-                        mMusicManager.setmStatus(1);
+                    if (mMusicService.getmStatus() == 0) {
+                        mMusicService.onPlayMusic();
+                        mMusicService.setmStatus(1);
                     }
                 } else {
-                    mMusicManager.onResumeMusic();
+                    mMusicService.onResumeMusic();
                     // 0 ,1 ko ro ràng
-                    if (mMusicManager.getmStatus() == 0) {
-                        mMusicManager.onPlayMusic();
-                        mMusicManager.setmStatus(1);
+                    if (mMusicService.getmStatus() == 0) {
+                        mMusicService.onPlayMusic();
+                        mMusicService.setmStatus(1);
                     }
                     mPlayIcon.setImageResource(R.drawable.custom_play_pause);
                 }
                 break;
             case R.id.iconNext:
-                mMusicManager.onNextMusic();
-                setTile(mMusicManager.getSongIsPlay());
+                mMusicService.onNextMusic();
+                setTile(mMusicService.getSongIsPlay());
                 setSeekBar();
                 mMediaListener.onNext();
                 setImagePlayer();
@@ -335,21 +338,21 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * Interface để callback lại cho MainActivity.
      */
     public interface IMediaPlayFragmentListenner {
-        // bài hát yêu thich
+        //BachNN : bài hát yêu thich
         void onLike();
 
-        // quay lại bài hát trước
+        //BachNN : quay lại bài hát trước
         void onPrevious();
 
-        // chay nhạc hay dừng
+        //BachNN : chay nhạc hay dừng
         void onPlay();
 
-        // chuyền bài khác
+        //BachNN : chuyền bài khác
         void onNext();
 
-        // bài hát ko thicks
+        //BachNN : bài hát ko thicks
         void onDisLike();
-
+        //BachNN :
         void onSeekBar();
     }
 

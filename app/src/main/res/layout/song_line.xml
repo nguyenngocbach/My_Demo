@@ -40,7 +40,7 @@
         android:layout_weight="1"
         >
         <TextView
-            android:id="@+id/nameMusic"
+            android:id="@+id/name_Music"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hedddddo"
@@ -51,7 +51,7 @@
             android:layout_marginBottom="1.5dp"
             />
         <TextView
-            android:id="@+id/nameAirsts"
+            android:id="@+id/name_Airsts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"

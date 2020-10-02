@@ -4,11 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.myapplication.listenner.INotificationBroadCastListener;
-import com.example.myapplication.unit.Coast;
-import com.example.myapplication.unit.LogSetting;
+import com.example.myapplication.util.Util;
+import com.example.myapplication.util.LogSetting;
 
 /** BachNN
  * Nhận các Message từ Notification bắn ra
@@ -28,27 +27,27 @@ public class NotificationBroadCast extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Coast.ACTION_PREVIOUS.equals(intent.getAction())) {
-            if (LogSetting.sLife) {
-                Log.d(TAG_BROADCAST, Coast.ACTION_PREVIOUS);
+        if (Util.ACTION_PREVIOUS.equals(intent.getAction())) {
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_BROADCAST, Util.ACTION_PREVIOUS);
             }
             mMusicBroadCastListener.onPreviousMusicBroadCast();
         }
-        if (Coast.ACTION_NEXT.equals(intent.getAction())) {
-            if (LogSetting.sLife) {
-                Log.d(TAG_BROADCAST, Coast.ACTION_NEXT);
+        if (Util.ACTION_NEXT.equals(intent.getAction())) {
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_BROADCAST, Util.ACTION_NEXT);
             }
             mMusicBroadCastListener.onNextMusicBroadCast();
         }
-        if (Coast.ACTION_PLAY.equals(intent.getAction())) {
-            if (LogSetting.sLife) {
-                Log.d(TAG_BROADCAST, Coast.ACTION_PLAY);
+        if (Util.ACTION_PLAY.equals(intent.getAction())) {
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_BROADCAST, Util.ACTION_PLAY);
             }
             mMusicBroadCastListener.onOnPlayMusicBroadCast();
         }
-        if (Coast.ACTION_AUTONEXT.equals(intent.getAction())) {
-            if (LogSetting.sLife) {
-                Log.d(TAG_BROADCAST, Coast.ACTION_AUTONEXT);
+        if (Util.ACTION_AUTONEXT.equals(intent.getAction())) {
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_BROADCAST, Util.ACTION_AUTONEXT);
             }
             mMusicBroadCastListener.onPlayMusicAutoNextBroadCast();
         }

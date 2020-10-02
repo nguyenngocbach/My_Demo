@@ -6,19 +6,33 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import com.example.myapplication.unit.Coast;
-
 public class SongaFvouriteDatabaseHelper extends SQLiteOpenHelper {
 
+    public static final String NAME_DATABASE = "SongFvourite.db";
+    public static final int VERSION = 1;
+    public static final String TABLE_NAME = "MY_SONG_FVOURITE";
+    public static final String _ID = "_id";
+    public static final String _PATH = "_path";
+    public static final String _AUTHOR = "_author";
+    public static final String _TITLE = "_title";
+    public static final String _DISPLAY_NAME = "_display_name";
+    public static final String _DURATION = "_duration";
+
+    public static final String CREATE_SONG_TABLE = "CREATE TABLE  " + TABLE_NAME+" ( "+_ID+" INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            +_PATH+" TEXT,"
+            +_AUTHOR+" TEXT,"
+            +_TITLE+" TEXT,"
+            +_DISPLAY_NAME+" TEXT,"
+            +_DURATION+" TEXT )";
     public SongaFvouriteDatabaseHelper(@Nullable Context context) {
-        // Coast.NameDatabase là tên Database
-        super(context, Coast.NAME_DATABASE, null, Coast.VERSION);
+        //BachNN : Coast.NameDatabase là tên Database
+        super(context, NAME_DATABASE, null, VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        //Coast.CREATE_SONG_TABLE là chuỗi String để tảo bảng.
-        sqLiteDatabase.execSQL(Coast.CREATE_SONG_TABLE);
+        //BachNN : Coast.CREATE_SONG_TABLE là chuỗi String để tảo bảng.
+        sqLiteDatabase.execSQL(CREATE_SONG_TABLE);
     }
 
     @Override

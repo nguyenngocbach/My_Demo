@@ -5,12 +5,12 @@ package com.example.myapplication.listenner;
  * theo các Action của Notification.
  */
 public interface INotificationBroadCastListener {
-    // chuyểm bài hát theo Action của Notification
+    //BachNN : chuyểm bài hát theo Action của Notification
     void onNextMusicBroadCast();
-    // quay lại bài hát theo Action của Notification
+    //BachNN : quay lại bài hát theo Action của Notification
     void onPreviousMusicBroadCast();
-    // dung hoặc chay  bài hát theo Action của Notification
+    //BachNN : dung hoặc chay  bài hát theo Action của Notification
     void onOnPlayMusicBroadCast();
-    // tự động next bài khi hết bài nhạc
+    //BachNN : tự động next bài khi hết bài nhạc
     void onPlayMusicAutoNextBroadCast();
 }

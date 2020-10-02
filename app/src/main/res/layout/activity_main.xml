@@ -6,26 +6,21 @@
     android:id="@+id/vertical_Screen"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <include layout="@layout/toolbar_layout"
         android:id="@+id/toolbar"/>
     <FrameLayout
-        android:id="@+id/allSongFragment"
+        android:id="@+id/all_Song_Fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="68dp"
         />
-
-    <FrameLayout
-        android:id="@+id/musicPlayer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
     </FrameLayout>
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationVew"
+        android:id="@+id/navigation_Vew"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"

@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -19,58 +18,54 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myapplication.Model.Song;
-import com.example.myapplication.Service.MusicManager;
+import com.example.myapplication.fragment.FavoriteSongsFragment;
+import com.example.myapplication.model.Song;
 import com.example.myapplication.Service.MusicService;
 import com.example.myapplication.broadcast.NotificationBroadCast;
 import com.example.myapplication.database.DataManager;
 import com.example.myapplication.fragment.AllSongFragment;
-import com.example.myapplication.fragment.FavoriteSongsFragment;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
 import com.example.myapplication.listenner.IDatabaseListenner;
-import com.example.myapplication.listenner.IMusicListenner;
 import com.example.myapplication.listenner.INotificationBroadCastListener;
-import com.example.myapplication.unit.Coast;
-import com.example.myapplication.unit.LogSetting;
+import com.example.myapplication.util.Util;
+import com.example.myapplication.util.LogSetting;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements  AllSongFragment.AllSongFragmentListenner
+public class MainActivity extends AppCompatActivity implements AllSongFragment.IAllSongFragmentListener
         , MediaPlaybackFragment.IMediaPlayFragmentListenner, INotificationBroadCastListener, IDatabaseListenner {
 
-    public static final String KEY_MUSIC_IBINDER = "com.example.myapplication.mIBinder";
     public static final String TAG_MAIN = "BachNN_MAIN";
     private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 123;
+    private static final int ALL_MUSIC = 0;
+    private static final int ALL_FAVOURITE_MUSIC = 1;
+    private static final int MUSIC_LIBRARY = 2;
     private MediaPlaybackFragment mMediaPlayer;
     private FragmentTransaction mTransaction;
     private Intent mIntent;
     private MusicService mMusicService;
-    private MusicManager mMusicManager;
     private FragmentManager mFragmentManager;
-    private boolean mIsVertical = false;
+    public boolean isVertical = false;
     private boolean mCheck = false;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
-    // ahead of Navigation
+    //BachNN : ahead of Navigation
     private TextView mListenTextView;
     private TextView mRecentTextView;
     private TextView mMusicLibraryTextView;
@@ -85,47 +80,30 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
     private MusicService.LocalMusic mLocalMusic;
     private DataManager mDatabase;
     private boolean mFavourite = false;
+    private View mFavouriteLayout;
     /*
      */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-//            mLocalMusic = (MusicService.LocalMusic) iBinder;
-//            mMusicService = mLocalMusic.getInstanceService();
-//            if (mMusicManager == null) {
-//                mMusicManager = mMusicService.getMusicManager();
-//            }
-//            if (!mCheck) {
-//                if (mIsVertical) {
-//                    AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-//                    if (LogSetting.sLife) {
-//                        Log.d(TAG_MAIN, mMusicManager + "  onServiceConnected " + mMusicManager.getmSongs().size());
-//                    }
-//                    //allSongFragment.setData(mMusicManager.getmSongs());
-////                    allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-////                    allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-////                    allSongFragment.setImageMusic();
-//
-//                } else {
-//                    AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-//                    //MediaPlaybackFragment playbackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-//                    allSongFragment.setData(mMusicManager.getmSongs());
-//                    allSongFragment.setData(mMusicManager.getmSongs());
-//                    allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-//                    allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-//                    allSongFragment.setVisible();
-//                }
-//            }
+            mLocalMusic = (MusicService.LocalMusic) iBinder;
+            mMusicService = mLocalMusic.getInstanceService();
+            createFragment();
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_MAIN, mLocalMusic + "  Connnect");
+            }
         }
 
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mMusicService = null;
-            mMusicManager = null;
         }
     };
-    private View mFavouriteLayout;
+
+    public MusicService getmMusicService() {
+        return mMusicService;
+    }
 
     public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -141,14 +119,20 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mMusicManager = MusicManager.getInstance(this);
+        mFragmentManager = getSupportFragmentManager();
 
-        if (savedInstanceState != null) {
-            mCheck = true;
-            mLocalMusic = (MusicService.LocalMusic) savedInstanceState.getSerializable(KEY_MUSIC_IBINDER);
-            mMusicManager = mLocalMusic.getInstanceService().getMusicManager();
-            Log.d(TAG_MAIN, "" + mLocalMusic);
-        }
+        mIntent = new Intent(MainActivity.this, MusicService.class);
+        startService(mIntent);
+        mDatabase = new DataManager(this);
+        // register BroadCast.
+        mBroadCast = new NotificationBroadCast(this);
+        IntentFilter mFilter = new IntentFilter();
+        mFilter.addAction(Util.ACTION_NEXT);
+        mFilter.addAction(Util.ACTION_PLAY);
+        mFilter.addAction(Util.ACTION_PREVIOUS);
+        mFilter.addAction(Util.ACTION_AUTONEXT);
+        this.registerReceiver(mBroadCast, mFilter);
+        //createFragment();
 
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -156,9 +140,22 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL_STORAGE);
         } else {
-            createFragment();
+            bindService(mIntent, mConnection, BIND_AUTO_CREATE);
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    createFragment();
+                }
+            } else {
+                finish();
+            }
+        }
     }
 
     /**
@@ -167,42 +164,22 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      * và kính hoạt Fragment , Service , Database
      */
     private void createFragment() {
-        mFragmentManager = getSupportFragmentManager();
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        if (findViewById(R.id.vertical_Screen) != null) isVertical = true;
+
 
         // start service.
-        mIntent = new Intent(MainActivity.this, MusicService.class);
-        startService(mIntent);
-        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-
-        mDatabase = new DataManager(this);
-        // register BroadCast.
-        mBroadCast = new NotificationBroadCast(this);
-        IntentFilter mFilter = new IntentFilter();
-        mFilter.addAction(Coast.ACTION_NEXT);
-        mFilter.addAction(Coast.ACTION_PLAY);
-        mFilter.addAction(Coast.ACTION_PREVIOUS);
-        mFilter.addAction(Coast.ACTION_AUTONEXT);
-        this.registerReceiver(mBroadCast, mFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadCast, mFilter);
-
-        if (findViewById(R.id.vertical_Screen) != null) mIsVertical = true;
-        if (findViewById(R.id.vertical_Screen) != null) mIsVertical = true;
-        if (mIsVertical) {
-            if ((MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer) != null) {
-                MediaPlaybackFragment fragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-                fragment.setMusicManager(mMusicManager);
-                if (LogSetting.sLife) {
-                    Log.d(TAG_MAIN, "cos nhe");
-                    //onBackPressed();
-                }
-            }
+//        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+        // todo xoa no di
+        if (isVertical) {
             AllSongFragment allSongFragment = new AllSongFragment();
+            allSongFragment.setmMusicService(mMusicService);
             FragmentTransaction ft = mFragmentManager.beginTransaction();
-            ft.replace(R.id.allSongFragment, allSongFragment);
+            ft.replace(R.id.all_Song_Fragment, allSongFragment);
             ft.commit();
-            //DrawerLayout and Navigation
+            //BachNN :DrawerLayout and Navigation
+            mToolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(mToolbar);
+            //todo hoi mr Thanh.
             mDrawerLayout = findViewById(R.id.vertical_Screen);
             mToggle = new ActionBarDrawerToggle(MainActivity.this
                     , mDrawerLayout, mToolbar, R.string.open_navigation, R.string.close_navigetion);
@@ -210,16 +187,14 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
             mToggle.syncState();
-            mNavigationView = findViewById(R.id.navigationVew);
+            mNavigationView = findViewById(R.id.navigation_Vew);
             mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.setting:
-                            Toast.makeText(MainActivity.this, "Setting", Toast.LENGTH_SHORT).show();
                             break;
                         case R.id.item_help:
-                            Toast.makeText(MainActivity.this, "Help & FeelBack", Toast.LENGTH_SHORT).show();
                             break;
                     }
                     mDrawerLayout.closeDrawers();
@@ -248,22 +223,20 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
                 }
             });
         } else {
-            MediaPlaybackFragment mediaPlaybackFragment = mLocalMusic.getMediaPlaybachFragment();
-            if (LogSetting.sLife) {
-                Log.d("BachNN_MAIN", mLocalMusic.getInstanceService().getMusicManager() + "  kkkkkk");
+            if (LogSetting.IS_DEBUG) {
+                Log.d(TAG_MAIN, mLocalMusic + "  DisConnnect");
             }
-            mediaPlaybackFragment.setMusicManager(mMusicManager);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(KEY_MUSIC_IBINDER, mLocalMusic);
-            mediaPlaybackFragment.setArguments(bundle);
+            MediaPlaybackFragment mediaPlaybackFragment = mLocalMusic.getMediaPlaybachFragment();
+            //todo xoa pham tren di
+            mediaPlaybackFragment.setMusicService(mMusicService);
             FragmentTransaction layer = mFragmentManager.beginTransaction();
-            layer.replace(R.id.musicPlayer, mediaPlaybackFragment);
+            layer.replace(R.id.music_Player, mediaPlaybackFragment);
             layer.addToBackStack(null);
             layer.commit();
 
             AllSongFragment allSongFragment = new AllSongFragment();
             FragmentTransaction ft = mFragmentManager.beginTransaction();
-            ft.replace(R.id.allSongFragment, allSongFragment);
+            ft.replace(R.id.all_Song_Fragment, allSongFragment);
             ft.commit();
         }
     }
@@ -290,11 +263,9 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
         mListenLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Listen_Now", Toast.LENGTH_SHORT).show();
                 setChangeAheader(0);
-                new AllFavouriteMusic().execute();
+                //new AllFavouriteMusic().execute();
                 mDrawerLayout.closeDrawers();
-                //mToolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
                 mFavourite = true;
 
             }
@@ -303,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
         mRecentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Recent", Toast.LENGTH_SHORT).show();
                 setChangeAheader(1);
                 mDrawerLayout.closeDrawers();
             }
@@ -312,16 +282,11 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
         mFavouriteLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (LogSetting.sLife) {
-                    Log.d("BachNN_MAIN", mLocalMusic.getInstanceService().getMusicManager() + "  kkkkkk");
-                }
-
-                FavoriteSongsFragment favouriteFragment= new FavoriteSongsFragment();
-                FragmentTransaction layer = mFragmentManager.beginTransaction();
-                layer.replace(R.id.allSongFragment, favouriteFragment);
-                layer.addToBackStack(null);
-                layer.commit();
+                FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
+                mTransaction = mFragmentManager.beginTransaction();
+                mTransaction.replace(R.id.all_Song_Fragment, favoriteSongsFragment);
+                mTransaction.addToBackStack(null);
+                mTransaction.commit();
                 mDrawerLayout.closeDrawers();
             }
         });
@@ -329,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
         mMusicLibraryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Music Library", Toast.LENGTH_SHORT).show();
                 setChangeAheader(2);
 
                 mDrawerLayout.closeDrawers();
@@ -338,6 +302,20 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
 
     }
 
+    public DataManager getDatabase() {
+        return mDatabase;
+    }
+
+    @Override
+    public void onOptionsMenuClosed(Menu menu) {
+        super.onOptionsMenuClosed(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     /**
      * BachNN
@@ -347,147 +325,44 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
     private void setChangeAheader(int i) {
         if (i == mPositionAHeader) return;
         switch (i) {
-            case 0:
+            case ALL_MUSIC:
                 mListenImage.setImageResource(R.drawable.custom_music_player);
-                mListenTextView.setTextColor(Color.argb(100, 250, 98, 50));
-                mListenLayout.setBackgroundColor(Color.argb(100, 234, 234, 232));
+                mListenTextView.setTextColor(getResources().getColor(R.color.ogin));
+                mListenLayout.setBackgroundColor(getResources().getColor(R.color.white_color));
                 break;
-            case 1:
+            case ALL_FAVOURITE_MUSIC:
                 mRecentImage.setImageResource(R.drawable.ic_replay_10);
-                mRecentTextView.setTextColor(Color.argb(100, 250, 98, 50));
-                mRecentLayout.setBackgroundColor(Color.argb(100, 234, 234, 232));
+                mRecentTextView.setTextColor(getResources().getColor(R.color.ogin));
+                mRecentLayout.setBackgroundColor(getResources().getColor(R.color.white_color));
                 break;
-            case 2:
+            case MUSIC_LIBRARY:
                 mMusicLibraryImage.setImageResource(R.drawable.ic_library_music_24);
-                mMusicLibraryTextView.setTextColor(Color.argb(100, 250, 98, 50));
-                mMusicLibraryLayout.setBackgroundColor(Color.argb(100, 234, 234, 232));
+                mMusicLibraryTextView.setTextColor(getResources().getColor(R.color.ogin));
+                mMusicLibraryLayout.setBackgroundColor(getResources().getColor(R.color.white_color));
                 break;
         }
 
         switch (mPositionAHeader) {
-            case 0:
+            case ALL_MUSIC:
                 mListenImage.setImageResource(R.drawable.ic_music_note_24);
-                mListenTextView.setTextColor(Color.argb(100, 122, 122, 121));
-                mListenLayout.setBackgroundColor(Color.argb(100, 255, 255, 255));
+                mListenTextView.setTextColor(getResources().getColor(R.color.grey_color));
+                mListenLayout.setBackgroundColor(getResources().getColor(R.color.ogin));
                 break;
-            case 1:
+            case ALL_FAVOURITE_MUSIC:
                 mRecentImage.setImageResource(R.drawable.ic_10_previous);
-                mRecentTextView.setTextColor(Color.argb(100, 122, 122, 121));
-                mRecentLayout.setBackgroundColor(Color.argb(100, 255, 255, 255));
+                mRecentTextView.setTextColor(getResources().getColor(R.color.grey_color));
+                mRecentLayout.setBackgroundColor(getResources().getColor(R.color.ogin));
                 break;
-            case 2:
+            case MUSIC_LIBRARY:
                 mMusicLibraryImage.setImageResource(R.drawable.ic_baseline_library_music_24);
-                mMusicLibraryTextView.setTextColor(Color.argb(100, 122, 122, 121));
-                mMusicLibraryLayout.setBackgroundColor(Color.argb(100, 255, 255, 255));
+                mMusicLibraryTextView.setTextColor(getResources().getColor(R.color.grey_color));
+                mMusicLibraryLayout.setBackgroundColor(getResources().getColor(R.color.ogin));
                 break;
         }
         mPositionAHeader = i;
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mCheck) {
-            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-            allSongFragment.setData(mMusicManager.getmSongs());
-//            allSongFragment.setSongManager(mMusicManager);
-            allSongFragment.setTitle(mMusicManager.getSongIsPlay());
-            allSongFragment.setImageMusic();
-            //allSongFragment.setVisible(!mMusicManager.getCurrentBegin());
-            if (!mIsVertical) {
-                //MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-                allSongFragment.setVisible();
-            } else allSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    public MusicManager getMusicManager() {
-        return mMusicManager;
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(KEY_MUSIC_IBINDER, mLocalMusic);
-        //outState.putSerializable(KEY_MUSIC_MANAGER, mMusicManager);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    createFragment();
-                }
-            } else {
-                finish();
-            }
-        }
-    }
-
-    /**
-     * BachNN
-     *
-     * @param i là vị trí bạn hát được chọn trongn AllFragment ,
-     *          và sẽ set lại ban hát cho đung  vị trí của i và cập nhập lại giao diện
-     */
-//    @Override
-//    public void selectMusic(int i) {
-////        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-////        allSongFragment.setSelection(i);
-////        allSongFragment.isPlayMusic(true);
-////        allSongFragment.setImageMusic();
-////        allSongFragment.setVisibleDisPlay();
-////        if (mMusicManager != null) {
-////            if (mMusicManager.isMusicPlaying()) {
-////                mMusicManager.onResetMusic();
-////            }
-////            mMusicManager.setmCurrentSong(i);
-////            mMusicManager.onPlayMusic();
-////        }
-//        if (!mIsVertical) {
-//            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-//            player.setMusicManager(mMusicManager);
-//        }
-//        mLocalMusic.setNextMusicNotification();
-//    }
-
-    /**
-     * BachNN
-     * @param i vị trí của item trong list Music.
-     * @param view chuyền vào các view đã click
-     *             hiện thi một PopupMenu đệ người dung chọn bài hát thích hay không thích.
-//     */
-//    @Override
-//    public void selectMoreMusic(final int i, View view) {
-////        PopupMenu mPopupMen = new PopupMenu(MainActivity.this, view);
-////        mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
-////
-////        mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-////            @Override
-////            public boolean onMenuItemClick(MenuItem menuItem) {
-////                switch (menuItem.getItemId()) {
-////                    case R.id.like_music:
-////                        new AddFavouriteMusic().execute(mMusicManager.getSinpleSong(i));
-////                        Toast.makeText(mMusicService, "You like " + mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
-////
-////                        break;
-////                    case R.id.dislike_music:
-////                        new DeleteFavouriteMusic().execute(Integer.parseInt(mMusicManager.getSinpleSong(i).getId()));
-////                        Toast.makeText(mMusicService, "You dislike " + mMusicManager.getmSongs().get(i).getTitle(), Toast.LENGTH_SHORT).show();
-////                        break;
-////                }
-////                return true;
-////            }
-////        });
-////        mPopupMen.show();
-//    }
 
     /**
      * BachNN
@@ -495,21 +370,11 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void show() {
-        if(mIsVertical) {
-            mMediaPlayer = mLocalMusic.getMediaPlaybachFragment();
-            mTransaction = mFragmentManager.beginTransaction();
-            mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
-            mTransaction.addToBackStack(null);
-            mTransaction.commit();
-
-        } else {
-            mMediaPlayer = mLocalMusic.getMediaPlaybachFragment();
-            mTransaction = mFragmentManager.beginTransaction();
-            mTransaction.replace(R.id.musicPlayer, mMediaPlayer);
-            mTransaction.addToBackStack(null);
-            mTransaction.commit();
-
-        }
+        MediaPlaybackFragment mediaPlaybackFragment = mLocalMusic.getMediaPlaybachFragment();
+        mTransaction = mFragmentManager.beginTransaction();
+        mTransaction.replace(R.id.all_Song_Fragment, mediaPlaybackFragment);
+        mTransaction.addToBackStack(null);
+        mTransaction.commit();
     }
 
     @Override
@@ -532,10 +397,13 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void onPrevious() {
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        allSongFragment.setData(mMusicManager.getmSongs());
-        allSongFragment.setImageMusic();
-        mLocalMusic.setPreviousMusicNotification();
+        if (!isVertical) {
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            // todo xoa di nhe
+            allSongFragment.setData(mMusicService.getmSongs());
+            allSongFragment.setImageMusic();
+            mLocalMusic.setPreviousMusicNotification();
+        }
     }
 
     /**
@@ -545,9 +413,11 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void onPlay() {
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        mAllSongFragment.isPlayMusic(!mMusicManager.isMusicPlaying());
-        mLocalMusic.setPlayMusicNoti();
+        if (!isVertical) {
+            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            mAllSongFragment.isPlayMusic(!mMusicService.isMusicPlaying());
+            mLocalMusic.setPlayMusicNoti();
+        }
     }
 
     /**
@@ -557,11 +427,14 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void onNext() {
+        if (!isVertical) {
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            // todo xoa di nhe
+            allSongFragment.setData(mMusicService.getmSongs());
+            allSongFragment.setImageMusic();
+            mLocalMusic.setNextMusicNotification();
+        }
 
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        allSongFragment.setData(mMusicManager.getmSongs());
-        allSongFragment.setImageMusic();
-        mLocalMusic.setNextMusicNotification();
     }
 
     @Override
@@ -576,12 +449,15 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
 
     @Override
     public void onSeekBar() {
-        AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        songFragment.setTitle(mMusicManager.getSongIsPlay());
+        if (!isVertical) {
+            AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            // todo ko can cai nay
+            songFragment.setTitle(mMusicService.getSongIsPlay());
+        }
     }
 
     public boolean isVertical() {
-        return mIsVertical;
+        return isVertical;
     }
 
     public boolean isCheck() {
@@ -597,16 +473,18 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
     //
     @Override
     public void onNextMusicBroadCast() {
-        mMusicManager.onNextMusic();
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        mAllSongFragment.setData(mMusicManager.getmSongs());
-        mAllSongFragment.setTitle(mMusicManager.getSongIsPlay());
-        mAllSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
-        mAllSongFragment.setImageMusic();
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        mMusicService.onNextMusic();
+        // todo viet mot ham set lai gian dien cho AllSongFragment.
+        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+//        mAllSongFragment.setData(mMusicService.getmSongs());
+//        mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
+//        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
+//        mAllSongFragment.setImageMusic();
+        mAllSongFragment.setUIAllView();
+        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
         if (mMediaPlaybackFragment != null) {
-            mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
-            mMediaPlaybackFragment.setTile(mMusicManager.getSongIsPlay());
+            mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
+            mMediaPlaybackFragment.setTile(mMusicService.getSongIsPlay());
             mMediaPlaybackFragment.setImagePlayer();
         }
         mLocalMusic.setNextMusicNotification();
@@ -619,16 +497,16 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void onPreviousMusicBroadCast() {
-        mMusicManager.onPreviousMusic();
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        mAllSongFragment.setData(mMusicManager.getmSongs());
-        mAllSongFragment.setTitle(mMusicManager.getSongIsPlay());
-        mAllSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
+        mMusicService.onPreviousMusic();
+        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+        mAllSongFragment.setData(mMusicService.getmSongs());
+        mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
+        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
         mAllSongFragment.setImageMusic();
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
         if (mMediaPlaybackFragment != null) {
-            mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
-            mMediaPlaybackFragment.setTile(mMusicManager.getSongIsPlay());
+            mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
+            mMediaPlaybackFragment.setTile(mMusicService.getSongIsPlay());
             mMediaPlaybackFragment.setImagePlayer();
         }
         mLocalMusic.setPreviousMusicNotification();
@@ -641,77 +519,52 @@ public class MainActivity extends AppCompatActivity implements  AllSongFragment.
      */
     @Override
     public void onOnPlayMusicBroadCast() {
-        if (mMusicManager.isMusicPlaying()) {
-            mMusicManager.onStopMusic();
+        if (mMusicService.isMusicPlaying()) {
+            mMusicService.onStopMusic();
         } else {
-            mMusicManager.onResumeMusic();
+            mMusicService.onResumeMusic();
         }
-        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        mAllSongFragment.isPlayMusic(mMusicManager.isMusicPlaying());
+        // todo viet mot ham set lai giao dien la on
+        AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+        mAllSongFragment.isPlayMusic(mMusicService.isMusicPlaying());
 
-        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
+        MediaPlaybackFragment mMediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
         if (mMediaPlaybackFragment != null) {
-            mMediaPlaybackFragment.setStatusIcon(mMusicManager.isMusicPlaying());
+            mMediaPlaybackFragment.setStatusIcon(mMusicService.isMusicPlaying());
         }
         mLocalMusic.setPlayMusic();
     }
 
     @Override
     public void onPlayMusicAutoNextBroadCast() {
-        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.allSongFragment);
-        allSongFragment.setSelection(mMusicManager.getmCurrentSong());
+        // todo viet mot ham set lai giao dien la on
+        AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+        allSongFragment.setSelection(mMusicService.getmCurrentSong());
         allSongFragment.isPlayMusic(true);
-        if (!mIsVertical) {
-            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.musicPlayer);
-            player.setMusicManager(mMusicManager);
+        if (!isVertical) {
+            MediaPlaybackFragment player = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            player.setMusicService(mMusicService);
         }
         mLocalMusic.setNextMusicNotification();
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void addFavouriteMusic(Song song) {
-        new AddFavouriteMusic().execute(song);
+//        new AddFavouriteMusic().execute(song);
     }
 
     @Override
     public void deleteFavouriteMusic(int id) {
-        new DeleteFavouriteMusic().execute(id);
+//        new DeleteFavouriteMusic().execute(id);
     }
 
     @Override
     public void getAllFavouriteMusic() {
     }
 
-    class AddFavouriteMusic extends AsyncTask<Song, Void, Void> {
-        @Override
-        protected Void doInBackground(Song... songs) {
-            mDatabase.addMusicFvourite(songs[0]);
-            return null;
-        }
-    }
-
-    class DeleteFavouriteMusic extends AsyncTask<Integer, Void, Void> {
-        @Override
-        protected Void doInBackground(Integer... integers) {
-            mDatabase.removeMusicFvourite(integers[0]);
-            return null;
-        }
-    }
-
-    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
-        @Override
-        protected List<Song> doInBackground(Void... voids) {
-            return mDatabase.getAllMusicFvourite();
-        }
-
-        @Override
-        protected void onPostExecute(List<Song> songs) {
-            super.onPostExecute(songs);
-            // todo something
-            if (songs.size() > 0) {
-                for (int i = 0; i < songs.size(); i++) {
-                }
-            }
-        }
-    }
 }

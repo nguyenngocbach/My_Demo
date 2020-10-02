@@ -11,18 +11,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.Model.Song;
+import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.listenner.IMusicListenner;
 
 import java.util.List;
 
 public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHolder> {
-    // LINE_NORMAL là  bài hát không đc chọn.
+    //BachNN : LINE_NORMAL là  bài hát không đc chọn.
     private static final int LINE_NORMAL = 0;
-    // LINE_CHOOSE là bài hát được chọn và đang chạy nhạc
+    //BachNN : LINE_CHOOSE là bài hát được chọn và đang chạy nhạc
     private static final int LINE_CHOOSE = 1;
-    public int mCurrentSong = 0;
+    public int mCurrentSong = 2;
     private Context mContext;
     private List<Song> mSongs;
     private IMusicListenner mListener;
@@ -44,7 +44,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view;
-        //nếu type = LINE_CHOOSE sẽ set cái dong đấy là bài được chọn còn ngược lại.
+        //BachNN : nếu type = LINE_CHOOSE sẽ set cái dong đấy là bài được chọn còn ngược lại.
         if (viewType == LINE_CHOOSE) {
             view = LayoutInflater.from(mContext).inflate(R.layout.song_line_play, parent, false);
         } else {
@@ -55,11 +55,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        boolean check = (position == mCurrentSong) ? true : false;
-        // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
-        holder.mIndexMusic.setText("" + (position + 1));
-        //chuyền một bài hát đang chay vào hàm dưới để title và author
-        holder.onBind(mSongs.get(position), check);
+        holder.onBind(mSongs.get(position));
     }
 
     @Override
@@ -80,16 +76,12 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         return (minutes < 10 ? "0" + minutes : minutes + "") + ":" + (second < 10 ? "0" + second : second + "");
     }
 
-    public int getCurrentSong() {
-        return mCurrentSong;
-    }
 
     public void setCurrentSong(int mCurrentSong) {
         this.mCurrentSong = mCurrentSong;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        // todo ko cam m
         TextView mIndexMusic;
         TextView mTitleTextView;
         TextView mAuthorTextView;
@@ -100,8 +92,8 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mIndexMusic = itemView.findViewById(R.id.txt_stt);
-            mTitleTextView = itemView.findViewById(R.id.nameMusic);
-            mAuthorTextView = itemView.findViewById(R.id.nameAirsts);
+            mTitleTextView = itemView.findViewById(R.id.name_Music);
+            mAuthorTextView = itemView.findViewById(R.id.name_Airsts);
             mPlayMusicIcon = itemView.findViewById(R.id.icon_play_music);
             mMoreIcon = itemView.findViewById(R.id.icon_more);
             mItemMuiscLayout = itemView.findViewById(R.id.click_item);
@@ -122,7 +114,11 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
             });
         }
 
-        public void onBind(Song song, boolean check) {
+        public void onBind(Song song) {
+            boolean check = (getAdapterPosition() == mCurrentSong) ? true : false;
+            // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
+            mIndexMusic.setText("" + (getAdapterPosition() + 1));
+            //chuyền một bài hát đang chay vào hàm dưới để title và author
             mTitleTextView.setText(song.getTitle());
             mAuthorTextView.setText(getDuration(song.getDuration()));
             if (check) {

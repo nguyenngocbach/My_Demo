@@ -1,8 +1,8 @@
-package com.example.myapplication.unit;
+package com.example.myapplication.util;
 
 /**BachNN
  * class này để điều khiển bất tắt.
  */
 public class LogSetting {
-    public static boolean sLife= true;
+    public static final boolean IS_DEBUG = true;
 }

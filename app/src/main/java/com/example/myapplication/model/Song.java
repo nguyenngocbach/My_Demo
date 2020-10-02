@@ -1,4 +1,4 @@
-package com.example.myapplication.Model;
+package com.example.myapplication.model;
 
 import java.io.Serializable;
 
@@ -7,7 +7,7 @@ public class Song implements Serializable {
     private String mPath;
     private String mAuthor;
     private String mTitle;
-    private String mDsplayName;
+    private String mDisplayName;
     private String mDuration;
 
     public Song(String id, String path, String author, String title, String display_Name, String duration) {
@@ -15,7 +15,7 @@ public class Song implements Serializable {
         this.mPath = path;
         this.mAuthor = author;
         this.mTitle = title;
-        this.mDsplayName = display_Name;
+        this.mDisplayName = display_Name;
         this.mDuration = duration;
     }
 
@@ -29,11 +29,11 @@ public class Song implements Serializable {
     }
 
     public String getDisplay_Name() {
-        return mDsplayName;
+        return mDisplayName;
     }
 
     public void setDisplay_Name(String display_Name) {
-        this.mDsplayName = display_Name;
+        this.mDisplayName = display_Name;
     }
 
     public String getPath() {
@@ -75,7 +75,7 @@ public class Song implements Serializable {
                 ", mPath='" + mPath + '\'' +
                 ", mAuthor='" + mAuthor + '\'' +
                 ", mTitle='" + mTitle + '\'' +
-                ", mDsplayName='" + mDsplayName + '\'' +
+                ", mDsplayName='" + mDisplayName + '\'' +
                 ", mDuration='" + mDuration + '\'' +
                 '}';
     }

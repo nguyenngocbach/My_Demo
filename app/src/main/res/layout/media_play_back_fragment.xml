@@ -42,7 +42,7 @@
             android:paddingTop="2dp"
             android:paddingLeft="8dp">
             <TextView
-                android:id="@+id/txtTitle"
+                android:id="@+id/txt_Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
@@ -52,7 +52,7 @@
                 android:text="Nơi này có anh"
                 />
             <TextView
-                android:id="@+id/txtAuthor"
+                android:id="@+id/txt_Author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
