@@ -116,13 +116,13 @@
             android:layout_marginRight="15dp" />
 
         <ImageView
-            android:id="@+id/iconLike"
+            android:id="@+id/icon_Like"
             android:layout_width="@dimen/size_icon"
             android:layout_height="38dp"
             android:layout_marginBottom="5dp"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iconPrevious"
+            app:layout_constraintEnd_toStartOf="@+id/icon_Previous"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_startTime"
@@ -131,46 +131,46 @@
             />
 
         <ImageView
-            android:id="@+id/iconPrevious"
+            android:id="@+id/icon_Previous"
             android:layout_width="@dimen/size_icon"
             android:layout_height="@dimen/size_icon"
             android:layout_marginBottom="5dp"
             android:padding="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iconPlay"
+            app:layout_constraintEnd_toStartOf="@+id/icon_Play"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/iconLike"
-            app:layout_constraintTop_toTopOf="@+id/iconLike"
+            app:layout_constraintStart_toEndOf="@+id/icon_Like"
+            app:layout_constraintTop_toTopOf="@+id/icon_Like"
             android:src="@drawable/ic_baseline_skip_previous"
             android:layout_marginRight="7dp"
             android:contentDescription="@string/app_name"/>
 
         <ImageView
-            android:id="@+id/iconPlay"
+            android:id="@+id/icon_Play"
             android:layout_width="@dimen/size_icon_pause"
             android:layout_height="@dimen/size_icon_pause"
             android:layout_marginBottom="3dp"
             android:padding="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iconNext"
+            app:layout_constraintEnd_toStartOf="@+id/icon_Next"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/iconPrevious"
-            app:layout_constraintTop_toTopOf="@+id/iconLike"
+            app:layout_constraintStart_toEndOf="@+id/icon_Previous"
+            app:layout_constraintTop_toTopOf="@+id/icon_Like"
             app:srcCompat="@drawable/costom_play"
             android:contentDescription="@string/app_name"
 
             />
 
         <ImageView
-            android:id="@+id/iconNext"
+            android:id="@+id/icon_Next"
             android:layout_width="@dimen/size_icon"
             android:layout_height="@dimen/size_icon"
             android:layout_marginBottom="5dp"
             android:padding="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/iconDislike"
+            app:layout_constraintEnd_toStartOf="@+id/icon_Dislike"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/iconPlay"
+            app:layout_constraintStart_toEndOf="@+id/icon_Play"
             app:layout_constraintTop_toBottomOf="@+id/txt_totalTime"
             android:src="@drawable/ic_baseline_skip_next"
             android:layout_marginLeft="7dp"
@@ -178,7 +178,7 @@
             />
 
         <ImageView
-            android:id="@+id/iconDislike"
+            android:id="@+id/icon_Dislike"
             android:layout_width="@dimen/size_icon"
             android:layout_height="@dimen/size_icon"
             android:layout_marginStart="1dp"
@@ -187,7 +187,7 @@
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/iconNext"
+            app:layout_constraintStart_toEndOf="@+id/icon_Next"
             app:layout_constraintTop_toBottomOf="@+id/txt_totalTime"
             android:contentDescription="@string/app_name"
             app:srcCompat="@drawable/ic_thumbs_down_default" />

@@ -15,7 +15,11 @@ public class AllSongFragment extends BaseSongListFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            new LoadAllMusic().execute();
+            LoadData();
     }
 
+    @Override
+    public void LoadData() {
+        new LoadAllMusic().execute();
+    }
 }

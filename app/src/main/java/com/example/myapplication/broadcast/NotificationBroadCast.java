@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.listenner.INotificationBroadCastListener;
 import com.example.myapplication.util.Util;
 import com.example.myapplication.util.LogSetting;
@@ -13,7 +14,6 @@ import com.example.myapplication.util.LogSetting;
  * Nhận các Message từ Notification bắn ra
  */
 public class NotificationBroadCast extends BroadcastReceiver {
-    private static final String TAG_BROADCAST = "Log_BroadCast";
     private INotificationBroadCastListener mMusicBroadCastListener;
 
     public NotificationBroadCast(INotificationBroadCastListener mBroadCastListener) {
@@ -29,25 +29,25 @@ public class NotificationBroadCast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Util.ACTION_PREVIOUS.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG_BROADCAST, Util.ACTION_PREVIOUS);
+                Log.d(MainActivity.TAG_MAIN, Util.ACTION_PREVIOUS);
             }
             mMusicBroadCastListener.onPreviousMusicBroadCast();
         }
         if (Util.ACTION_NEXT.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG_BROADCAST, Util.ACTION_NEXT);
+                Log.d(MainActivity.TAG_MAIN, Util.ACTION_NEXT);
             }
             mMusicBroadCastListener.onNextMusicBroadCast();
         }
         if (Util.ACTION_PLAY.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG_BROADCAST, Util.ACTION_PLAY);
+                Log.d(MainActivity.TAG_MAIN, Util.ACTION_PLAY);
             }
             mMusicBroadCastListener.onOnPlayMusicBroadCast();
         }
         if (Util.ACTION_AUTONEXT.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG_BROADCAST, Util.ACTION_AUTONEXT);
+                Log.d(MainActivity.TAG_MAIN, Util.ACTION_AUTONEXT);
             }
             mMusicBroadCastListener.onPlayMusicAutoNextBroadCast();
         }

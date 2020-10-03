@@ -47,19 +47,19 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AllSongFragment.IAllSongFragmentListener
-        , MediaPlaybackFragment.IMediaPlayFragmentListenner, INotificationBroadCastListener, IDatabaseListenner {
+        , MediaPlaybackFragment.IMediaPlayFragmentListenner, INotificationBroadCastListener {
 
     public static final String TAG_MAIN = "BachNN_MAIN";
     private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 123;
     private static final int ALL_MUSIC = 0;
     private static final int ALL_FAVOURITE_MUSIC = 1;
     private static final int MUSIC_LIBRARY = 2;
+    public boolean isVertical = false;
     private MediaPlaybackFragment mMediaPlayer;
     private FragmentTransaction mTransaction;
     private Intent mIntent;
     private MusicService mMusicService;
     private FragmentManager mFragmentManager;
-    public boolean isVertical = false;
     private boolean mCheck = false;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
@@ -134,23 +134,32 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         this.registerReceiver(mBroadCast, mFilter);
         //createFragment();
 
+        // kiêm tra xem đã có quyền truy cập hay chưa.
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL_STORAGE);
         } else {
+            startService(mIntent);
             bindService(mIntent, mConnection, BIND_AUTO_CREATE);
         }
 
     }
 
+    /**
+     * @param requestCode
+     * @param permissions
+     * @param grantResults ..
+     *                     xin quyêm truy cập để lấy các bài hát.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_READ_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    createFragment();
+                    startService(mIntent);
+                    bindService(mIntent, mConnection, BIND_AUTO_CREATE);
                 }
             } else {
                 finish();
@@ -165,11 +174,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
      */
     private void createFragment() {
         if (findViewById(R.id.vertical_Screen) != null) isVertical = true;
-
-
-        // start service.
-//        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-        // todo xoa no di
         if (isVertical) {
             AllSongFragment allSongFragment = new AllSongFragment();
             allSongFragment.setmMusicService(mMusicService);
@@ -179,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             //BachNN :DrawerLayout and Navigation
             mToolbar = findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
-            //todo hoi mr Thanh.
             mDrawerLayout = findViewById(R.id.vertical_Screen);
             mToggle = new ActionBarDrawerToggle(MainActivity.this
                     , mDrawerLayout, mToolbar, R.string.open_navigation, R.string.close_navigetion);
@@ -227,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
                 Log.d(TAG_MAIN, mLocalMusic + "  DisConnnect");
             }
             MediaPlaybackFragment mediaPlaybackFragment = mLocalMusic.getMediaPlaybachFragment();
-            //todo xoa pham tren di
             mediaPlaybackFragment.setMusicService(mMusicService);
             FragmentTransaction layer = mFragmentManager.beginTransaction();
             layer.replace(R.id.music_Player, mediaPlaybackFragment);
@@ -264,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             @Override
             public void onClick(View view) {
                 setChangeAheader(0);
-                //new AllFavouriteMusic().execute();
                 mDrawerLayout.closeDrawers();
                 mFavourite = true;
 
@@ -307,14 +308,9 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     }
 
     @Override
-    public void onOptionsMenuClosed(Menu menu) {
-        super.onOptionsMenuClosed(menu);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     /**
@@ -439,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
 
     @Override
     public void onDisLike() {
-
     }
 
     @Override
@@ -451,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onSeekBar() {
         if (!isVertical) {
             AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            // todo ko can cai nay
             songFragment.setTitle(mMusicService.getSongIsPlay());
         }
     }
@@ -459,11 +453,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public boolean isVertical() {
         return isVertical;
     }
-
-    public boolean isCheck() {
-        return mCheck;
-    }
-
 
     /**
      * BachNN
@@ -500,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mAllSongFragment.setImageMusic();
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
-                mMusicService.setChangeUIMediaFragment();
+            mMusicService.setChangeUIMediaFragment();
         }
         mLocalMusic.setPreviousMusicNotification();
     }
@@ -528,6 +517,9 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mLocalMusic.setPlayMusic();
     }
 
+    /**
+     * hàm này tự động next bài hát khi chay hết bài
+     */
     @Override
     public void onPlayMusicAutoNextBroadCast() {
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
@@ -535,31 +527,18 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             allSongFragment.setSelection(mMusicService.getmCurrentSong());
             allSongFragment.isPlayMusic(true);
         }
-        if (!isVertical) {
-            if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
-                mMusicService.setChangeUIMediaFragment();
-            }
+        if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
+            mMusicService.setChangeUIMediaFragment();
         }
         mLocalMusic.setNextMusicNotification();
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    public void addFavouriteMusic(Song song) {
-//        new AddFavouriteMusic().execute(song);
-    }
-
-    @Override
-    public void deleteFavouriteMusic(int id) {
-//        new DeleteFavouriteMusic().execute(id);
-    }
-
-    @Override
-    public void getAllFavouriteMusic() {
+        stopService(mIntent);
+        mMusicService.onDestroy();
     }
 
 }

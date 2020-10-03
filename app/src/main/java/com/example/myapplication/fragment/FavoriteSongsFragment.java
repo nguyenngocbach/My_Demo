@@ -15,8 +15,11 @@ public class FavoriteSongsFragment extends AllSongFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        mMainActivity = (MainActivity) getActivity();
-//        mAllSongListener = (IAllSongFragmentListener) getActivity();
+    }
+
+
+    @Override
+    public void LoadData() {
         new AllFavouriteMusic().execute();
     }
 

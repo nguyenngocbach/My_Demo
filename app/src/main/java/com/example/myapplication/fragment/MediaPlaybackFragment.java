@@ -25,7 +25,6 @@ import com.example.myapplication.util.Util;
 
 public class MediaPlaybackFragment extends Fragment implements View.OnClickListener {
 
-    public static final String KEY_MEDIA_FRAGMENT = "com.example.myapplication.fragment.musicManager";
     private int TIME_REPEAT = 300;
     private ImageView mMusicImageView;
     private ImageView mAvatarImageView;
@@ -94,11 +93,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mAvatarImageView = view.findViewById(R.id.icon_avata);
         mMoreIcon = view.findViewById(R.id.icon_more);
         mListMusicIcon = view.findViewById(R.id.icon_queue);
-        mLikeIcon = view.findViewById(R.id.iconLike);
-        mPreviousIcon = view.findViewById(R.id.iconPrevious);
-        mPlayIcon = view.findViewById(R.id.iconPlay);
-        mNextIcon = view.findViewById(R.id.iconNext);
-        mDislikeIcon = view.findViewById(R.id.iconDislike);
+        mLikeIcon = view.findViewById(R.id.icon_Like);
+        mPreviousIcon = view.findViewById(R.id.icon_Previous);
+        mPlayIcon = view.findViewById(R.id.icon_Play);
+        mNextIcon = view.findViewById(R.id.icon_Next);
+        mDislikeIcon = view.findViewById(R.id.icon_Dislike);
         mRePeatIcon = view.findViewById(R.id.icon_repeat);
         mShuffleIcon = view.findViewById(R.id.icon_shuffle);
         mAuthorTextView = view.findViewById(R.id.txt_Author);
@@ -155,14 +154,23 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (mMusicService != null) {
-            //Song song = (Song) getArguments().getSerializable(KEY_MEDIA_FRAGMENT);
-//            MusicService.LocalMusic localMusic = (MusicService.LocalMusic) getArguments().getSerializable(MainActivity.KEY_MUSIC_IBINDER);
-//            mMusicManager = localMusic.getInstanceService().getMusicManager();
             setTile(mMusicService.getSongIsPlay());
             setSeekBar();
             setStatusIcon(mMusicService.isMusicPlaying());
+            setRepeat();
         }
         setImagePlayer();
+    }
+
+    private void setRepeat() {
+        if (mMusicService.getStatueRepeat() == MusicService.NORMAL) {
+            mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
+            mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
+        } else if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
+            mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
+        } else {
+            mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
+        }
     }
 
     /**
@@ -183,7 +191,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * set lại toàn bộ các view trong Fragment này.
      */
-    public void setUIMusic(){
+    public void setUIMusic() {
         setSeekBar();
         setTile(mMusicService.getSongIsPlay());
         setStatusIcon(mMusicService.isMusicPlaying());
@@ -212,7 +220,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mHandler.postDelayed(runnable, TIME_REPEAT);
     }
 
-    // set title va author cho bai hay
+    /**
+     * @param song bài hát mà muosn set tiêu đề.
+     *             set title va author cho bai hay
+     */
     public void setTile(Song song) {
         mAuthorTextView.setText(song.getAuthor());
         mTitleTextView.setText(song.getTitle());
@@ -245,8 +256,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * BachNN
+     * set Image cho 2 cái ảnh của MediaPlaybackFragment.
+     */
     public void setImagePlayer() {
-        if (mMusicService==null) return;
+        if (mMusicService == null) return;
         byte[] sourceImage = Util.getByteImageSong(mMusicService.getSongIsPlay().getPath());
         Glide.with(getContext())
                 .load(sourceImage)
@@ -270,11 +285,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             case R.id.icon_queue:
                 getActivity().onBackPressed();
                 break;
-            case R.id.iconLike:
+            case R.id.icon_Like:
                 mMediaListener.onLike();
                 mMusicService.setChangeNotification();
                 break;
-            case R.id.iconPrevious:
+            case R.id.icon_Previous:
                 mMusicService.onPreviousMusic();
                 setTile(mMusicService.getSongIsPlay());
                 setSeekBar();
@@ -282,27 +297,27 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setImagePlayer();
                 mMusicService.setChangeNotification();
                 break;
-            case R.id.iconPlay:
+            case R.id.icon_Play:
                 mMediaListener.onPlay();
                 if (mMusicService.isMusicPlaying()) {
                     mMusicService.onStopMusic();
                     mPlayIcon.setImageResource(R.drawable.costom_play);
-                    if (mMusicService.getmStatus() == 0) {
+                    if (mMusicService.getmStatus() == MusicService.INITIALLY) {
                         mMusicService.onPlayMusic();
-                        mMusicService.setmStatus(1);
+                        mMusicService.setmStatus(MusicService.STOP);
                     }
                 } else {
                     mMusicService.onResumeMusic();
                     // 0 ,1 ko ro ràng
-                    if (mMusicService.getmStatus() == 0) {
+                    if (mMusicService.getmStatus() ==  MusicService.INITIALLY) {
                         mMusicService.onPlayMusic();
-                        mMusicService.setmStatus(1);
+                        mMusicService.setmStatus(MusicService.STOP);
                     }
                     mPlayIcon.setImageResource(R.drawable.custom_play_pause);
                 }
                 mMusicService.setChangeNotification();
                 break;
-            case R.id.iconNext:
+            case R.id.icon_Next:
                 mMusicService.onNextMusic();
                 setTile(mMusicService.getSongIsPlay());
                 setSeekBar();
@@ -310,14 +325,22 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 setImagePlayer();
                 mMusicService.setChangeNotification();
                 break;
-            case R.id.iconDislike:
+            case R.id.icon_Dislike:
                 mMediaListener.onDisLike();
                 break;
             case R.id.icon_shuffle:
                 mMusicService.setShuff();
+                if (mMusicService.getStatueRepeat() == MusicService.SHUFF) {
+                    mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
+                }
+                mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
                 break;
             case R.id.icon_repeat:
                 mMusicService.setRandom();
+                if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
+                    mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
+                }
+                mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
                 break;
         }
     }
@@ -360,6 +383,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         //BachNN : bài hát ko thicks
         void onDisLike();
+
         //BachNN :
         void onSeekBar();
     }

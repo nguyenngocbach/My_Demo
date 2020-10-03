@@ -37,12 +37,15 @@ import java.util.Random;
 
 public class MusicService extends Service {
 
+    public static final int RANDOM = 5;
+    public static final int SHUFF = 6;
+    public static final int NORMAL = 7;
     private static final String ID_CHANNEL = "1999";
     private static final int ID_NOTIFICATION = 111;
     private static final String LOG_REALTIME = "log_realtime";
     private int TIME_REPEAT = 300;
     //    private MusicManager mMusicManager;
-    private MediaPlaybackFragment mMediaPlaybackFragment= new MediaPlaybackFragment();
+    private MediaPlaybackFragment mMediaPlaybackFragment = new MediaPlaybackFragment();
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotificationManager;
@@ -50,21 +53,18 @@ public class MusicService extends Service {
     private IBinder iBinder = new LocalMusic();
     private SeekBar mSeekBar;
 
-    private List<Song> mSongs = new ArrayList<>();
+    private List<Song> mSongs ;
     private MediaPlayer mPlayer;
     private int mCurrentSong = -1;
     private Context mContext;
 
     // BachNN :next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
-    private int mInitially = 0;
+    public static final int INITIALLY = 0;
     // BachNN :khí bài hát đang chạy nó bị dừng.
-    private int mStop = 3;
-    private int mRandom = 5;
-    private int mShuff=6;
-    private int mNormal= 7;
-    private int mStatueRepeat=mNormal;
+    public static final  int STOP = 3;
+    private int mStatueRepeat = NORMAL;
     // BachNN :về trang thái lúc ban đâu là next , previous bài hát.
-    private int mStatus = mInitially;
+    private int mStatus = INITIALLY;
 
 
     private Handler mHandler = new Handler();
@@ -95,8 +95,8 @@ public class MusicService extends Service {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
-        getAllSong();
         mPlayer = new MediaPlayer();
+
     }
 
     @Nullable
@@ -107,14 +107,10 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // todo songthing bỏ set Current = 0 đi
+        mSongs=getAllSong();
         mSeekBar = new SeekBar(this);
-        mHandler.postDelayed(runnable, TIME_REPEAT);
-//        mMediaPlaybackFragment = new MediaPlaybackFragment();
+//        mHandler.postDelayed(runnable, TIME_REPEAT);
         mMediaPlaybackFragment.setMusicService(this);
-        if (LogSetting.IS_DEBUG) {
-            Log.d(MainActivity.TAG_MAIN, getTimeCurrents() + "hehehehehehehe");
-        }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             //
             NotificationChannel channel =
@@ -127,8 +123,6 @@ public class MusicService extends Service {
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
             if (mNotificationRemoteBig != null) {
-//                mNotificationRemoteBig.setTextViewText(R.id.noti_title, mMusicManager.getSongIsPlay().getTitle());
-//                mNotificationRemoteBig.setTextViewText(R.id.noti_author, mMusicManager.getSongIsPlay().getAuthor());
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
                 mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
@@ -154,7 +148,8 @@ public class MusicService extends Service {
     }
 
     public void onPlayMusic() {
-        if (mStatus == mStop) {
+        mHandler.postDelayed(runnable,TIME_REPEAT);
+        if (mStatus == STOP) {
             mPlayer.reset();
             mStatus = 0;
         }
@@ -215,25 +210,22 @@ public class MusicService extends Service {
         onPlayMusic();
     }
 
-    /** BachNN
-     * hàm này để phát nhạc
-     */
 
     /**
      * BachNN
      * next bài hát
      */
     public void onNextMusic() {
-        mStatus = mInitially;
-        if (mStatueRepeat==mNormal){
+        mStatus = INITIALLY;
+        if (mStatueRepeat == NORMAL) {
             if (mCurrentSong == (mSongs.size() - 1)) {
                 mCurrentSong = 0;
             } else mCurrentSong++;
-        }else if (mStatueRepeat==mShuff){
+        } else if (mStatueRepeat == SHUFF) {
 
-        }else {
-            Random random= new Random(mSongs.size());
-            mCurrentSong= random.nextInt();
+        } else {
+            Random random = new Random();
+            mCurrentSong = random.nextInt(mSongs.size());
         }
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
@@ -252,23 +244,6 @@ public class MusicService extends Service {
 
     }
 
-    public void setRandom(){
-        if (mStatueRepeat==mRandom){
-            mStatueRepeat=mNormal;
-        }
-        else mStatueRepeat=mRandom;
-    }
-
-    public void setShuff(){
-        if (mStatueRepeat==mShuff){
-            mStatueRepeat=mNormal;
-        }
-        else mStatueRepeat=mShuff;
-    }
-
-    public int getStatueRepeat(){
-        return mStatueRepeat;
-    }
     /**
      * BachNN
      *
@@ -276,6 +251,22 @@ public class MusicService extends Service {
      */
     public void setmCurrentSong(int CurrentSong) {
         mCurrentSong = CurrentSong;
+    }
+
+    public void setRandom() {
+        if (mStatueRepeat == RANDOM) {
+            mStatueRepeat = NORMAL;
+        } else mStatueRepeat = RANDOM;
+    }
+
+    public void setShuff() {
+        if (mStatueRepeat == SHUFF) {
+            mStatueRepeat = NORMAL;
+        } else mStatueRepeat = SHUFF;
+    }
+
+    public int getStatueRepeat() {
+        return mStatueRepeat;
     }
 
     /**
@@ -290,7 +281,7 @@ public class MusicService extends Service {
         mPlayer.reset();
         mCurrentSong = position;
         onPlayMusic();
-        mStatus = mInitially;
+        mStatus = INITIALLY;
     }
 
     public void setRunning() {
@@ -331,7 +322,7 @@ public class MusicService extends Service {
      */
     public void onStopMusic() {
         mPlayer.pause();
-        mStatus = mStop;
+        mStatus = STOP;
     }
 
     /**
@@ -348,7 +339,8 @@ public class MusicService extends Service {
      * BachNN
      * get tất cả các bài hát từ Database trên thiết bị di động.
      */
-    private void getAllSong() {
+    private List<Song> getAllSong() {
+        List<Song> songs = new ArrayList<>();
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
                 MediaStore.Audio.AudioColumns.DATA,
@@ -381,14 +373,12 @@ public class MusicService extends Service {
                 String title = cursor.getString(TITLE);
                 String displayName = cursor.getString(DISPLAY_NAME);
                 String duration = cursor.getString(DURATION);
-                mSongs.add(new Song(id, data, author, title, displayName, duration));
-                if (LogSetting.IS_DEBUG) {
-                    Log.d(MainActivity.TAG_MAIN, mSongs.size() + "");
-                }
+                songs.add(new Song(id, data, author, title, displayName, duration));
                 cursor.moveToNext();
             }
             cursor.close();
         }
+        return songs;
 
     }
 
@@ -396,17 +386,9 @@ public class MusicService extends Service {
         return mSongs;
     }
 
-    public Song getSinpleSong(int position) {
-        return mSongs.get(position);
-    }
 
     public Song getSongIsPlay() {
-        try {
-            return mSongs.get(mCurrentSong);
-        } catch (Exception e) {
-
-        }
-        return null;
+        return mSongs.get(mCurrentSong);
     }
 
     public int getmStatus() {
@@ -426,17 +408,17 @@ public class MusicService extends Service {
         return mPlayer.getCurrentPosition();
     }
 
-    public void setChangeUIMediaFragment(){
+    public void setChangeUIMediaFragment() {
         mMediaPlaybackFragment.setUIMusic();
     }
 
-    public void setChangeNotification(){
+    public void setChangeNotification() {
         mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
         mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
-        if (isMusicPlaying()){
+        if (isMusicPlaying()) {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-        }else {
+        } else {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
         }
@@ -510,17 +492,8 @@ public class MusicService extends Service {
             return mSongs;
         }
 
-        public Song getSinpleSong(int position) {
-            return mSongs.get(position);
-        }
-
         public Song getSongIsPlay() {
-            try {
                 return mSongs.get(mCurrentSong);
-            } catch (Exception e) {
-
-            }
-            return null;
         }
 
 

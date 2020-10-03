@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.model.Song;
-import com.example.myapplication.util.Util;
 import com.example.myapplication.util.LogSetting;
 
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.List;
  * Class nay dùng để quản lý các hành vị query với DATABSE
  */
 public class DataManager {
-    public static final String TAG = "BachNN";
     private SongaFvouriteDatabaseHelper mMusicHelper;
     private SQLiteDatabase mDatabase;
 
@@ -31,7 +30,12 @@ public class DataManager {
         mDatabase = mMusicHelper.getWritableDatabase();
     }
 
+    /**
+     * @param song bài hát chuyền vào để lưu vào bảng CSDL
+     *             hàm này dùng để thêm một bài hát vào CSDL
+     */
     public void addMusicFavourite(Song song) {
+        //BachNN : chuyền các giá trị của bài hát vào cvValues để chuyền vào CDSL
         ContentValues cvValues = new ContentValues();
         cvValues.put(SongaFvouriteDatabaseHelper._ID, song.getId());
         cvValues.put(SongaFvouriteDatabaseHelper._PATH, song.getPath());
@@ -42,25 +46,29 @@ public class DataManager {
         Long insert = mDatabase.insert(SongaFvouriteDatabaseHelper.TABLE_NAME, null, cvValues);
         if (insert > 0) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG, "Thêm Thành Công");
+                Log.d(MainActivity.TAG_MAIN, "Thêm Thành Công");
             }
         } else {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG, "Thêm Thất Bại");
+                Log.d(MainActivity.TAG_MAIN, "Thêm Thất Bại");
             }
         }
 
     }
 
+    /**
+     * @param id ID của từng bài hát.
+     *           để xóa bài hát khỏi CSDL
+     */
     public void removeMusicFavourite(int id) {
         int delete = mDatabase.delete(SongaFvouriteDatabaseHelper.TABLE_NAME, SongaFvouriteDatabaseHelper._ID + "=" + id, null);
         if (delete > 0) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG, "Xóa Thành Công");
+                Log.d(MainActivity.TAG_MAIN, "Xóa Thành Công");
             }
         } else {
             if (LogSetting.IS_DEBUG) {
-                Log.d(TAG, "Xóa Thất Bại");
+                Log.d(MainActivity.TAG_MAIN, "Xóa Thất Bại");
             }
         }
     }

@@ -27,10 +27,10 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     private List<Song> mSongs;
     private IMusicListenner mListener;
 
-    public AllSongAdapter(Context mContext, List<Song> mSongs, IMusicListenner listenner) {
+    public AllSongAdapter(Context mContext, List<Song> mSongs, IMusicListenner listener) {
         this.mContext = mContext;
         this.mSongs = mSongs;
-        this.mListener = listenner;
+        this.mListener = listener;
     }
 
     @Override
@@ -55,6 +55,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        // BachNN : set cac gia tri cua cua cac view
         holder.onBind(mSongs.get(position));
     }
 
