@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -300,8 +303,9 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     }
 
     /**
-     *  BachNN
-     * @param i vị trị bài hát người dùng chọn.
+     * BachNN
+     *
+     * @param i    vị trị bài hát người dùng chọn.
      * @param view mà nguời dùng click.
      *             hàm này để set các bài hát yêu thich của người dùng.
      *             nêu chọn thích thi thêm vào CSDL.
@@ -311,6 +315,11 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     public void selectMoreMusic(final int i, View view) {
         PopupMenu mPopupMen = new PopupMenu(getActivity(), view);
         mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
+        //BachNN : set mau text cho một Item.
+        MenuItem menuItem = mPopupMen.getMenu().getItem(0);
+        SpannableString s = new SpannableString("Like");
+        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+        menuItem.setTitle(s);
 
         mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -331,10 +340,11 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
 
     /**
      * BachNN
+     *
      * @return một List<song> Music.
-     *        hàm này nó lấy một List nhạc
+     * hàm này nó lấy một List nhạc
      */
-    private List<Song> getAllSong() {
+    public List<Song> getAllSong() {
         List<Song> song = new ArrayList<>();
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
@@ -369,9 +379,6 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
                 String displayName = cursor.getString(DISPLAY_NAME);
                 String duration = cursor.getString(DURATION);
                 song.add(new Song(id, data, author, title, displayName, duration));
-                if (LogSetting.IS_DEBUG) {
-                    Log.d(MainActivity.TAG_MAIN, song.size() + "");
-                }
                 cursor.moveToNext();
             }
             cursor.close();
@@ -418,6 +425,23 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         protected void onPostExecute(List<Song> songs) {
             setData(songs);
             super.onPostExecute(songs);
+        }
+    }
+
+    /**
+     * BachNN
+     * Tạo ra một Thread khác để đọc các bài hát yêu thích từ CSDL về.
+     */
+    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+        @Override
+        protected List<Song> doInBackground(Void... voids) {
+            return mDatabaseManager.getAllMusicFavourite();
+        }
+
+        @Override
+        protected void onPostExecute(List<Song> songs) {
+            setData(songs);
+            mMusicService.setAllSongService(songs);
         }
     }
 }

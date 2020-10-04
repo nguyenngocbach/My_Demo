@@ -53,7 +53,7 @@ public class MusicService extends Service {
     private IBinder iBinder = new LocalMusic();
     private SeekBar mSeekBar;
 
-    private List<Song> mSongs ;
+    private List<Song> mSongs;
     private MediaPlayer mPlayer;
     private int mCurrentSong = -1;
     private Context mContext;
@@ -61,7 +61,7 @@ public class MusicService extends Service {
     // BachNN :next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
     public static final int INITIALLY = 0;
     // BachNN :khí bài hát đang chạy nó bị dừng.
-    public static final  int STOP = 3;
+    public static final int STOP = 3;
     private int mStatueRepeat = NORMAL;
     // BachNN :về trang thái lúc ban đâu là next , previous bài hát.
     private int mStatus = INITIALLY;
@@ -107,7 +107,7 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mSongs=getAllSong();
+        mSongs = getAllSong();
         mSeekBar = new SeekBar(this);
 //        mHandler.postDelayed(runnable, TIME_REPEAT);
         mMediaPlaybackFragment.setMusicService(this);
@@ -148,7 +148,7 @@ public class MusicService extends Service {
     }
 
     public void onPlayMusic() {
-        mHandler.postDelayed(runnable,TIME_REPEAT);
+        mHandler.postDelayed(runnable, TIME_REPEAT);
         if (mStatus == STOP) {
             mPlayer.reset();
             mStatus = 0;
@@ -426,6 +426,17 @@ public class MusicService extends Service {
         mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
     }
 
+    /**
+     * BachNN
+     *
+     * @param s là list bài hát
+     *          hàm này dùng để set bài hát .
+     */
+    public void setAllSongService(List<Song> s) {
+        mSongs.clear();
+        mSongs.addAll(s);
+    }
+
 
     public class LocalMusic extends Binder implements Serializable {
         public MusicService getInstanceService() {
@@ -493,9 +504,8 @@ public class MusicService extends Service {
         }
 
         public Song getSongIsPlay() {
-                return mSongs.get(mCurrentSong);
+            return mSongs.get(mCurrentSong);
         }
-
 
     }
 }

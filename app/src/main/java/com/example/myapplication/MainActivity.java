@@ -401,7 +401,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mLocalMusic.setPreviousMusicNotification();
         }
     }
-
     /**
      * BachNN
      * play bài hày hoặc puase
