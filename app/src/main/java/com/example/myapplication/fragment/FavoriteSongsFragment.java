@@ -24,6 +24,7 @@ public class FavoriteSongsFragment extends AllSongFragment {
 
     @Override
     public void LoadData() {
+        mID= mMusicService.getSongIsPlay().getId();
         new AllFavouriteMusic().execute();
         mMusicService.setmCurrentSong(-1);
     }
@@ -35,7 +36,9 @@ public class FavoriteSongsFragment extends AllSongFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mID=mMusicService.getSongIsPlay().getId();
+        if (mMusicService.getmCurrentSong()!=-1) {
+            mID = mMusicService.getSongIsPlay().getId();
+        }
         mMusicService.setAllSongService(getAllSong());
         reSetCurrentSong();
         if (LogSetting.IS_DEBUG) {
