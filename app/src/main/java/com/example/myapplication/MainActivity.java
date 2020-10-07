@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,12 +80,10 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             //Bkav Thanhnch: Bien nay la gi? CODE linh tinh?
-            mLocalMusic = (MusicService.LocalMusic) iBinder;
             mMusicService = ((MusicService.LocalMusic) iBinder).getInstanceService();
             //Bkav Thanhnch: tao fragment gi day? dat ten khong chinh xac.
             createAllFragmentMusic();
         }
-
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
@@ -143,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     }
 
     /**Bkav Thanhnch: Khong co comment ai code
-
+     * BachNN
      * @param requestCode
      * @param permissions
      * @param grantResults ..
@@ -169,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
      * và kính hoạt Fragment , Service , Database
      */
     private void createAllFragmentMusic() {
-        //Bkav Thanhnch: tai sao lai code the nay?
+        //Bkav Thanhnch: tai sao lai code the nay? -ok
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mIsVertical = false;
@@ -215,9 +212,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
                 }
             });
         } else {
-            if (LogSetting.IS_DEBUG) {
-                Log.d(TAG_MAIN, mLocalMusic + "  DisConnnect");
-            }
             MediaPlaybackFragment mediaPlaybackFragment = new MediaPlaybackFragment();
             mediaPlaybackFragment.setMusicService(mMusicService);
             FragmentTransaction layer = mFragmentManager.beginTransaction();
@@ -241,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     private void setAHeaderNavigation() {
         //Bkav Thanhnch: Sao lai get ra gia tri 0.
         //BachNN : get = 0 để lấy cái view của Navigation thì mới ánh xa đc.
+        // https://stackoverflow.com/questions/33194594/navigationview-get-find-header-layout
         View mView = mNavigationView.getHeaderView(0);
         mListenTextView = mView.findViewById(R.id.txt_listen_now);
         mMusicLibraryTextView = mView.findViewById(R.id.txt_music_library);
@@ -383,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         if (!mIsVertical) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             // todo xoa di nhe
-            allSongFragment.setData(mMusicService.getmSongs());
+            allSongFragment.setData(mMusicService.getSongs());
             allSongFragment.setImageMusic();
             mMusicService.setPreviousMusicNotification();
         }
@@ -411,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onNext() {
         if (!mIsVertical) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            allSongFragment.setData(mMusicService.getmSongs());
+            allSongFragment.setData(mMusicService.getSongs());
             allSongFragment.setImageMusic();
             mMusicService.setNextMusicNotification();
         }
@@ -464,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mMusicService.onPreviousMusic();
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
             AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            mAllSongFragment.setData(mMusicService.getmSongs());
+            mAllSongFragment.setData(mMusicService.getSongs());
             mAllSongFragment.setTitle(mMusicService.getSongIsPlay());
             mAllSongFragment.setButtonIconPlayMusic(mMusicService.isMusicPlaying());
             mAllSongFragment.setImageMusic();
@@ -508,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onPlayMusicAutoNextBroadCast() {
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            allSongFragment.setSelection(mMusicService.getmCurrentSong());
+            allSongFragment.setSelection(mMusicService.getCurrentSong());
             allSongFragment.setButtonIconPlayMusic(true);
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {

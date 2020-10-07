@@ -54,7 +54,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         @Override
         public void run() {
             if (mMusicService != null) {
-                if (mMusicService.getmCurrentSong() == -1) return;
+                if (mMusicService.getCurrentSong() == -1) return;
                 setUI();
                 int index = (Integer.parseInt(mMusicService.getSongIsPlay().getDuration()));
                 mSeekBar.setMax(index);
@@ -84,6 +84,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (context instanceof MainActivity) {
             mMediaListener = (IMediaPlayFragmentListenner) context;
             mActivity = (MainActivity) context;
+            mMusicService= mActivity.getMusicService();
         } else throw new ClassCastException("onAttach Methods have problem !");
     }
 
@@ -176,11 +177,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (mMusicService != null) {
-            if (mMusicService.getmCurrentSong() == -1) return;
+            if (mMusicService.getCurrentSong() == -1) return;
             setTile(mMusicService.getSongIsPlay());
             setSeekBar();
             setStatusIcon(mMusicService.isMusicPlaying());
             setRepeat();
+
             if (checkSongFavourite(mMusicService.getSongIsPlay())) {
                 if (LogSetting.IS_DEBUG) {
                     Log.d(MainActivity.TAG_MAIN, "Like To ");
@@ -208,7 +210,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
         } else if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
             mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
-        } else {
+        } else if (mMusicService.getStatueRepeat() == MusicService.REPEAT){
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
         }
     }
@@ -218,7 +220,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * set lại toàn bộ các view trong Fragment này.
      */
-    //todo songthing
     public void setUIMusic() {
         setSeekBar();
         setTile(mMusicService.getSongIsPlay());
@@ -329,16 +330,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (mMusicService.isMusicPlaying()) {
                     mMusicService.onStopMusic();
                     mPlayIcon.setImageResource(R.drawable.costom_play);
-                    if (mMusicService.getmStatus() == MusicService.INITIALLY) {
+                    if (mMusicService.getStatus() == MusicService.INITIALLY) {
                         mMusicService.onPlayMusic();
-                        mMusicService.setmStatus(MusicService.STOP);
+                        mMusicService.setStatus(MusicService.STOP);
                     }
                 } else {
                     mMusicService.onResumeMusic();
                     // 0 ,1 ko ro ràng
-                    if (mMusicService.getmStatus() == MusicService.INITIALLY) {
+                    if (mMusicService.getStatus() == MusicService.INITIALLY) {
                         mMusicService.onPlayMusic();
-                        mMusicService.setmStatus(MusicService.STOP);
+                        mMusicService.setStatus(MusicService.STOP);
                     }
                     mPlayIcon.setImageResource(R.drawable.custom_play_pause);
                 }
@@ -358,15 +359,21 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMusicService.setShuff();
                 if (mMusicService.getStatueRepeat() == MusicService.REPEAT) {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
+                    mMusicService.setStatus(MusicService.NORMAL);
+                }else {
+                    mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
+                    mMusicService.setStatus(MusicService.REPEAT);
                 }
-                mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
                 break;
             case R.id.icon_repeat:
                 mMusicService.setRandom();
                 if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
+                    mMusicService.setStatus(MusicService.NORMAL);
+                }else {
+                    mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
+                    mMusicService.setStatus(MusicService.RANDOM);
                 }
-                mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
                 break;
         }
     }
@@ -417,6 +424,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onStop() {
         super.onStop();
+        //
         mHandler.removeCallbacks(mRunnable);
     }
 

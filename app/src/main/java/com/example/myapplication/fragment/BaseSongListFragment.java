@@ -64,7 +64,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mLocalMusic = (MusicService.LocalMusic) iBinder;
             mMusicService = mLocalMusic.getInstanceService();
-            if (mIsVertical && mMusicService.getmCurrentSong() != -1) {
+            if (mIsVertical && mMusicService.getCurrentSong() != -1) {
                 setVisibleDisPlay();
             }
         }
@@ -103,16 +103,16 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     public void onStart() {
         super.onStart();
         if (mMusicService == null) return;
-        if (mMusicService.getmCurrentSong() != -1) {
-            setSelection(mMusicService.getmCurrentSong());
+        if (mMusicService.getCurrentSong() != -1) {
+            setSelection(mMusicService.getCurrentSong());
             setImageMusic();
         }
         // lần đâu vài chưa set title vị trị.
-        if (mMusicService.getmCurrentSong() == -1) return;
-        setData(mMusicService.getmSongs());
+        if (mMusicService.getCurrentSong() == -1) return;
+        setData(mMusicService.getSongs());
         setTitle(mMusicService.getSongIsPlay());
         setButtonIconPlayMusic(mMusicService.isMusicPlaying());
-        if (mIsVertical && mMusicService.getmCurrentSong() != -1) {
+        if (mIsVertical && mMusicService.getCurrentSong() != -1) {
             setVisibleDisPlay();
         } else {
             setVisible();
@@ -162,9 +162,9 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
                     mMusicService.onResumeMusic();
                     mMusicService.setChangeNotification();
                     mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
-                    if (mMusicService.getmStatus() == 0) {
+                    if (mMusicService.getStatus() == 0) {
                         mMusicService.onPlayMusic();
-                        mMusicService.setmStatus(1);
+                        mMusicService.setStatus(1);
                     }
                 }
                 mAllSongListener.setIconNotification();
@@ -179,7 +179,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         mSongs.addAll(songList);
         // BachNN : set lai vị trị bài hát đang chay cho List Song
         if (mLocalMusic != null) {
-            mAdapter.setCurrentSong(mMusicService.getmCurrentSong());
+            mAdapter.setCurrentSong(mMusicService.getCurrentSong());
         }
         mAdapter.notifyDataSetChanged();
     }
@@ -189,7 +189,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * hàm để set anh cho từng bài hát
      */
     public void setImageMusic() {
-        if (mMusicService.getmCurrentSong() != -1) {
+        if (mMusicService.getCurrentSong() != -1) {
             byte[] sourceImage = Util.getByteImageSong(mMusicService.getSongIsPlay().getPath());
             Glide.with(getContext())
                     .load(sourceImage)
@@ -231,16 +231,16 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     /**
      * BachNN
      *
-     * @param cerrentMusic vị trị mà người dụng click vào ban hát
+     * @param currentMusic vị trị mà người dụng click vào ban hát
      *                     nó sẽ sưa lại giao diên củâ AllSongFragment
      */
-    public void setSelection(int cerrentMusic) {
-        mMusicService.setmCurrentSong(cerrentMusic);
+    public void setSelection(int currentMusic) {
+        mMusicService.setCurrentSong(currentMusic);
         if (mSongs != null) {
             mSongs.clear();
         }
-        mSongs.addAll(mMusicService.getmSongs());
-        mAdapter.setCurrentSong(cerrentMusic);
+        mSongs.addAll(mMusicService.getSongs());
+        mAdapter.setCurrentSong(currentMusic);
         setTitle(mMusicService.getSongIsPlay());
         mAdapter.notifyDataSetChanged();
         mMusicService.setChangeNotification();
@@ -251,7 +251,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * set lại toàn bị các view trên Fragment này
      */
     public void setUIAllView() {
-        setData(mMusicService.getmSongs());
+        setData(mMusicService.getSongs());
         setTitle(mMusicService.getSongIsPlay());
         setButtonIconPlayMusic(mMusicService.isMusicPlaying());
         setImageMusic();
@@ -263,7 +263,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * @param song
      */
     public void setTitle(Song song) {
-        if (mMusicService.getmCurrentSong() != -1) {
+        if (mMusicService.getCurrentSong() != -1) {
             mAuthorTextView.setText(song.getAuthor());
             mTitleTextView.setText(song.getTitle());
         }
@@ -286,7 +286,8 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         }
         //BachNN : nếu là màn hinh ngang thì set lại giai trị đúng cho MediaPlaybackFragment.
         if (!mIsVertical) {
-            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment)
+                    getActivity().getSupportFragmentManager().findFragmentById(R.id.music_Player);
             mediaPlaybackFragment.setUIMusic();
         }
         // BachNN : kiểm tra xem bài hát nó đang chay hay ko chay.
@@ -294,7 +295,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
             if (mMusicService.isMusicPlaying()) {
                 mMusicService.onResetMusic();
             }
-            mMusicService.setmCurrentSong(i);
+            mMusicService.setCurrentSong(i);
             mMusicService.onPlayMusic();
         }
         mMusicService.setChangeNotification();
@@ -315,16 +316,16 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
         //BachNN : set mau text cho một Item.
         MenuItem menuItem = mPopupMen.getMenu().getItem(0);
-        SpannableString s = new SpannableString("Like");
-        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-        menuItem.setTitle(s);
+        SpannableString text = new SpannableString("Like");
+        text.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(), 0);
+        menuItem.setTitle(text);
 
         mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.like_music:
-                        mDatabaseManager.addMusicFavourite(mMusicService.getmSongs().get(i));
+                        mDatabaseManager.addMusicFavourite(mMusicService.getSongs().get(i));
                         break;
                     case R.id.dislike_music:
                         mDatabaseManager.removeMusicFavourite(Integer.parseInt(mSongs.get(i).getId()));

@@ -26,7 +26,6 @@ import com.example.myapplication.MainActivity;
 import com.example.myapplication.fragment.BaseSongListFragment;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
-import com.example.myapplication.fragment.MediaPlaybackFragment;
 import com.example.myapplication.util.Util;
 import com.example.myapplication.util.LogSetting;
 
@@ -72,7 +71,7 @@ public class MusicService extends Service {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            if (getmCurrentSong() != -1) {
+            if (getCurrentSong() != -1) {
                 int index = (Integer.parseInt(getSongIsPlay().getDuration()));
                 mSeekBar.setMax(index);
                 if (LogSetting.IS_DEBUG) {
@@ -129,7 +128,7 @@ public class MusicService extends Service {
 
 
             //Bkav Thanhnch: xem lai bien -1
-            if (getmCurrentSong() != BaseSongListFragment.POSITION_MUSIC) {
+            if (getCurrentSong() != BaseSongListFragment.POSITION_MUSIC) {
                 loadImageNotification();
             }
             mBuilder = new NotificationCompat.Builder(this, ID_CHANNEL)
@@ -160,7 +159,7 @@ public class MusicService extends Service {
             mPlayer.setDataSource(mSongs.get(mCurrentSong).getPath());
             mPlayer.prepare();
             mPlayer.start();
-        } catch (IOException e) {
+        } catch (IOException e) { // BachNN : nó tự động try /catch
             e.printStackTrace();
         }
     }
@@ -231,7 +230,7 @@ public class MusicService extends Service {
      *
      * @return lấy vị trị mà bài hát đang chạy
      */
-    public int getmCurrentSong() {
+    public int getCurrentSong() {
         return mCurrentSong;
 
     }
@@ -241,7 +240,7 @@ public class MusicService extends Service {
      *
      * @param CurrentSong lấy bài hát của vi trị trên
      */
-    public void setmCurrentSong(int CurrentSong) {
+    public void setCurrentSong(int CurrentSong) {
         mCurrentSong = CurrentSong;
     }
 
@@ -335,6 +334,9 @@ public class MusicService extends Service {
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
                 songs.add(new Song(cursor));
+                if (LogSetting.IS_DEBUG){
+                    Log.d(MainActivity.TAG_MAIN,""+songs.size());
+                }
                 cursor.moveToNext();
             }
             cursor.close();
@@ -343,7 +345,7 @@ public class MusicService extends Service {
 
     }
 
-    public List<Song> getmSongs() {
+    public List<Song> getSongs() {
         return mSongs;
     }
 
@@ -352,11 +354,11 @@ public class MusicService extends Service {
         return mSongs.get(mCurrentSong);
     }
 
-    public int getmStatus() {
+    public int getStatus() {
         return mStatus;
     }
 
-    public void setmStatus(int Status) {
+    public void setStatus(int Status) {
         mStatus = Status;
     }
 

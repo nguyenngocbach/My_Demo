@@ -28,11 +28,11 @@ public class FavoriteSongsFragment extends AllSongFragment {
         //Bkav Thanhnch: -1 can co y nghia, la gi? tao bien constant.-ok
         //BachNN : khi chuyền từ AllSongFragment sang FavouriteSongFraggment mà chưa chay bài hát nào.
         // dong dười để kiềm tra xem AllSongFragment đã chay bài nhạc nào chưa nêu rồi thì lưu mID của nó.
-        if (mMusicService.getmCurrentSong() != POSITION_MUSIC) {
+        if (mMusicService.getCurrentSong() != POSITION_MUSIC) {
             mID = mMusicService.getSongIsPlay().getId();
         }
         new AllFavouriteMusic().execute();
-        mMusicService.setmCurrentSong(POSITION_MUSIC);
+        mMusicService.setCurrentSong(POSITION_MUSIC);
     }
 
     /**
@@ -43,7 +43,7 @@ public class FavoriteSongsFragment extends AllSongFragment {
     public void onDestroy() {
         super.onDestroy();
         //Bkav Thanhnch:
-        if (mMusicService.getmCurrentSong() != POSITION_MUSIC) {
+        if (mMusicService.getCurrentSong() != POSITION_MUSIC) {
             mID = mMusicService.getSongIsPlay().getId();
         }
         mMusicService.setAllSongService(getAllSong());
@@ -60,9 +60,9 @@ public class FavoriteSongsFragment extends AllSongFragment {
     //Bkav Thanhnch:
     //chua fomat code
     public void resetCurrentSong() {
-        for (int i = 0; i < mMusicService.getmSongs().size(); i++) {
-            if (mMusicService.getmSongs().get(i).getId().equals(mID)) {
-                mMusicService.setmCurrentSong(i);
+        for (int i = 0; i < mMusicService.getSongs().size(); i++) {
+            if (mMusicService.getSongs().get(i).getId().equals(mID)) {
+                mMusicService.setCurrentSong(i);
             }
         }
     }
