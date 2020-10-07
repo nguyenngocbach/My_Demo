@@ -14,6 +14,8 @@ import java.util.List;
 
 public class FavoriteSongsFragment extends AllSongFragment {
 
+    //BachNN : mID là chưa ID cua 1 bài hát để tìm lại vị trị dúng của bài hát
+    // khi chay bài hát ở FavouriteSongFragment khi quay lại AllSongFragment.
     private String mID;
 
     @Override
@@ -21,12 +23,16 @@ public class FavoriteSongsFragment extends AllSongFragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-
     @Override
-    public void LoadData() {
-        mID= mMusicService.getSongIsPlay().getId();
+    public void loadData() {
+        //Bkav Thanhnch: -1 can co y nghia, la gi? tao bien constant.-ok
+        //BachNN : khi chuyền từ AllSongFragment sang FavouriteSongFraggment mà chưa chay bài hát nào.
+        // dong dười để kiềm tra xem AllSongFragment đã chay bài nhạc nào chưa nêu rồi thì lưu mID của nó.
+        if (mMusicService.getmCurrentSong() != POSITION_MUSIC) {
+            mID = mMusicService.getSongIsPlay().getId();
+        }
         new AllFavouriteMusic().execute();
-        mMusicService.setmCurrentSong(-1);
+        mMusicService.setmCurrentSong(POSITION_MUSIC);
     }
 
     /**
@@ -36,11 +42,12 @@ public class FavoriteSongsFragment extends AllSongFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mMusicService.getmCurrentSong()!=-1) {
+        //Bkav Thanhnch:
+        if (mMusicService.getmCurrentSong() != POSITION_MUSIC) {
             mID = mMusicService.getSongIsPlay().getId();
         }
         mMusicService.setAllSongService(getAllSong());
-        reSetCurrentSong();
+        resetCurrentSong();
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG_MAIN, "onDestroy To ");
         }
@@ -50,11 +57,30 @@ public class FavoriteSongsFragment extends AllSongFragment {
      * BachNN
      * hàm này dụng để set lại vị trị của bài hát cho AllSongFragment.
      */
-    public void reSetCurrentSong(){
-        for (int i=0;i<mMusicService.getmSongs().size();i++){
-            if (mMusicService.getmSongs().get(i).getId().equals(mID)){
+    //Bkav Thanhnch:
+    //chua fomat code
+    public void resetCurrentSong() {
+        for (int i = 0; i < mMusicService.getmSongs().size(); i++) {
+            if (mMusicService.getmSongs().get(i).getId().equals(mID)) {
                 mMusicService.setmCurrentSong(i);
             }
+        }
+    }
+    /**Bkav Thanhnch: todo chuyen sang lop favourite
+     *
+     * BachNN
+     * Tạo ra một Thread khác để đọc các bài hát yêu thích từ CSDL về.
+     */
+    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+        @Override
+        protected List<Song> doInBackground(Void... voids) {
+            return mDatabaseManager.getAllMusicFavourite();
+        }
+
+        @Override
+        protected void onPostExecute(List<Song> songs) {
+            setData(songs);
+            mMusicService.setAllSongService(songs);
         }
     }
 }

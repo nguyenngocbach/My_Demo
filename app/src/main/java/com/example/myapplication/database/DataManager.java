@@ -18,32 +18,36 @@ import java.util.List;
  * Class nay dùng để quản lý các hành vị query với DATABSE
  */
 public class DataManager {
-    private SongaFvouriteDatabaseHelper mMusicHelper;
     private SQLiteDatabase mDatabase;
 
-    /** BachNN
+    /**
+     * BachNN
+     *
      * @param context khơi tao
      */
     public DataManager(Context context) {
+        SongFavouriteDatabaseHelper mMusicHelper;
         //BachNN : khởi tạo SongaFavouriteDatabaseHelper là lớp còn của SQLiteOpenHelper class
-        mMusicHelper = new SongaFvouriteDatabaseHelper(context);
+        mMusicHelper = new SongFavouriteDatabaseHelper(context);
         mDatabase = mMusicHelper.getWritableDatabase();
     }
 
     /**
+     * BachNN
+     *
      * @param song bài hát chuyền vào để lưu vào bảng CSDL
      *             hàm này dùng để thêm một bài hát vào CSDL
      */
     public void addMusicFavourite(Song song) {
         //BachNN : chuyền các giá trị của bài hát vào cvValues để chuyền vào CDSL
         ContentValues cvValues = new ContentValues();
-        cvValues.put(SongaFvouriteDatabaseHelper._ID, song.getId());
-        cvValues.put(SongaFvouriteDatabaseHelper._PATH, song.getPath());
-        cvValues.put(SongaFvouriteDatabaseHelper._AUTHOR, song.getAuthor());
-        cvValues.put(SongaFvouriteDatabaseHelper._TITLE, song.getTitle());
-        cvValues.put(SongaFvouriteDatabaseHelper._DISPLAY_NAME, song.getDisplay_Name());
-        cvValues.put(SongaFvouriteDatabaseHelper._DURATION, song.getDuration());
-        Long insert = mDatabase.insert(SongaFvouriteDatabaseHelper.TABLE_NAME, null, cvValues);
+        cvValues.put(SongFavouriteDatabaseHelper.ID, song.getId());
+        cvValues.put(SongFavouriteDatabaseHelper.PATH, song.getPath());
+        cvValues.put(SongFavouriteDatabaseHelper.AUTHOR, song.getAuthor());
+        cvValues.put(SongFavouriteDatabaseHelper.TITLE, song.getTitle());
+        cvValues.put(SongFavouriteDatabaseHelper.DISPLAY_NAME, song.getDisplay_Name());
+        cvValues.put(SongFavouriteDatabaseHelper.DURATION, song.getDuration());
+        long insert = mDatabase.insert(SongFavouriteDatabaseHelper.TABLE_NAME, null, cvValues);
         if (insert > 0) {
             if (LogSetting.IS_DEBUG) {
                 Log.d(MainActivity.TAG_MAIN, "Thêm Thành Công");
@@ -57,11 +61,13 @@ public class DataManager {
     }
 
     /**
+     * BachNN
+     *
      * @param id ID của từng bài hát.
      *           để xóa bài hát khỏi CSDL
      */
     public void removeMusicFavourite(int id) {
-        int delete = mDatabase.delete(SongaFvouriteDatabaseHelper.TABLE_NAME, SongaFvouriteDatabaseHelper._ID + "=" + id, null);
+        int delete = mDatabase.delete(SongFavouriteDatabaseHelper.TABLE_NAME, SongFavouriteDatabaseHelper.ID + "=" + id, null);
         if (delete > 0) {
             if (LogSetting.IS_DEBUG) {
                 Log.d(MainActivity.TAG_MAIN, "Xóa Thành Công");
@@ -75,18 +81,19 @@ public class DataManager {
 
     /**
      * BachNN
+     *
      * @return chả về một list bài nhạc yêu thich trong Database
      */
     public List<Song> getAllMusicFavourite() {
         List<Song> mAllSong = new ArrayList<>();
-        Cursor cursor = mDatabase.query(SongaFvouriteDatabaseHelper.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = mDatabase.query(SongFavouriteDatabaseHelper.TABLE_NAME, null, null, null, null, null, null);
         //BachNN :  lấy vị trị của các cột theo các thuộc tính trong database
-        int id = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._ID);
-        int path = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._PATH);
-        int author = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._AUTHOR);
-        int title = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._TITLE);
-        int displayName = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._DISPLAY_NAME);
-        int duration = cursor.getColumnIndex(SongaFvouriteDatabaseHelper._DURATION);
+        int id = cursor.getColumnIndex(SongFavouriteDatabaseHelper.ID);
+        int path = cursor.getColumnIndex(SongFavouriteDatabaseHelper.PATH);
+        int author = cursor.getColumnIndex(SongFavouriteDatabaseHelper.AUTHOR);
+        int title = cursor.getColumnIndex(SongFavouriteDatabaseHelper.TITLE);
+        int displayName = cursor.getColumnIndex(SongFavouriteDatabaseHelper.DISPLAY_NAME);
+        int duration = cursor.getColumnIndex(SongFavouriteDatabaseHelper.DURATION);
         //BachNN : chuyển con trỏ đến đâu bảng
         cursor.moveToFirst();
         // BachNN :nếu con trỏ ko phải vị trị cuối cùng thì chạy tiếp vong While

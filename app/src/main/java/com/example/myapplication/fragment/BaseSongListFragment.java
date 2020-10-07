@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseSongListFragment extends Fragment implements IMusicListenner {
+    public static final int POSITION_MUSIC = -1;
     protected MusicService.LocalMusic mLocalMusic;
     protected AllSongFragment.IAllSongFragmentListener mAllSongListener;
     protected MainActivity mMainActivity;
@@ -56,7 +57,6 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     protected TextView mTitleTextView;
     protected TextView mAuthorTextView;
     protected LinearLayout mItemMusic;
-    protected int mCurrentMusic;
     private boolean mIsVertical;
 
     ServiceConnection mConnection = new ServiceConnection() {
@@ -75,7 +75,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         }
     };
 
-    public void setmMusicService(MusicService mMusicService) {
+    public void setMusicService(MusicService mMusicService) {
         this.mMusicService = mMusicService;
     }
 
@@ -89,14 +89,10 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
             Intent intent = new Intent(getContext(), MusicService.class);
             context.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
-        mMusicService = mainActivity.getmMusicService();
+        mMusicService = mainActivity.getMusicService();
         mDatabaseManager = mainActivity.getDatabase();
-        mIsVertical = mainActivity.isVertical;
+        mIsVertical = mainActivity.mIsVertical;
         super.onAttach(context);
-    }
-
-    public void setCurrentMusic(int currentMusic) {
-        mCurrentMusic = currentMusic;
     }
 
     /**
@@ -115,7 +111,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         if (mMusicService.getmCurrentSong() == -1) return;
         setData(mMusicService.getmSongs());
         setTitle(mMusicService.getSongIsPlay());
-        isPlayMusic(mMusicService.isMusicPlaying());
+        setButtonIconPlayMusic(mMusicService.isMusicPlaying());
         if (mIsVertical && mMusicService.getmCurrentSong() != -1) {
             setVisibleDisPlay();
         } else {
@@ -151,7 +147,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         mItemMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAllSongListener.show();
+                mAllSongListener.showMediaPlaybackFragment();
             }
         });
 
@@ -178,9 +174,9 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         return view;
     }
 
-    public void setData(List<Song> s) {
+    public void setData(List<Song> songList) {
         mSongs.clear();
-        mSongs.addAll(s);
+        mSongs.addAll(songList);
         // BachNN : set lai vị trị bài hát đang chay cho List Song
         if (mLocalMusic != null) {
             mAdapter.setCurrentSong(mMusicService.getmCurrentSong());
@@ -208,7 +204,8 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * @param musicRunning kiểm tra bài hát đang chay hay đang dung để
      *                     sét Icon của bài nhạc.
      */
-    public void isPlayMusic(boolean musicRunning) {
+    //Thanhnch todo ten khong dung nghia oK
+    public void setButtonIconPlayMusic(boolean musicRunning) {
         if (musicRunning) {
             mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
         } else {
@@ -256,7 +253,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     public void setUIAllView() {
         setData(mMusicService.getmSongs());
         setTitle(mMusicService.getSongIsPlay());
-        isPlayMusic(mMusicService.isMusicPlaying());
+        setButtonIconPlayMusic(mMusicService.isMusicPlaying());
         setImageMusic();
     }
 
@@ -281,7 +278,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
     @Override
     public void selectMusic(int i) {
         setSelection(i);
-        isPlayMusic(true);
+        setButtonIconPlayMusic(true);
         setImageMusic();
         if (mIsVertical) {
             //BachNN nếu chưa xuất hiện thanh Tiêu đề thì hiện nó nên.
@@ -289,7 +286,8 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         }
         //BachNN : nếu là màn hinh ngang thì set lại giai trị đúng cho MediaPlaybackFragment.
         if (!mIsVertical) {
-            mMusicService.setChangeUIMediaFragment();
+            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.music_Player);
+            mediaPlaybackFragment.setUIMusic();
         }
         // BachNN : kiểm tra xem bài hát nó đang chay hay ko chay.
         if (mLocalMusic != null) {
@@ -361,42 +359,32 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG_MAIN, "cursor : " + cursor);
         }
+        //Bkav Thanhnch: todo can check null, neu null thi bao loi hoac log r --ok
+        if (cursor==null){
+            if (LogSetting.IS_DEBUG){
+                Log.d(MainActivity.TAG_MAIN,"loi vi cursor = null");
+            }
+            return null;
+        }
+
         cursor.moveToFirst();
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
-                //BachNN : lấy các gia trị theo các trương của bảng
-                int _ID = cursor.getColumnIndex(allColoumSong[0]);
-                int DATA = cursor.getColumnIndex(allColoumSong[1]);
-                int ARTIST = cursor.getColumnIndex(allColoumSong[2]);
-                int TITLE = cursor.getColumnIndex(allColoumSong[3]);
-                int DISPLAY_NAME = cursor.getColumnIndex(allColoumSong[4]);
-                int DURATION = cursor.getColumnIndex(allColoumSong[5]);
-
-                String id = cursor.getString(_ID);
-                String data = cursor.getString(DATA);
-                String author = cursor.getString(ARTIST);
-                String title = cursor.getString(TITLE);
-                String displayName = cursor.getString(DISPLAY_NAME);
-                String duration = cursor.getString(DURATION);
-                song.add(new Song(id, data, author, title, displayName, duration));
+                song.add(new Song(cursor));
                 cursor.moveToNext();
             }
             cursor.close();
-
-
         }
-
         return song;
 
     }
 
-    @Override
-    public void onDestroy() {
-        getContext().unbindService(mConnection);
-        super.onDestroy();
-    }
-
-    public void LoadData() {
+    /**
+     * BachNN
+     * hàm này dùng đẻ ghi đề ở lớp con của nó đó là AllSongFragment.
+     */
+    //Bkav Thanhnch: thieu comment -ok
+    public void loadData() {
     }
 
     /**
@@ -405,19 +393,19 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      */
     public interface IAllSongFragmentListener {
         //BachNN : để hiện MediaPlayerFragemnt nên.
-        void show();
+        void showMediaPlaybackFragment();
 
         //BachNN : set lại icon cho notification chay nhạc hay dưng.
         void setIconNotification();
     }
 
     /**
+     * BachNN
      * tạo một luồng để lấy một list bài hát về.
      */
     class LoadAllMusic extends AsyncTask<Void, Void, List<Song>> {
         @Override
         protected List<Song> doInBackground(Void... voids) {
-
             return getAllSong();
         }
 
@@ -428,20 +416,4 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         }
     }
 
-    /**
-     * BachNN
-     * Tạo ra một Thread khác để đọc các bài hát yêu thích từ CSDL về.
-     */
-    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
-        @Override
-        protected List<Song> doInBackground(Void... voids) {
-            return mDatabaseManager.getAllMusicFavourite();
-        }
-
-        @Override
-        protected void onPostExecute(List<Song> songs) {
-            setData(songs);
-            mMusicService.setAllSongService(songs);
-        }
-    }
 }

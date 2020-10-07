@@ -11,6 +11,12 @@ public class Util {
     public static final String ACTION_PLAY = "com.example.myapplication.unit.playMusic";
     public static final String ACTION_AUTONEXT = "com.example.myapplication.unit.autoNextMusic";
 
+    /**
+     * @param path path bai hat
+     *             ham nay dung de chuyen path bai hat thanh 1 chuoi byte[].
+     * @return 1 chuoi Byte[]
+     */
+    //Bkav Thanhnch: ham nay de lam gi?
     public static byte[] getByteImageSong(String path) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         try {

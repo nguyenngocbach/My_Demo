@@ -88,7 +88,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         TextView mAuthorTextView;
         ImageView mPlayMusicIcon;
         ImageView mMoreIcon;
-        LinearLayout mItemMuiscLayout;
+        LinearLayout mItemMusicLayout;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -97,8 +97,8 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
             mAuthorTextView = itemView.findViewById(R.id.name_Airsts);
             mPlayMusicIcon = itemView.findViewById(R.id.icon_play_music);
             mMoreIcon = itemView.findViewById(R.id.icon_more);
-            mItemMuiscLayout = itemView.findViewById(R.id.click_item);
-            mItemMuiscLayout.setOnClickListener(new View.OnClickListener() {
+            mItemMusicLayout = itemView.findViewById(R.id.click_item);
+            mItemMusicLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int mPosition = getLayoutPosition();
@@ -116,7 +116,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         }
 
         public void onBind(Song song) {
-            boolean check = (getAdapterPosition() == mCurrentSong) ? true : false;
+            boolean check = getAdapterPosition() == mCurrentSong;
             // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
             mIndexMusic.setText("" + (getAdapterPosition() + 1));
             //chuyền một bài hát đang chay vào hàm dưới để title và author

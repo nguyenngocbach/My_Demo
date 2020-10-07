@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.myapplication.MainActivity;
+import com.example.myapplication.fragment.BaseSongListFragment;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.fragment.MediaPlaybackFragment;
@@ -38,37 +39,37 @@ import java.util.Random;
 public class MusicService extends Service {
 
     public static final int RANDOM = 5;
-    public static final int SHUFF = 6;
+    //Bkav Thanhnch: khong hieu bien nay la trang thai nao -ok
+    public static final int REPEAT = 6;
     public static final int NORMAL = 7;
+    // BachNN :next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
+    public static final int INITIALLY = 0;
+    // BachNN :khí bài hát đang chạy nó bị dừng.
+    public static final int STOP = 3;
     private static final String ID_CHANNEL = "1999";
     private static final int ID_NOTIFICATION = 111;
     private static final String LOG_REALTIME = "log_realtime";
     private int TIME_REPEAT = 300;
     //    private MusicManager mMusicManager;
-    private MediaPlaybackFragment mMediaPlaybackFragment = new MediaPlaybackFragment();
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
-    private IBinder iBinder = new LocalMusic();
+    //Bkav Thanhnch: sai convention -ok
+    private IBinder mIBinder = new LocalMusic();
     private SeekBar mSeekBar;
-
     private List<Song> mSongs;
     private MediaPlayer mPlayer;
     private int mCurrentSong = -1;
     private Context mContext;
-
-    // BachNN :next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
-    public static final int INITIALLY = 0;
-    // BachNN :khí bài hát đang chạy nó bị dừng.
-    public static final int STOP = 3;
     private int mStatueRepeat = NORMAL;
     // BachNN :về trang thái lúc ban đâu là next , previous bài hát.
     private int mStatus = INITIALLY;
 
 
     private Handler mHandler = new Handler();
-    private Runnable runnable = new Runnable() {
+    //Bkav Thanhnch: sai convention -ok
+    private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
             if (getmCurrentSong() != -1) {
@@ -102,39 +103,34 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return iBinder;
+        return mIBinder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mSongs = getAllSong();
         mSeekBar = new SeekBar(this);
-//        mHandler.postDelayed(runnable, TIME_REPEAT);
-        mMediaPlaybackFragment.setMusicService(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            //
             NotificationChannel channel =
                     new NotificationChannel(ID_CHANNEL, "App_Music_OF_Bach", NotificationManager.IMPORTANCE_LOW);
             channel.setLightColor(Color.RED);
-            //
-
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
-            if (mNotificationRemoteBig != null) {
-                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
-                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
-                mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
-            }
-            if (mNotificationRemoteSmall != null) {
-                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
-                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
-                mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
+            //Bkav Thanhnch: sao can check null? -ok
+            mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
+            mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
+            mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
 
-            }
-            if (getmCurrentSong() != -1) {
-                loadImage();
+            mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
+            mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
+            mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
+
+
+            //Bkav Thanhnch: xem lai bien -1
+            if (getmCurrentSong() != BaseSongListFragment.POSITION_MUSIC) {
+                loadImageNotification();
             }
             mBuilder = new NotificationCompat.Builder(this, ID_CHANNEL)
                     .setSmallIcon(R.drawable.ic_baseline_library_music_24)
@@ -147,11 +143,18 @@ public class MusicService extends Service {
         return START_NOT_STICKY;
     }
 
+    /**
+     * BachNN hàm này dung để chay bài nhạc.
+     */
+    //Bkav Thanhnch:  thieu comment logic kho hieu, can
+    //comment them
     public void onPlayMusic() {
-        mHandler.postDelayed(runnable, TIME_REPEAT);
+        mHandler.postDelayed(mRunnable, TIME_REPEAT);
+        //BachNN : if bài nhạc đang chay mà dừng bài hát lại chuyền bài hát khác thì.
+        // đọng sự lý logic dưới.
         if (mStatus == STOP) {
             mPlayer.reset();
-            mStatus = 0;
+            mStatus = INITIALLY;
         }
         try {
             mPlayer.setDataSource(mSongs.get(mCurrentSong).getPath());
@@ -162,9 +165,10 @@ public class MusicService extends Service {
         }
     }
 
-
+    //Bkav Thanhnch: thieu ten ai code ham nay -ok
+    //BachNN :ten ham khong dung, ne la load anh cho view Notification
     // ham set Anh.
-    private void loadImage() {
+    private void loadImageNotification() {
         byte[] sourceImage = Util.getByteImageSong(getSongIsPlay().getPath());
         if ((sourceImage == null)) return;
         Bitmap imageBitmap = BitmapFactory.decodeByteArray(sourceImage, 0, sourceImage.length);
@@ -183,18 +187,6 @@ public class MusicService extends Service {
         Intent intent = new Intent(actionPrevious);
         return PendingIntent.getBroadcast(this, icon_previous, intent, 0);
     }
-
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     /**
      * BachNN
      * quay lại bàn nhạc
@@ -221,7 +213,7 @@ public class MusicService extends Service {
             if (mCurrentSong == (mSongs.size() - 1)) {
                 mCurrentSong = 0;
             } else mCurrentSong++;
-        } else if (mStatueRepeat == SHUFF) {
+        } else if (mStatueRepeat == REPEAT) {
 
         } else {
             Random random = new Random();
@@ -260,35 +252,15 @@ public class MusicService extends Service {
     }
 
     public void setShuff() {
-        if (mStatueRepeat == SHUFF) {
+        if (mStatueRepeat == REPEAT) {
             mStatueRepeat = NORMAL;
-        } else mStatueRepeat = SHUFF;
+        } else mStatueRepeat = REPEAT;
     }
 
     public int getStatueRepeat() {
         return mStatueRepeat;
     }
 
-    /**
-     * BachNN
-     *
-     * @param position vị tri mà người dụng chon để chay bài hát.
-     */
-    public void selectMusic(int position) {
-        if (mPlayer.isPlaying()) {
-            mPlayer.pause();
-        }
-        mPlayer.reset();
-        mCurrentSong = position;
-        onPlayMusic();
-        mStatus = INITIALLY;
-    }
-
-    public void setRunning() {
-        if (mPlayer.getCurrentPosition() == Integer.parseInt(getSongIsPlay().getDuration())) {
-            onNextMusic();
-        }
-    }
 
     /**
      * BachNN
@@ -297,10 +269,6 @@ public class MusicService extends Service {
      */
     public boolean isMusicPlaying() {
         return (mPlayer.isPlaying()) ? true : false;
-    }
-
-    public void onPauseMusic() {
-        mPlayer.pause();
     }
 
     public void onResumeMusic() {
@@ -356,24 +324,17 @@ public class MusicService extends Service {
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG_MAIN, "cursor : " + cursor);
         }
+        //Bkav Thanhnch: sao khong chuyen vao trong doan check null?
+        if (cursor==null){
+            if (LogSetting.IS_DEBUG){
+                Log.d(MainActivity.TAG_MAIN,"Cursor bang null");
+            }
+            return null ;
+        }
         cursor.moveToFirst();
         if (cursor != null) {
             while (!cursor.isAfterLast()) {
-                // BachNN :lấy các gia trị theo các trương của bảng
-                int _ID = cursor.getColumnIndex(allColoumSong[0]);
-                int DATA = cursor.getColumnIndex(allColoumSong[1]);
-                int ARTIST = cursor.getColumnIndex(allColoumSong[2]);
-                int TITLE = cursor.getColumnIndex(allColoumSong[3]);
-                int DISPLAY_NAME = cursor.getColumnIndex(allColoumSong[4]);
-                int DURATION = cursor.getColumnIndex(allColoumSong[5]);
-
-                String id = cursor.getString(_ID);
-                String data = cursor.getString(DATA);
-                String author = cursor.getString(ARTIST);
-                String title = cursor.getString(TITLE);
-                String displayName = cursor.getString(DISPLAY_NAME);
-                String duration = cursor.getString(DURATION);
-                songs.add(new Song(id, data, author, title, displayName, duration));
+                songs.add(new Song(cursor));
                 cursor.moveToNext();
             }
             cursor.close();
@@ -408,9 +369,6 @@ public class MusicService extends Service {
         return mPlayer.getCurrentPosition();
     }
 
-    public void setChangeUIMediaFragment() {
-        mMediaPlaybackFragment.setUIMusic();
-    }
 
     public void setChangeNotification() {
         mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
@@ -422,7 +380,7 @@ public class MusicService extends Service {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
         }
-        loadImage();
+        loadImageNotification();
         mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
     }
 
@@ -436,75 +394,63 @@ public class MusicService extends Service {
         mSongs.clear();
         mSongs.addAll(s);
     }
+    /**
+     * BachNN
+     * set lại các giai trị của Notification
+     */
+    public void setNextMusicNotification() {
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        loadImageNotification();
+        mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
+    }
+
+    /**
+     * BachNN
+     * set lại các giai trị của Notification
+     */
+    public void setPreviousMusicNotification() {
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        loadImageNotification();
+        mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
+    }
+
+    /**
+     * BachNN
+     * set lại các giai trị của Notification
+     */
+    public void setPlayMusic() {
+        if (isMusicPlaying()) {
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        } else {
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+        }
+        mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
+    }
+
+    public void setPlayMusicNoti() {
+        if (!isMusicPlaying()) {
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
+        } else {
+            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
+        }
+        mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
+    }
+
 
 
     public class LocalMusic extends Binder implements Serializable {
         public MusicService getInstanceService() {
             return MusicService.this;
-        }
-
-        /**
-         * BachNN
-         * set lại các giai trị của Notification
-         */
-        public void setNextMusicNotification() {
-            mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
-            mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
-            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            loadImage();
-            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
-        }
-
-        /**
-         * BachNN
-         * set lại các giai trị của Notification
-         */
-        public void setPreviousMusicNotification() {
-            mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
-            mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
-            mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            loadImage();
-            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
-        }
-
-        /**
-         * BachNN
-         * set lại các giai trị của Notification
-         */
-        public void setPlayMusic() {
-            if (isMusicPlaying()) {
-                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            } else {
-                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
-                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
-            }
-            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
-        }
-
-        public void setPlayMusicNoti() {
-            if (!isMusicPlaying()) {
-                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
-            } else {
-                mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
-                mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.costom_play);
-            }
-            mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
-        }
-
-        public MediaPlaybackFragment getMediaPlaybachFragment() {
-            return mMediaPlaybackFragment;
-        }
-
-        public List<Song> getmSongs() {
-            return mSongs;
-        }
-
-        public Song getSongIsPlay() {
-            return mSongs.get(mCurrentSong);
         }
 
     }
