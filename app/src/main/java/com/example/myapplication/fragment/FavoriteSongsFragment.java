@@ -20,11 +20,11 @@ public class FavoriteSongsFragment extends AllSongFragment {
         //Bkav Thanhnch: -1 can co y nghia, la gi? tao bien constant.-ok
         //BachNN : khi chuyền từ AllSongFragment sang FavouriteSongFraggment mà chưa chay bài hát nào.
         // dong dười để kiềm tra xem AllSongFragment đã chay bài nhạc nào chưa nêu rồi thì lưu mID của nó.
-        if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC) {
-            mIDMusic = mMainActivity.getMusicService().getSongIsPlay().getId();
+        if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC_DEFAULT) {
+            mIDMusic = mMainActivity.getMusicService().getSongPlaying().getId();
         }
         new AllFavouriteMusic().execute();
-        mMainActivity.getMusicService().setCurrentSong(POSITION_MUSIC);
+        mMainActivity.getMusicService().setCurrentSong(POSITION_MUSIC_DEFAULT);
     }
 
     /**
@@ -35,8 +35,8 @@ public class FavoriteSongsFragment extends AllSongFragment {
     public void onDestroy() {
         super.onDestroy();
         //Bkav Thanhnch:
-        if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC) {
-            mIDMusic = mMainActivity.getMusicService().getSongIsPlay().getId();
+        if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC_DEFAULT) {
+            mIDMusic = mMainActivity.getMusicService().getSongPlaying().getId();
         }
         mMainActivity.getMusicService().setAllSongService(getAllSong());
         resetCurrentSong();
@@ -52,8 +52,8 @@ public class FavoriteSongsFragment extends AllSongFragment {
     //Bkav Thanhnch:
     //chua fomat code
     public void resetCurrentSong() {
-        for (int i = 0; i < mMainActivity.getMusicService().getSongs().size(); i++) {
-            if (mMainActivity.getMusicService().getSongs().get(i).getId().equals(mIDMusic)) {
+        for (int i = 0; i < mMainActivity.getMusicService().getAllSongs().size(); i++) {
+            if (mMainActivity.getMusicService().getAllSongs().get(i).getId().equals(mIDMusic)) {
                 mMainActivity.getMusicService().setCurrentSong(i);
             }
         }

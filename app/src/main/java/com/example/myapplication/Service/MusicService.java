@@ -73,7 +73,7 @@ public class MusicService extends Service {
         @Override
         public void run() {
             if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
-                int index = (Integer.parseInt(getSongIsPlay().getDuration()));
+                int index = (Integer.parseInt(getSongPlaying().getDuration()));
                 mSeekBar.setMax(index);
                 if (mSeekBar.getProgress() / 100 == index / 100) {
                     onNextMusic();
@@ -177,7 +177,7 @@ public class MusicService extends Service {
     //BachNN :ten ham khong dung, ne la load anh cho view Notification
     // ham set Anh.
     private void loadImageNotification() {
-        byte[] sourceImage = Util.getByteImageSong(getSongIsPlay().getPath());
+        byte[] sourceImage = Util.getByteImageSong(getSongPlaying().getPath());
         if ((sourceImage == null)) return;
         Bitmap imageBitmap = BitmapFactory.decodeByteArray(sourceImage, 0, sourceImage.length);
         mNotificationRemoteSmall.setImageViewBitmap(R.id.icon_music, imageBitmap);
@@ -348,12 +348,12 @@ public class MusicService extends Service {
 
     }
 
-    public List<Song> getSongs() {
+    public List<Song> getAllSongs() {
         return mSongs;
     }
 
 
-    public Song getSongIsPlay() {
+    public Song getSongPlaying() {
         return mSongs.get(mCurrentSong);
     }
 
@@ -376,8 +376,8 @@ public class MusicService extends Service {
 
 
     public void setChangeNotification() {
-        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
-        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongPlaying().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongPlaying().getAuthor());
         if (checkMusicPlaying()) {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
@@ -404,8 +404,8 @@ public class MusicService extends Service {
      * set lại các giai trị của Notification
      */
     public void setNextMusicNotification() {
-        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
-        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongPlaying().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongPlaying().getAuthor());
         mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         loadImageNotification();
@@ -417,8 +417,8 @@ public class MusicService extends Service {
      * set lại các giai trị của Notification
      */
     public void setPreviousMusicNotification() {
-        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
-        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongPlaying().getTitle());
+        mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongPlaying().getAuthor());
         mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         loadImageNotification();
@@ -460,6 +460,5 @@ public class MusicService extends Service {
         public MusicService getInstanceService() {
             return MusicService.this;
         }
-
     }
 }

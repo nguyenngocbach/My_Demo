@@ -40,21 +40,21 @@ public class DataManager {
      */
     public void addMusicFavourite(Song song) {
         //BachNN : chuyền các giá trị của bài hát vào cvValues để chuyền vào CDSL
-        ContentValues cvValues = new ContentValues();
-        cvValues.put(SongFavouriteDatabaseHelper.ID, song.getId());
-        cvValues.put(SongFavouriteDatabaseHelper.PATH, song.getPath());
-        cvValues.put(SongFavouriteDatabaseHelper.AUTHOR, song.getAuthor());
-        cvValues.put(SongFavouriteDatabaseHelper.TITLE, song.getTitle());
-        cvValues.put(SongFavouriteDatabaseHelper.DISPLAY_NAME, song.getDisplay_Name());
-        cvValues.put(SongFavouriteDatabaseHelper.DURATION, song.getDuration());
-        long insert = mDatabase.insert(SongFavouriteDatabaseHelper.TABLE_NAME, null, cvValues);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(SongFavouriteDatabaseHelper.ID, song.getId());
+        contentValues.put(SongFavouriteDatabaseHelper.PATH, song.getPath());
+        contentValues.put(SongFavouriteDatabaseHelper.AUTHOR, song.getAuthor());
+        contentValues.put(SongFavouriteDatabaseHelper.TITLE, song.getTitle());
+        contentValues.put(SongFavouriteDatabaseHelper.DISPLAY_NAME, song.getDisplay_Name());
+        contentValues.put(SongFavouriteDatabaseHelper.DURATION, song.getDuration());
+        long insert = mDatabase.insert(SongFavouriteDatabaseHelper.TABLE_NAME, null, contentValues);
         if (insert > 0) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, "Thêm Thành Công");
+                Log.d(MainActivity.TAG, "Thêm Thành Công");
             }
         } else {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, "Thêm Thất Bại");
+                Log.d(MainActivity.TAG, "Thêm Thất Bại");
             }
         }
 
@@ -70,11 +70,11 @@ public class DataManager {
         int delete = mDatabase.delete(SongFavouriteDatabaseHelper.TABLE_NAME, SongFavouriteDatabaseHelper.ID + "=" + id, null);
         if (delete > 0) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, "Xóa Thành Công");
+                Log.d(MainActivity.TAG, "Xóa Thành Công");
             }
         } else {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, "Xóa Thất Bại");
+                Log.d(MainActivity.TAG, "Xóa Thất Bại");
             }
         }
     }
@@ -87,26 +87,10 @@ public class DataManager {
     public List<Song> getAllMusicFavourite() {
         List<Song> mAllSong = new ArrayList<>();
         Cursor cursor = mDatabase.query(SongFavouriteDatabaseHelper.TABLE_NAME, null, null, null, null, null, null);
-        //BachNN :  lấy vị trị của các cột theo các thuộc tính trong database
-        int id = cursor.getColumnIndex(SongFavouriteDatabaseHelper.ID);
-        int path = cursor.getColumnIndex(SongFavouriteDatabaseHelper.PATH);
-        int author = cursor.getColumnIndex(SongFavouriteDatabaseHelper.AUTHOR);
-        int title = cursor.getColumnIndex(SongFavouriteDatabaseHelper.TITLE);
-        int displayName = cursor.getColumnIndex(SongFavouriteDatabaseHelper.DISPLAY_NAME);
-        int duration = cursor.getColumnIndex(SongFavouriteDatabaseHelper.DURATION);
         //BachNN : chuyển con trỏ đến đâu bảng
         cursor.moveToFirst();
         // BachNN :nếu con trỏ ko phải vị trị cuối cùng thì chạy tiếp vong While
         while (!cursor.isAfterLast()) {
-            // BachNN: lấy các gia trị theo các trương của bảng
-//            String idSong = cursor.getString(id);
-//            String pathSong = cursor.getString(path);
-//            String authorSong = cursor.getString(author);
-//            String titleSong = cursor.getString(title);
-//            String displaySing = cursor.getString(displayName);
-//            String durationSong = cursor.getString(duration);
-//            Song song = new Song(idSong, pathSong, authorSong, titleSong, displaySing, durationSong);
-            // BachNN :thêm Song vào List Song
             mAllSong.add(new Song(cursor));
             // chuyển con tro xuông dong dươi của bảng
             cursor.moveToNext();

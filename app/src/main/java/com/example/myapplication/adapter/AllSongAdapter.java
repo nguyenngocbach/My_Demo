@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.fragment.BaseSongListFragment;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.listenner.IMusicListenner;
@@ -19,10 +20,10 @@ import java.util.List;
 
 public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHolder> {
     //BachNN : LINE_NORMAL là  bài hát không đc chọn.
-    private static final int LINE_NORMAL = 0;
+    private static final int LINE_NORMAL_TYPE = 0;
     //BachNN : LINE_CHOOSE là bài hát được chọn và đang chạy nhạc
-    private static final int LINE_CHOOSE = 1;
-    public int mCurrentSong = 2;
+    private static final int LINE_CHOOSE_TYPE = 1;
+    public int mCurrentSong= BaseSongListFragment.POSITION_MUSIC_DEFAULT;
     private Context mContext;
     private List<Song> mSongs;
     private IMusicListenner mListener;
@@ -35,8 +36,8 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (position == mCurrentSong) return LINE_CHOOSE;
-        return LINE_NORMAL;
+        if (position == mCurrentSong) return LINE_CHOOSE_TYPE;
+        return LINE_NORMAL_TYPE;
     }
 
     @NonNull
@@ -45,7 +46,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
         View view;
         //BachNN : nếu type = LINE_CHOOSE sẽ set cái dong đấy là bài được chọn còn ngược lại.
-        if (viewType == LINE_CHOOSE) {
+        if (viewType == LINE_CHOOSE_TYPE) {
             view = LayoutInflater.from(mContext).inflate(R.layout.song_line_play, parent, false);
         } else {
             view = LayoutInflater.from(mContext).inflate(R.layout.song_line, parent, false);
@@ -116,13 +117,13 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         }
 
         public void onBind(Song song) {
-            boolean check = getAdapterPosition() == mCurrentSong;
+            boolean checkLineChooseMusic = getAdapterPosition() == mCurrentSong;
             // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
             mIndexMusic.setText("" + (getAdapterPosition() + 1));
             //chuyền một bài hát đang chay vào hàm dưới để title và author
             mTitleTextView.setText(song.getTitle());
             mAuthorTextView.setText(getDuration(song.getDuration()));
-            if (check) {
+            if (checkLineChooseMusic) {
                 mIndexMusic.setVisibility(View.INVISIBLE);
                 mPlayMusicIcon.setVisibility(View.VISIBLE);
             }

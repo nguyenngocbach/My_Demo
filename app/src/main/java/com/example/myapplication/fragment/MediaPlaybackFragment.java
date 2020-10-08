@@ -40,7 +40,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private TextView mTitleTextView;
     private TextView mAuthorTextView;
     private SeekBar mSeekBar;
-    private MusicService mMusicService;
     private IMediaPlayFragmentListenner mMediaListener;
     private MainActivity mActivity;
 
@@ -53,24 +52,22 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            if (mMusicService != null) {
-                if (mMusicService.getCurrentSong() == -1) return;
-                setUI();
-                int index = (Integer.parseInt(mMusicService.getSongIsPlay().getDuration()));
-                mSeekBar.setMax(index);
-                if (mSeekBar.getProgress() == index) {
+            if (mActivity.getMusicService() != null) {
+                //BachNN : nêu mà chưa có bài hát nào đang chạy thì nó sẽ ko chay mRunnable.
+                if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
+                setUIMediaPlaybackFragment();
+                int indexMusicPlaying = (Integer.parseInt(mActivity.getMusicService().getSongPlaying().getDuration()));
+                mSeekBar.setMax(indexMusicPlaying);
+                //BachNN : next bài
+                if (mSeekBar.getProgress() == indexMusicPlaying) {
                     setSeekBar();
-                    setTile(mMusicService.getSongIsPlay());
+                    setTile(mActivity.getMusicService().getSongPlaying());
                     mMediaListener.onSeekBar();
                 }
                 mHandler.postDelayed(this, TIME_REPEAT);
             }
         }
     };
-
-    public void setMusicService(MusicService musicService) {
-        this.mMusicService = musicService;
-    }
 
     /**
      * BachNN
@@ -84,7 +81,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (context instanceof MainActivity) {
             mMediaListener = (IMediaPlayFragmentListenner) context;
             mActivity = (MainActivity) context;
-            mMusicService= mActivity.getMusicService();
         } else throw new ClassCastException("onAttach Methods have problem !");
     }
 
@@ -126,18 +122,20 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mShuffleIcon.setOnClickListener(this);
 
         //BachNN : set kiểu anh cho ảnh chính của MediaPlayFragment.
-        if (!mActivity.isVertical()) mMusicImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (!mActivity.getVertical()) mMusicImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         //BachNN : user click vào icon này sẽ thêm hoặc xóa bài hát.
         mLikeIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkSongFavourite(mMusicService.getSongIsPlay())) {
-                    int id = Integer.parseInt(mMusicService.getSongIsPlay().getId());
+                if (checkSongFavourite(mActivity.getMusicService().getSongPlaying())) {
+                    int iDMusic = Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId());
                     mLikeIcon.setImageResource(R.drawable.ic_thumbs_up_default);
-                    mActivity.getDatabase().removeMusicFavourite(id);
+                    //BachNN : xóa bài hát vào CSDL.
+                    mActivity.getDatabase().removeMusicFavourite(iDMusic);
                 } else {
-                    mActivity.getDatabase().addMusicFavourite(mMusicService.getSongIsPlay());
+                    //BachNN : thêm bài hát vào CSDL.
+                    mActivity.getDatabase().addMusicFavourite(mActivity.getMusicService().getSongPlaying());
                     mLikeIcon.setImageResource(R.drawable.ic_baseline_thumb_up_24);
                 }
             }
@@ -147,10 +145,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (b) {
-                    if (mMusicService != null) {
+                    if (mActivity.getMusicService() != null) {
                         //BachNN : set thời gian thưc của ban hát ban đang chạy
-                        seekBar.setProgress(mMusicService.getTimeCurrents());
-                        mMusicService.setSeekMusic(i);
+                        seekBar.setProgress(mActivity.getMusicService().getTimeCurrents());
+                        mActivity.getMusicService().setSeekMusic(i);
                         mTimeTextView.setText(getDuration(i + ""));
                     }
                 }
@@ -176,21 +174,24 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (mMusicService != null) {
-            if (mMusicService.getCurrentSong() == -1) return;
-            setTile(mMusicService.getSongIsPlay());
+        if (mActivity.getVertical()) {
+            mActivity.setHideToolbar();
+        }
+        if (mActivity.getMusicService() != null) {
+            if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
+            setTile(mActivity.getMusicService().getSongPlaying());
             setSeekBar();
-            setStatusIcon(mMusicService.isMusicPlaying());
+            setStatusIcon(mActivity.getMusicService().checkMusicPlaying());
             setRepeat();
 
-            if (checkSongFavourite(mMusicService.getSongIsPlay())) {
+            if (checkSongFavourite(mActivity.getMusicService().getSongPlaying())) {
                 if (LogSetting.IS_DEBUG) {
-                    Log.d(MainActivity.TAG_MAIN, "Like To ");
+                    Log.d(MainActivity.TAG, "Like To ");
                 }
                 mLikeIcon.setImageResource(R.drawable.ic_baseline_thumb_up_24);
             } else {
                 if (LogSetting.IS_DEBUG) {
-                    Log.d(MainActivity.TAG_MAIN, "Like Bé");
+                    Log.d(MainActivity.TAG, "Like Bé");
                 }
                 mLikeIcon.setImageResource(R.drawable.ic_thumbs_up_default);
             }
@@ -205,12 +206,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      */
     //Bkav Thanhnch:
     private void setRepeat() {
-        if (mMusicService.getStatueRepeat() == MusicService.NORMAL) {
+        if (mActivity.getMusicService().getStatueRepeat() == MusicService.NORMAL) {
             mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
-        } else if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
+        } else if (mActivity.getMusicService().getStatueRepeat() == MusicService.RANDOM) {
             mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
-        } else if (mMusicService.getStatueRepeat() == MusicService.REPEAT){
+        } else if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT){
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
         }
     }
@@ -222,8 +223,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      */
     public void setUIMusic() {
         setSeekBar();
-        setTile(mMusicService.getSongIsPlay());
-        setStatusIcon(mMusicService.isMusicPlaying());
+        setTile(mActivity.getMusicService().getSongPlaying());
+        setStatusIcon(mActivity.getMusicService().checkMusicPlaying());
         loadImageMusicAvatar();
     }
 
@@ -245,7 +246,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * set Max của SeekBar và chay đung giơi gian thực của bài hát.
      */
     private void setSeekBar() {
-        mSeekBar.setMax(Integer.parseInt(mMusicService.getSongIsPlay().getDuration()));
+        mSeekBar.setMax(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getDuration()));
         mHandler.postDelayed(mRunnable, TIME_REPEAT);
     }
 
@@ -265,7 +266,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * @return format về đinh dạnh phút / giây và tra về kiểu String
      */
     private String getDuration(String time) {
-        Long total = Long.parseLong(time);
+        long total = Long.parseLong(time);
         int minutes = (int) ((total / 1000) / 60);
         int second = (int) ((total / 1000) % 60);
         return (minutes < 10 ? "0" + minutes : minutes + "") + ":" + (second < 10 ? "0" + second : second + "");
@@ -275,13 +276,14 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * set Thời gian thực vào các textView và SeekBar sẽ chay theo thời gian thực
      */
-    private void setUI() {
-        if (mMusicService != null) {
-            String totalT = getDuration(mMusicService.getSongIsPlay().getDuration());
+    private void setUIMediaPlaybackFragment() {
+        if (mActivity.getMusicService() != null) {
+            if (mActivity.getMusicService().getCurrentSong()==BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
+            String totalT = getDuration(mActivity.getMusicService().getSongPlaying().getDuration());
             mTotalTimeTextView.setText(totalT);
-            String realTime = getDuration(mMusicService.getTimeCurrents() + "");
+            String realTime = getDuration(mActivity.getMusicService().getTimeCurrents() + "");
             mTimeTextView.setText(realTime);
-            mSeekBar.setProgress(mMusicService.getTimeCurrents());
+            mSeekBar.setProgress(mActivity.getMusicService().getTimeCurrents());
         }
     }
 
@@ -290,8 +292,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * set Image cho 2 cái ảnh của MediaPlaybackFragment.
      */
     public void loadImageMusicAvatar() {
-        if (mMusicService == null) return;
-        byte[] sourceImage = Util.getByteImageSong(mMusicService.getSongIsPlay().getPath());
+        if (mActivity.getMusicService() == null) return;
+        byte[] sourceImage = Util.getByteImageSong(mActivity.getMusicService().getSongPlaying().getPath());
         Glide.with(getContext())
                 .load(sourceImage)
                 .into(mMusicImageView);
@@ -315,64 +317,64 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 getActivity().onBackPressed();
                 break;
             case R.id.icon_Like:
-                mMusicService.setChangeNotification();
+                mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Previous:
-                mMusicService.onPreviousMusic();
-                setTile(mMusicService.getSongIsPlay());
+                mActivity.getMusicService().onPreviousMusic();
+                setTile(mActivity.getMusicService().getSongPlaying());
                 setSeekBar();
                 mMediaListener.onPrevious();
                 loadImageMusicAvatar();
-                mMusicService.setChangeNotification();
+                mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Play:
                 mMediaListener.onPlay();
-                if (mMusicService.isMusicPlaying()) {
-                    mMusicService.onStopMusic();
+                if (mActivity.getMusicService().checkMusicPlaying()) {
+                    mActivity.getMusicService().onStopMusic();
                     mPlayIcon.setImageResource(R.drawable.costom_play);
-                    if (mMusicService.getStatus() == MusicService.INITIALLY) {
-                        mMusicService.onPlayMusic();
-                        mMusicService.setStatus(MusicService.STOP);
+                    if (mActivity.getMusicService().getStatus() == MusicService.INITIALLY) {
+                        mActivity.getMusicService().onPlayMusic();
+                        mActivity.getMusicService().setStatus(MusicService.STOP);
                     }
                 } else {
-                    mMusicService.onResumeMusic();
+                    mActivity.getMusicService().onResumeMusic();
                     // 0 ,1 ko ro ràng
-                    if (mMusicService.getStatus() == MusicService.INITIALLY) {
-                        mMusicService.onPlayMusic();
-                        mMusicService.setStatus(MusicService.STOP);
+                    if (mActivity.getMusicService().getStatus() == MusicService.INITIALLY) {
+                        mActivity.getMusicService().onPlayMusic();
+                        mActivity.getMusicService().setStatus(MusicService.STOP);
                     }
                     mPlayIcon.setImageResource(R.drawable.custom_play_pause);
                 }
-                mMusicService.setChangeNotification();
+                mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Next:
-                mMusicService.onNextMusic();
-                setTile(mMusicService.getSongIsPlay());
+                mActivity.getMusicService().onNextMusic();
+                setTile(mActivity.getMusicService().getSongPlaying());
                 setSeekBar();
                 mMediaListener.onNext();
                 loadImageMusicAvatar();
-                mMusicService.setChangeNotification();
+                mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Dislike:
                 break;
             case R.id.icon_shuffle:
-                mMusicService.setShuff();
-                if (mMusicService.getStatueRepeat() == MusicService.REPEAT) {
+                mActivity.getMusicService().setShuff();
+                if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT) {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
-                    mMusicService.setStatus(MusicService.NORMAL);
+                    mActivity.getMusicService().setStatus(MusicService.NORMAL);
                 }else {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
-                    mMusicService.setStatus(MusicService.REPEAT);
+                    mActivity.getMusicService().setStatus(MusicService.REPEAT);
                 }
                 break;
             case R.id.icon_repeat:
-                mMusicService.setRandom();
-                if (mMusicService.getStatueRepeat() == MusicService.RANDOM) {
+                mActivity.getMusicService().setRandom();
+                if (mActivity.getMusicService().getStatueRepeat() == MusicService.RANDOM) {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
-                    mMusicService.setStatus(MusicService.NORMAL);
+                    mActivity.getMusicService().setStatus(MusicService.NORMAL);
                 }else {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
-                    mMusicService.setStatus(MusicService.RANDOM);
+                    mActivity.getMusicService().setStatus(MusicService.RANDOM);
                 }
                 break;
         }
