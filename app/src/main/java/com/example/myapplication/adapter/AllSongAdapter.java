@@ -117,9 +117,9 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
         public void onBind(Song song) {
             boolean check = getAdapterPosition() == mCurrentSong;
-            // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
+            //BachNN : set giá trị TextView nó là mIndexMusic với các số theo bài hát .
             mIndexMusic.setText("" + (getAdapterPosition() + 1));
-            //chuyền một bài hát đang chay vào hàm dưới để title và author
+            //BachNN : chuyền một bài hát đang chay vào hàm dưới để title và author
             mTitleTextView.setText(song.getTitle());
             mAuthorTextView.setText(getDuration(song.getDuration()));
             if (check) {

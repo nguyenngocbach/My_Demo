@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -107,7 +108,7 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mSongs = getAllSong();
+        new AllFavouriteMusic().execute();
         mSeekBar = new SeekBar(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel =
@@ -142,6 +143,17 @@ public class MusicService extends Service {
         return START_NOT_STICKY;
     }
 
+    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+        @Override
+        protected List<Song> doInBackground(Void... voids) {
+            return getAllSong();
+        }
+
+        @Override
+        protected void onPostExecute(List<Song> songs) {
+            mSongs=songs;
+        }
+    }
     /**
      * BachNN hàm này dung để chay bài nhạc.
      */

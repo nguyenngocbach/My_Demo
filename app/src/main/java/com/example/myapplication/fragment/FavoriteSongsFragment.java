@@ -66,8 +66,10 @@ public class FavoriteSongsFragment extends AllSongFragment {
             }
         }
     }
-    /**Bkav Thanhnch: todo chuyen sang lop favourite
-     *
+
+    /**
+     * Bkav Thanhnch: todo chuyen sang lop favourite
+     * <p>
      * BachNN
      * Tạo ra một Thread khác để đọc các bài hát yêu thích từ CSDL về.
      */

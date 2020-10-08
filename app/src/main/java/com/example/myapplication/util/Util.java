@@ -12,6 +12,7 @@ public class Util {
     public static final String ACTION_AUTONEXT = "com.example.myapplication.unit.autoNextMusic";
 
     /**
+     * BachNN
      * @param path path bai hat
      *             ham nay dung de chuyen path bai hat thanh 1 chuoi byte[].
      * @return 1 chuoi Byte[]
