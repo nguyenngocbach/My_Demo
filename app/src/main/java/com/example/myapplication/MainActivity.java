@@ -95,12 +95,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         return mMusicService;
     }
 
-    /**
-     * BachNN
-     * @param serviceClass ..
-     *                     Kiểm tra xem service co dang chay hay ko.
-     * @return true nếu đang chay else thi false.
-     */
     public boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -117,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         setContentView(R.layout.activity_main);
         mFragmentManager = getSupportFragmentManager();
         mIntent = new Intent(MainActivity.this, MusicService.class);
+        startService(mIntent);
         mDatabase = new DataManager(this);
         //Bkav Thanhnch: Khong co comment ai code
         //BachNN : register BroadCast.

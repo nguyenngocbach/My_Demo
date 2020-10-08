@@ -107,7 +107,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
             setSelection(mMusicService.getCurrentSong());
             setImageMusic();
         }
-        //BachNN : lần đâu vài chưa set title vị trị.
+        // lần đâu vài chưa set title vị trị.
         if (mMusicService.getCurrentSong() == -1) return;
         setData(mMusicService.getSongs());
         setTitle(mMusicService.getSongIsPlay());

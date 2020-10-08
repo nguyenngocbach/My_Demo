@@ -29,25 +29,25 @@ public class NotificationBroadCast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Util.ACTION_PREVIOUS.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, Util.ACTION_PREVIOUS);
+                Log.d(MainActivity.TAG, Util.ACTION_PREVIOUS);
             }
             mMusicBroadCastListener.onPreviousMusicBroadCast();
         }
         if (Util.ACTION_NEXT.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, Util.ACTION_NEXT);
+                Log.d(MainActivity.TAG, Util.ACTION_NEXT);
             }
             mMusicBroadCastListener.onNextMusicBroadCast();
         }
         if (Util.ACTION_PLAY.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, Util.ACTION_PLAY);
+                Log.d(MainActivity.TAG, Util.ACTION_PLAY);
             }
             mMusicBroadCastListener.onOnPlayMusicBroadCast();
         }
         if (Util.ACTION_AUTONEXT.equals(intent.getAction())) {
             if (LogSetting.IS_DEBUG) {
-                Log.d(MainActivity.TAG_MAIN, Util.ACTION_AUTONEXT);
+                Log.d(MainActivity.TAG, Util.ACTION_AUTONEXT);
             }
             mMusicBroadCastListener.onPlayMusicAutoNextBroadCast();
         }

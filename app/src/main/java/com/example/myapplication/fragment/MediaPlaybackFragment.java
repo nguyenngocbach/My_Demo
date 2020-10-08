@@ -215,6 +215,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+
     /**
      * BachNN
      * set lại toàn bộ các view trong Fragment này.
@@ -249,7 +250,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     /**
-     * BachNN
      * @param song bài hát mà muosn set tiêu đề.
      *             set title va author cho bai hay
      */
@@ -273,7 +273,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     /**
      * BachNN
-     * set Thời gian thực vào các textView và SeekBar sẽ chay theo thời gian thực.
+     * set Thời gian thực vào các textView và SeekBar sẽ chay theo thời gian thực
      */
     private void setUI() {
         if (mMusicService != null) {
@@ -336,6 +336,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     }
                 } else {
                     mMusicService.onResumeMusic();
+                    // 0 ,1 ko ro ràng
                     if (mMusicService.getStatus() == MusicService.INITIALLY) {
                         mMusicService.onPlayMusic();
                         mMusicService.setStatus(MusicService.STOP);

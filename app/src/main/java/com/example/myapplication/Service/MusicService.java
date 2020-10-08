@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.myapplication.MainActivity;
-import com.example.myapplication.fragment.BaseSongListFragment;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
 import com.example.myapplication.util.Util;
@@ -38,6 +37,8 @@ import java.util.Random;
 
 public class MusicService extends Service {
 
+    private static final int POSITION_DEFAULT_MUSIC = -1;
+    private static final String NOTIFICATION_NAME = "App_Music_OF_Bach";
     public static final int RANDOM = 5;
     //Bkav Thanhnch: khong hieu bien nay la trang thai nao -ok
     public static final int REPEAT = 6;
@@ -50,7 +51,6 @@ public class MusicService extends Service {
     private static final int ID_NOTIFICATION = 111;
     private static final String LOG_REALTIME = "log_realtime";
     private int TIME_REPEAT = 300;
-    //    private MusicManager mMusicManager;
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotificationManager;
@@ -60,7 +60,7 @@ public class MusicService extends Service {
     private SeekBar mSeekBar;
     private List<Song> mSongs;
     private MediaPlayer mPlayer;
-    private int mCurrentSong = -1;
+    private int mCurrentSong = POSITION_DEFAULT_MUSIC;
     private Context mContext;
     private int mStatueRepeat = NORMAL;
     // BachNN :về trang thái lúc ban đâu là next , previous bài hát.
@@ -72,16 +72,13 @@ public class MusicService extends Service {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            if (getCurrentSong() != -1) {
+            if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
                 int index = (Integer.parseInt(getSongIsPlay().getDuration()));
                 mSeekBar.setMax(index);
-                if (LogSetting.IS_DEBUG) {
-                    Log.d(LOG_REALTIME, getTimeCurrents() + "---" + (index) + "--" + mSeekBar.getProgress());
-                }
                 if (mSeekBar.getProgress() / 100 == index / 100) {
                     onNextMusic();
                     if (LogSetting.IS_DEBUG) {
-                        Log.d(LOG_REALTIME, "Next Bai");
+                        Log.d(MainActivity.TAG, "Next Bai");
                     }
                     Intent intent = new Intent(Util.ACTION_AUTONEXT);
                     sendBroadcast(intent);
@@ -112,7 +109,7 @@ public class MusicService extends Service {
         mSeekBar = new SeekBar(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel =
-                    new NotificationChannel(ID_CHANNEL, "App_Music_OF_Bach", NotificationManager.IMPORTANCE_LOW);
+                    new NotificationChannel(ID_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setLightColor(Color.RED);
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
@@ -129,7 +126,7 @@ public class MusicService extends Service {
 
 
             //Bkav Thanhnch: xem lai bien -1
-            if (getCurrentSong() != BaseSongListFragment.POSITION_MUSIC) {
+            if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
                 loadImageNotification();
             }
             mBuilder = new NotificationCompat.Builder(this, ID_CHANNEL)
@@ -206,9 +203,12 @@ public class MusicService extends Service {
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
         }
+        //BachNN : nếu size của List bài hát =-1 thì quay lại bài cuối cùng.
         if (mCurrentSong == 0) {
             mCurrentSong = mSongs.size() - 1;
-        } else mCurrentSong--;
+        } else {
+            mCurrentSong--;
+        }
         mPlayer.reset();
         onPlayMusic();
     }
@@ -278,7 +278,7 @@ public class MusicService extends Service {
      *
      * @return true thi bài nhạc đang chay con false thi ngược lại
      */
-    public boolean isMusicPlaying() {
+    public boolean checkMusicPlaying() {
         return (mPlayer.isPlaying()) ? true : false;
     }
 
@@ -333,22 +333,13 @@ public class MusicService extends Service {
                 query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColoumSong, null, null, null, null);
         // BachNN :chuyển con trỏ đến đâu bảng
         if (LogSetting.IS_DEBUG) {
-            Log.d(MainActivity.TAG_MAIN, "cursor : " + cursor);
+            Log.d(MainActivity.TAG, "cursor : " + cursor);
         }
         //Bkav Thanhnch: sao khong chuyen vao trong doan check null?
-        if (cursor==null){
-            if (LogSetting.IS_DEBUG){
-                Log.d(MainActivity.TAG_MAIN,"Cursor bang null");
-            }
-            return null ;
-        }
-        cursor.moveToFirst();
         if (cursor != null) {
+            cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 songs.add(new Song(cursor));
-                if (LogSetting.IS_DEBUG){
-                    Log.d(MainActivity.TAG_MAIN,""+songs.size());
-                }
                 cursor.moveToNext();
             }
             cursor.close();
@@ -387,7 +378,7 @@ public class MusicService extends Service {
     public void setChangeNotification() {
         mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongIsPlay().getTitle());
         mNotificationRemoteBig.setTextViewText(R.id.noti_author, getSongIsPlay().getAuthor());
-        if (isMusicPlaying()) {
+        if (checkMusicPlaying()) {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         } else {
@@ -439,7 +430,7 @@ public class MusicService extends Service {
      * set lại các giai trị của Notification
      */
     public void setPlayMusic() {
-        if (isMusicPlaying()) {
+        if (checkMusicPlaying()) {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         } else {
@@ -449,8 +440,11 @@ public class MusicService extends Service {
         mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
     }
 
-    public void setPlayMusicNoti() {
-        if (!isMusicPlaying()) {
+    /**
+     * hhàm nay dung để set lại IU cho Notifiaction dó chính là Buttom Play.
+     */
+    public void setPlayMusicNotification() {
+        if (!checkMusicPlaying()) {
             mNotificationRemoteBig.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
             mNotificationRemoteSmall.setImageViewResource(R.id.icon_play, R.drawable.custom_play_pause);
         } else {

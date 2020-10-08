@@ -8,9 +8,9 @@ import androidx.annotation.Nullable;
 
 public class SongFavouriteDatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String NAME_DATABASE = "SongFvourite.db";
+    public static final String NAME_DATABASE = "SongFavourite.db";
     public static final int VERSION = 1;
-    public static final String TABLE_NAME = "MY_SONG_FVOURITE";
+    public static final String TABLE_NAME = "MY_SONG_FAVOURITE";
     public static final String ID = "_id";
     public static final String PATH = "_path";
     public static final String AUTHOR = "_author";

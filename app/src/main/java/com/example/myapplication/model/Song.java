@@ -27,26 +27,12 @@ public class Song implements Serializable {
      *               constructor nay chieu tham so la mot bien Cursor
      */
     public Song(Cursor cursor) {
-        String[] allColoumSong = new String[]{
-                MediaStore.Audio.AudioColumns._ID,
-                MediaStore.Audio.AudioColumns.DATA,
-                MediaStore.Audio.AudioColumns.ARTIST,
-                MediaStore.Audio.AudioColumns.TITLE,
-                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
-                MediaStore.Audio.AudioColumns.DURATION
-        };
-        int idColumn = cursor.getColumnIndex(allColoumSong[0]);
-        int dataColumn = cursor.getColumnIndex(allColoumSong[1]);
-        int artistColumn = cursor.getColumnIndex(allColoumSong[2]);
-        int titleColumn = cursor.getColumnIndex(allColoumSong[3]);
-        int displayNameColumn = cursor.getColumnIndex(allColoumSong[4]);
-        int durationColumn = cursor.getColumnIndex(allColoumSong[5]);
-        String id = cursor.getString(idColumn);
-        String data = cursor.getString(dataColumn);
-        String author = cursor.getString(artistColumn);
-        String title = cursor.getString(titleColumn);
-        String displayName = cursor.getString(displayNameColumn);
-        String duration = cursor.getString(durationColumn);
+        String id = cursor.getString(0);
+        String data = cursor.getString(1);
+        String author = cursor.getString(2);
+        String title = cursor.getString(3);
+        String displayName = cursor.getString(4);
+        String duration = cursor.getString(5);
         this.mID = id;
         this.mPath = data;
         this.mAuthor = author;

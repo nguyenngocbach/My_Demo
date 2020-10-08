@@ -99,16 +99,16 @@ public class DataManager {
         // BachNN :nếu con trỏ ko phải vị trị cuối cùng thì chạy tiếp vong While
         while (!cursor.isAfterLast()) {
             // BachNN: lấy các gia trị theo các trương của bảng
-            String idSong = cursor.getString(id);
-            String pathSong = cursor.getString(path);
-            String authorSong = cursor.getString(author);
-            String titleSong = cursor.getString(title);
-            String displaySing = cursor.getString(displayName);
-            String durationSong = cursor.getString(duration);
-            Song song = new Song(idSong, pathSong, authorSong, titleSong, displaySing, durationSong);
+//            String idSong = cursor.getString(id);
+//            String pathSong = cursor.getString(path);
+//            String authorSong = cursor.getString(author);
+//            String titleSong = cursor.getString(title);
+//            String displaySing = cursor.getString(displayName);
+//            String durationSong = cursor.getString(duration);
+//            Song song = new Song(idSong, pathSong, authorSong, titleSong, displaySing, durationSong);
             // BachNN :thêm Song vào List Song
-            mAllSong.add(song);
-            //BachNN : chuyển con tro xuông dong dươi của bảng
+            mAllSong.add(new Song(cursor));
+            // chuyển con tro xuông dong dươi của bảng
             cursor.moveToNext();
         }
         //BachNN : đóng con trỏ lại
