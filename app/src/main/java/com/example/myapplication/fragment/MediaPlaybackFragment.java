@@ -40,6 +40,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private TextView mTitleTextView;
     private TextView mAuthorTextView;
     private SeekBar mSeekBar;
+    private ImageView mPreviousIcon;
+    private ImageView mNextIcon;
+    private ImageView mDislikeIcon;
+    private ImageView mMoreIcon;
+    private ImageView mListMusicIcon;
     private IMediaPlayFragmentListenner mMediaListener;
     private MainActivity mActivity;
 
@@ -54,7 +59,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         public void run() {
             if (mActivity.getMusicService() != null) {
                 //BachNN : nêu mà chưa có bài hát nào đang chạy thì nó sẽ ko chay mRunnable.
-                if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
+                if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT)
+                    return;
                 setUIMediaPlaybackFragment();
                 int indexMusicPlaying = (Integer.parseInt(mActivity.getMusicService().getSongPlaying().getDuration()));
                 mSeekBar.setMax(indexMusicPlaying);
@@ -88,29 +94,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.media_play_back_fragment, container, false);
-        ImageView mPreviousIcon;
-        ImageView mNextIcon;
-        ImageView mDislikeIcon;
-        ImageView mMoreIcon;
-        ImageView mListMusicIcon;
-
-        mMusicImageView = view.findViewById(R.id.img_music);
-        mAvatarImageView = view.findViewById(R.id.icon_avata);
-        mMoreIcon = view.findViewById(R.id.icon_more);
-        mListMusicIcon = view.findViewById(R.id.icon_queue);
-        mLikeIcon = view.findViewById(R.id.icon_Like);
-        mPreviousIcon = view.findViewById(R.id.icon_Previous);
-        mPlayIcon = view.findViewById(R.id.icon_Play);
-        mNextIcon = view.findViewById(R.id.icon_Next);
-        mDislikeIcon = view.findViewById(R.id.icon_Dislike);
-        mRePeatIcon = view.findViewById(R.id.icon_repeat);
-        mShuffleIcon = view.findViewById(R.id.icon_shuffle);
-        mAuthorTextView = view.findViewById(R.id.txt_Author);
-        mTitleTextView = view.findViewById(R.id.txt_Title);
-        mTimeTextView = view.findViewById(R.id.txt_startTime);
-        mTotalTimeTextView = view.findViewById(R.id.txt_totalTime);
-        mSeekBar = view.findViewById(R.id.seebar_ok);
-
+        anhXa(view);
         mMoreIcon.setOnClickListener(this);
         mListMusicIcon.setOnClickListener(this);
         mLikeIcon.setOnClickListener(this);
@@ -166,6 +150,25 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         return view;
     }
 
+    private void anhXa(View view) {
+        mMusicImageView = view.findViewById(R.id.img_music);
+        mAvatarImageView = view.findViewById(R.id.icon_avata);
+        mMoreIcon = view.findViewById(R.id.icon_more);
+        mListMusicIcon = view.findViewById(R.id.icon_queue);
+        mLikeIcon = view.findViewById(R.id.icon_Like);
+        mPreviousIcon = view.findViewById(R.id.icon_Previous);
+        mPlayIcon = view.findViewById(R.id.icon_Play);
+        mNextIcon = view.findViewById(R.id.icon_Next);
+        mDislikeIcon = view.findViewById(R.id.icon_Dislike);
+        mRePeatIcon = view.findViewById(R.id.icon_repeat);
+        mShuffleIcon = view.findViewById(R.id.icon_shuffle);
+        mAuthorTextView = view.findViewById(R.id.txt_Author);
+        mTitleTextView = view.findViewById(R.id.txt_Title);
+        mTimeTextView = view.findViewById(R.id.txt_startTime);
+        mTotalTimeTextView = view.findViewById(R.id.txt_totalTime);
+        mSeekBar = view.findViewById(R.id.seebar_ok);
+    }
+
     /**
      * BachNN
      *
@@ -174,11 +177,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //BachNN : nếu nó là màn hinh doc thi ẩn toolbar di.
         if (mActivity.getVertical()) {
             mActivity.setHideToolbar();
         }
         if (mActivity.getMusicService() != null) {
-            if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
+            if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT)
+                return;
             setTile(mActivity.getMusicService().getSongPlaying());
             setSeekBar();
             setStatusIcon(mActivity.getMusicService().checkMusicPlaying());
@@ -211,11 +216,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
         } else if (mActivity.getMusicService().getStatueRepeat() == MusicService.RANDOM) {
             mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
-        } else if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT){
+        } else if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT) {
             mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
         }
     }
-
 
     /**
      * BachNN
@@ -251,6 +255,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     /**
+     * BachNN
+     *
      * @param song bài hát mà muosn set tiêu đề.
      *             set title va author cho bai hay
      */
@@ -278,9 +284,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      */
     private void setUIMediaPlaybackFragment() {
         if (mActivity.getMusicService() != null) {
-            if (mActivity.getMusicService().getCurrentSong()==BaseSongListFragment.POSITION_MUSIC_DEFAULT) return;
-            String totalT = getDuration(mActivity.getMusicService().getSongPlaying().getDuration());
-            mTotalTimeTextView.setText(totalT);
+            if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT) {
+                return;
+            }
+            String totalTime = getDuration(mActivity.getMusicService().getSongPlaying().getDuration());
+            mTotalTimeTextView.setText(totalTime);
             String realTime = getDuration(mActivity.getMusicService().getTimeCurrents() + "");
             mTimeTextView.setText(realTime);
             mSeekBar.setProgress(mActivity.getMusicService().getTimeCurrents());
@@ -362,7 +370,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT) {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
                     mActivity.getMusicService().setStatus(MusicService.NORMAL);
-                }else {
+                } else {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle);
                     mActivity.getMusicService().setStatus(MusicService.REPEAT);
                 }
@@ -372,7 +380,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (mActivity.getMusicService().getStatueRepeat() == MusicService.RANDOM) {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
                     mActivity.getMusicService().setStatus(MusicService.NORMAL);
-                }else {
+                } else {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat);
                     mActivity.getMusicService().setStatus(MusicService.RANDOM);
                 }
@@ -426,7 +434,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onStop() {
         super.onStop();
-        //
+        //BachNN : dừng runnable để nó ko cập nhật UI cho fragment này nữa.
         mHandler.removeCallbacks(mRunnable);
     }
 

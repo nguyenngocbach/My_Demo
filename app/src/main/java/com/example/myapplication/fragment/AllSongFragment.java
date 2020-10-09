@@ -26,6 +26,7 @@ public class AllSongFragment extends BaseSongListFragment {
     public void loadData() {
         new LoadAllMusic().execute();
     }
+
     /**
      * BachNN
      * tạo một luồng để lấy một list bài hát về.
@@ -33,12 +34,12 @@ public class AllSongFragment extends BaseSongListFragment {
     class LoadAllMusic extends AsyncTask<Void, Void, List<Song>> {
         @Override
         protected List<Song> doInBackground(Void... voids) {
-            return getAllSong();
+            return getAllSongDatabase();
         }
 
         @Override
         protected void onPostExecute(List<Song> songs) {
-            setData(songs);
+            setDataAllMusic(songs);
             super.onPostExecute(songs);
         }
     }

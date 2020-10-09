@@ -26,10 +26,10 @@ public class DataManager {
      * @param context khơi tao
      */
     public DataManager(Context context) {
-        SongFavouriteDatabaseHelper mMusicHelper;
+        SongFavouriteDatabaseHelper musicDatabaseHelper;
         //BachNN : khởi tạo SongaFavouriteDatabaseHelper là lớp còn của SQLiteOpenHelper class
-        mMusicHelper = new SongFavouriteDatabaseHelper(context);
-        mDatabase = mMusicHelper.getWritableDatabase();
+        musicDatabaseHelper = new SongFavouriteDatabaseHelper(context);
+        mDatabase = musicDatabaseHelper.getWritableDatabase();
     }
 
     /**
@@ -57,7 +57,6 @@ public class DataManager {
                 Log.d(MainActivity.TAG, "Thêm Thất Bại");
             }
         }
-
     }
 
     /**
@@ -67,8 +66,8 @@ public class DataManager {
      *           để xóa bài hát khỏi CSDL
      */
     public void removeMusicFavourite(int id) {
-        int delete = mDatabase.delete(SongFavouriteDatabaseHelper.TABLE_NAME, SongFavouriteDatabaseHelper.ID + "=" + id, null);
-        if (delete > 0) {
+        int deleteFavouriteMusic = mDatabase.delete(SongFavouriteDatabaseHelper.TABLE_NAME, SongFavouriteDatabaseHelper.ID + "=" + id, null);
+        if (deleteFavouriteMusic > 0) {
             if (LogSetting.IS_DEBUG) {
                 Log.d(MainActivity.TAG, "Xóa Thành Công");
             }
@@ -85,18 +84,18 @@ public class DataManager {
      * @return chả về một list bài nhạc yêu thich trong Database
      */
     public List<Song> getAllMusicFavourite() {
-        List<Song> mAllSong = new ArrayList<>();
+        List<Song> allFavoriteSong = new ArrayList<>();
         Cursor cursor = mDatabase.query(SongFavouriteDatabaseHelper.TABLE_NAME, null, null, null, null, null, null);
         //BachNN : chuyển con trỏ đến đâu bảng
         cursor.moveToFirst();
         // BachNN :nếu con trỏ ko phải vị trị cuối cùng thì chạy tiếp vong While
         while (!cursor.isAfterLast()) {
-            mAllSong.add(new Song(cursor));
+            allFavoriteSong.add(new Song(cursor));
             // chuyển con tro xuông dong dươi của bảng
             cursor.moveToNext();
         }
         //BachNN : đóng con trỏ lại
         cursor.close();
-        return mAllSong;
+        return allFavoriteSong;
     }
 }

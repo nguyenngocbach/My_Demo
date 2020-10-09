@@ -11,9 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -91,23 +89,12 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         return mMusicService;
     }
 
-    public boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mFragmentManager = getSupportFragmentManager();
         mIntent = new Intent(MainActivity.this, MusicService.class);
-        startService(mIntent);
         mDatabase = new DataManager(this);
         //Bkav Thanhnch: Khong co comment ai code
         //BachNN : register BroadCast.
@@ -209,10 +196,10 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             });
         } else {
             MediaPlaybackFragment mediaPlaybackFragment = new MediaPlaybackFragment();
-            FragmentTransaction layer = mFragmentManager.beginTransaction();
-            layer.replace(R.id.music_Player, mediaPlaybackFragment);
-            layer.addToBackStack(null);
-            layer.commit();
+            FragmentTransaction mediaPlaybackTransaction = mFragmentManager.beginTransaction();
+            mediaPlaybackTransaction.replace(R.id.music_Player, mediaPlaybackFragment);
+            mediaPlaybackTransaction.addToBackStack(null);
+            mediaPlaybackTransaction.commit();
 
             AllSongFragment allSongFragment = new AllSongFragment();
             FragmentTransaction ft = mFragmentManager.beginTransaction();
@@ -373,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         if (!mIsVertical) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             // todo xoa di nhe
-            allSongFragment.setData(mMusicService.getAllSongs());
+            allSongFragment.setDataAllMusic(mMusicService.getAllSongs());
             allSongFragment.setImageMusic();
             mMusicService.setPreviousMusicNotification();
         }
@@ -401,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onNext() {
         if (!mIsVertical) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            allSongFragment.setData(mMusicService.getAllSongs());
+            allSongFragment.setDataAllMusic(mMusicService.getAllSongs());
             allSongFragment.setImageMusic();
             mMusicService.setNextMusicNotification();
         }
@@ -417,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onSeekBar() {
         if (!mIsVertical) {
             AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            songFragment.setTitle(mMusicService.getSongPlaying());
+            songFragment.setTitleMusic(mMusicService.getSongPlaying());
         }
     }
 
@@ -434,8 +421,8 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onNextMusicBroadCast() {
         mMusicService.onNextMusic();
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
-            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            mAllSongFragment.setUIAllView();
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setUIAllView();
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
             MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
@@ -453,11 +440,11 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onPreviousMusicBroadCast() {
         mMusicService.onPreviousMusic();
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
-            AllSongFragment mAllSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            mAllSongFragment.setData(mMusicService.getAllSongs());
-            mAllSongFragment.setTitle(mMusicService.getSongPlaying());
-            mAllSongFragment.setButtonIconPlayMusic(mMusicService.checkMusicPlaying());
-            mAllSongFragment.setImageMusic();
+            AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            allSongFragment.setDataAllMusic(mMusicService.getAllSongs());
+            allSongFragment.setTitleMusic(mMusicService.getSongPlaying());
+            allSongFragment.setButtonIconPlayMusic(mMusicService.checkMusicPlaying());
+            allSongFragment.setImageMusic();
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
             MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);

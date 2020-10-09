@@ -37,8 +37,6 @@ import java.util.Random;
 
 public class MusicService extends Service {
 
-    private static final int POSITION_DEFAULT_MUSIC = -1;
-    private static final String NOTIFICATION_NAME = "App_Music_OF_Bach";
     public static final int RANDOM = 5;
     //Bkav Thanhnch: khong hieu bien nay la trang thai nao -ok
     public static final int REPEAT = 6;
@@ -47,9 +45,10 @@ public class MusicService extends Service {
     public static final int INITIALLY = 0;
     // BachNN :khí bài hát đang chạy nó bị dừng.
     public static final int STOP = 3;
+    private static final int POSITION_DEFAULT_MUSIC = -1;
+    private static final String NOTIFICATION_NAME = "App_Music_OF_Bach";
     private static final String ID_CHANNEL = "1999";
     private static final int ID_NOTIFICATION = 111;
-    private static final String LOG_REALTIME = "log_realtime";
     private int TIME_REPEAT = 300;
     private RemoteViews mNotificationRemoteSmall;
     private RemoteViews mNotificationRemoteBig;
@@ -106,13 +105,14 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         new AllFavouriteMusic().execute();
+        //BachNN : anh xem đoạn nay phải sưa ko .
         mSeekBar = new SeekBar(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel =
+            NotificationChannel channelNotification =
                     new NotificationChannel(ID_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_LOW);
-            channel.setLightColor(Color.RED);
+            channelNotification.setLightColor(Color.RED);
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.createNotificationChannel(channel);
+            mNotificationManager.createNotificationChannel(channelNotification);
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
             //Bkav Thanhnch: sao can check null? -ok
@@ -140,17 +140,6 @@ public class MusicService extends Service {
         return START_NOT_STICKY;
     }
 
-    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
-        @Override
-        protected List<Song> doInBackground(Void... voids) {
-            return getAllSong();
-        }
-
-        @Override
-        protected void onPostExecute(List<Song> songs) {
-            mSongs=songs;
-        }
-    }
     /**
      * BachNN hàm này dung để chay bài nhạc.
      */
@@ -195,6 +184,7 @@ public class MusicService extends Service {
         Intent intent = new Intent(actionPrevious);
         return PendingIntent.getBroadcast(this, icon_previous, intent, 0);
     }
+
     /**
      * BachNN
      * quay lại bàn nhạc
@@ -212,7 +202,6 @@ public class MusicService extends Service {
         mPlayer.reset();
         onPlayMusic();
     }
-
 
     /**
      * BachNN
@@ -272,7 +261,6 @@ public class MusicService extends Service {
         return mStatueRepeat;
     }
 
-
     /**
      * BachNN
      *
@@ -318,7 +306,7 @@ public class MusicService extends Service {
      * BachNN
      * get tất cả các bài hát từ Database trên thiết bị di động.
      */
-    private List<Song> getAllSong() {
+    public List<Song> getAllSongDatabase() {
         List<Song> songs = new ArrayList<>();
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
@@ -352,7 +340,10 @@ public class MusicService extends Service {
         return mSongs;
     }
 
-
+    /**
+     * BachNN
+     * @return bài hat đang chay
+     */
     public Song getSongPlaying() {
         return mSongs.get(mCurrentSong);
     }
@@ -373,7 +364,6 @@ public class MusicService extends Service {
     public int getTimeCurrents() {
         return mPlayer.getCurrentPosition();
     }
-
 
     public void setChangeNotification() {
         mNotificationRemoteBig.setTextViewText(R.id.noti_title, getSongPlaying().getTitle());
@@ -399,6 +389,7 @@ public class MusicService extends Service {
         mSongs.clear();
         mSongs.addAll(s);
     }
+
     /**
      * BachNN
      * set lại các giai trị của Notification
@@ -454,7 +445,21 @@ public class MusicService extends Service {
         mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
     }
 
+    /**
+     * BachNN
+     * Hàm này dùng để lấy lại allSong khi quay lại list bài hát từ FavouriteSongFragment.
+     */
+    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+        @Override
+        protected List<Song> doInBackground(Void... voids) {
+            return getAllSongDatabase();
+        }
 
+        @Override
+        protected void onPostExecute(List<Song> songs) {
+            mSongs = songs;
+        }
+    }
 
     public class LocalMusic extends Binder implements Serializable {
         public MusicService getInstanceService() {

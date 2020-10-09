@@ -26,12 +26,12 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     public int mCurrentSong= BaseSongListFragment.POSITION_MUSIC_DEFAULT;
     private Context mContext;
     private List<Song> mSongs;
-    private IMusicListenner mListener;
+    private IMusicListenner mMusicListener;
 
     public AllSongAdapter(Context mContext, List<Song> mSongs, IMusicListenner listener) {
         this.mContext = mContext;
         this.mSongs = mSongs;
-        this.mListener = listener;
+        this.mMusicListener = listener;
     }
 
     @Override
@@ -79,6 +79,10 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     }
 
 
+    /**
+     * @param mCurrentSong vị trí bài hát đang chay.
+     *                     set lại vị trí bài hát đang chạy.
+     */
     public void setCurrentSong(int mCurrentSong) {
         this.mCurrentSong = mCurrentSong;
     }
@@ -103,7 +107,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
                 @Override
                 public void onClick(View view) {
                     int mPosition = getLayoutPosition();
-                    mListener.selectMusic(mPosition);
+                    mMusicListener.selectMusic(mPosition);
                 }
             });
 
@@ -111,7 +115,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
                 @Override
                 public void onClick(View view) {
                     int mPosition = getLayoutPosition();
-                    mListener.selectMoreMusic(mPosition, mMoreIcon);
+                    mMusicListener.selectMoreMusic(mPosition, mMoreIcon);
                 }
             });
         }

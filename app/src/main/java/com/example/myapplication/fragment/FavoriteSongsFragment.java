@@ -35,10 +35,11 @@ public class FavoriteSongsFragment extends AllSongFragment {
     public void onDestroy() {
         super.onDestroy();
         //Bkav Thanhnch:
+        //BachNN : nếu mà trong danh sach bài hát yêu tích mà chưa chay bài hát nào thì ko set mIDMusic
         if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC_DEFAULT) {
             mIDMusic = mMainActivity.getMusicService().getSongPlaying().getId();
         }
-        mMainActivity.getMusicService().setAllSongService(getAllSong());
+        mMainActivity.getMusicService().setAllSongService(mMainActivity.getMusicService().getAllSongDatabase());
         resetCurrentSong();
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG, "onDestroy To ");
@@ -73,7 +74,7 @@ public class FavoriteSongsFragment extends AllSongFragment {
 
         @Override
         protected void onPostExecute(List<Song> songs) {
-            setData(songs);
+            setDataAllMusic(songs);
             mMainActivity.getMusicService().setAllSongService(songs);
         }
     }
