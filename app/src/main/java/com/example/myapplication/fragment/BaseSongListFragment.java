@@ -121,7 +121,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         //BachNN : mMainActivity.getMusicService() == null --> return, bời vì nếu mà ko thì sẽ ko có Data để set
         // cho các View ở các dòng lệnh dưới.
         if (mMainActivity.getMusicService() == null) return;
-        // nếu màn hình dọc mới hiên set hiện thị lại ToolBar ngược lại thì ko.
+        //BachNN : nếu màn hình dọc mới hiên set hiện thị lại ToolBar ngược lại thì ko.
         if (mMainActivity.getVertical()) {
             mMainActivity.setShowToolbar();
         }

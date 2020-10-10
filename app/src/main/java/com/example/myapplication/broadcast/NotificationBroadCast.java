@@ -10,7 +10,8 @@ import com.example.myapplication.listenner.INotificationBroadCastListener;
 import com.example.myapplication.util.Util;
 import com.example.myapplication.util.LogSetting;
 
-/** BachNN
+/**
+ * BachNN
  * Nhận các Message từ Notification bắn ra
  */
 public class NotificationBroadCast extends BroadcastReceiver {
@@ -20,7 +21,9 @@ public class NotificationBroadCast extends BroadcastReceiver {
         this.mMusicBroadCastListener = mBroadCastListener;
     }
 
-    /** BachNN
+    /**
+     * BachNN
+     *
      * @param context
      * @param intent  ..
      *                nhân các thông báo từ các Action của Notification.

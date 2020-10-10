@@ -66,7 +66,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
     }
 
     /**
-     * BacnhNN
+     * BachNN
      *
      * @param time tổng thời gian của bàn hát
      * @return format về đinh dạnh phút / giây
@@ -80,6 +80,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
 
     /**
+     * BachNN
      * @param mCurrentSong vị trí bài hát đang chay.
      *                     set lại vị trí bài hát đang chạy.
      */
@@ -122,9 +123,9 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
         public void onBind(Song song) {
             boolean checkLineChooseMusic = getAdapterPosition() == mCurrentSong;
-            // set giá trị TextView nó là mIndexMusic với các số theo bài hát .
+            //BacHNN : set giá trị TextView nó là mIndexMusic với các số theo bài hát .
             mIndexMusic.setText("" + (getAdapterPosition() + 1));
-            //chuyền một bài hát đang chay vào hàm dưới để title và author
+            //BachNN :chuyền một bài hát đang chay vào hàm dưới để title và author
             mTitleTextView.setText(song.getTitle());
             mAuthorTextView.setText(getDuration(song.getDuration()));
             if (checkLineChooseMusic) {

@@ -91,7 +91,7 @@ public class DataManager {
         // BachNN :nếu con trỏ ko phải vị trị cuối cùng thì chạy tiếp vong While
         while (!cursor.isAfterLast()) {
             allFavoriteSong.add(new Song(cursor));
-            // chuyển con tro xuông dong dươi của bảng
+            //BachNN chuyển con tro xuông dong dươi của bảng
             cursor.moveToNext();
         }
         //BachNN : đóng con trỏ lại

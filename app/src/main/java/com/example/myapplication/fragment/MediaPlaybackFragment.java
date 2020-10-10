@@ -53,7 +53,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * để lặp lại set giời gian chạy thực cho bài hát.
      */
-    //Bkav Thanhnch: todo sai convention - ok
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
@@ -201,7 +200,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mLikeIcon.setImageResource(R.drawable.ic_thumbs_up_default);
             }
         }
-        //Bkav Thanhnch:
         loadImageMusicAvatar();
     }
 
@@ -209,7 +207,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * Hàm này dùng để set cái trạng thai khi chuyển bài hát trong app.
      */
-    //Bkav Thanhnch:
     private void setRepeat() {
         if (mActivity.getMusicService().getStatueRepeat() == MusicService.NORMAL) {
             mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
@@ -328,6 +325,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Previous:
+                //BachNN : quay lại bài và set lại các giá trị.
                 mActivity.getMusicService().onPreviousMusic();
                 setTile(mActivity.getMusicService().getSongPlaying());
                 setSeekBar();
@@ -346,7 +344,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     }
                 } else {
                     mActivity.getMusicService().onResumeMusic();
-                    // 0 ,1 ko ro ràng
                     if (mActivity.getMusicService().getStatus() == MusicService.INITIALLY) {
                         mActivity.getMusicService().onPlayMusic();
                         mActivity.getMusicService().setStatus(MusicService.STOP);
@@ -356,6 +353,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Next:
+                //BachNN : next bài và set lại các giá trị.
                 mActivity.getMusicService().onNextMusic();
                 setTile(mActivity.getMusicService().getSongPlaying());
                 setSeekBar();
@@ -367,6 +365,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.icon_shuffle:
                 mActivity.getMusicService().setShuff();
+                // BachNN : kỉểm tra xem trạng thái của Service hiện tại có bằng REPEAT không.
                 if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT) {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);
                     mActivity.getMusicService().setStatus(MusicService.NORMAL);
@@ -377,6 +376,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.icon_repeat:
                 mActivity.getMusicService().setRandom();
+                // BachNN : kỉểm tra xem trạng thái của Service hiện tại có bằng RANDOM không.
                 if (mActivity.getMusicService().getStatueRepeat() == MusicService.RANDOM) {
                     mRePeatIcon.setImageResource(R.drawable.ic_baseline_repeat_24);
                     mActivity.getMusicService().setStatus(MusicService.NORMAL);
@@ -394,7 +394,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * @param view view khi user click vào
      *             hàm dung để hiện thi nên để like hay ko like.
      */
-    //Bkav Thanhnch: thieu comment -ok
     private void displayPopupMenu(View view) {
         PopupMenu mPopupMen = new PopupMenu(getContext(), view);
         mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
@@ -403,8 +402,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.like_music:
+                        mActivity.getDatabase()
+                                .addMusicFavourite(mActivity.getMusicService().getAllSongs().get(mActivity.getMusicService().getCurrentSong()));
                         break;
                     case R.id.dislike_music:
+                        mActivity.getDatabase()
+                                .removeMusicFavourite(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId()));
                         break;
                 }
                 return true;

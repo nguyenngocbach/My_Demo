@@ -37,8 +37,8 @@ import java.util.Random;
 
 public class MusicService extends Service {
 
+    //BachNN : các trang thái để chuyển bài hát(RANDOM , REPEAT , NORMAL )
     public static final int RANDOM = 5;
-    //Bkav Thanhnch: khong hieu bien nay la trang thai nao -ok
     public static final int REPEAT = 6;
     public static final int NORMAL = 7;
     // BachNN :next,previous bài hát hoặc trọn 1 bài hát bất kỳ.
@@ -54,8 +54,6 @@ public class MusicService extends Service {
     private RemoteViews mNotificationRemoteBig;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
-    //Bkav Thanhnch: sai convention -ok
-    private IBinder mIBinder = new LocalMusic();
     private SeekBar mSeekBar;
     private List<Song> mSongs;
     private MediaPlayer mPlayer;
@@ -67,7 +65,6 @@ public class MusicService extends Service {
 
 
     private Handler mHandler = new Handler();
-    //Bkav Thanhnch: sai convention -ok
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
@@ -99,7 +96,7 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mIBinder;
+        return new LocalMusic();
     }
 
     @Override
@@ -115,7 +112,6 @@ public class MusicService extends Service {
             mNotificationManager.createNotificationChannel(channelNotification);
             mNotificationRemoteSmall = new RemoteViews(getPackageName(), R.layout.notifiation_small);
             mNotificationRemoteBig = new RemoteViews(getPackageName(), R.layout.notifiation_big);
-            //Bkav Thanhnch: sao can check null? -ok
             mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_previous, onButtonNotificationClick(R.id.icon_previous, Util.ACTION_PREVIOUS));
             mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
             mNotificationRemoteBig.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
@@ -124,8 +120,6 @@ public class MusicService extends Service {
             mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_play, onButtonNotificationClick(R.id.icon_play, Util.ACTION_PLAY));
             mNotificationRemoteSmall.setOnClickPendingIntent(R.id.icon_next, onButtonNotificationClick(R.id.icon_next, Util.ACTION_NEXT));
 
-
-            //Bkav Thanhnch: xem lai bien -1
             if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
                 loadImageNotification();
             }
@@ -143,8 +137,6 @@ public class MusicService extends Service {
     /**
      * BachNN hàm này dung để chay bài nhạc.
      */
-    //Bkav Thanhnch:  thieu comment logic kho hieu, can
-    //comment them
     public void onPlayMusic() {
         mHandler.postDelayed(mRunnable, TIME_REPEAT);
         //BachNN : if bài nhạc đang chay mà dừng bài hát lại chuyền bài hát khác thì.
@@ -162,12 +154,11 @@ public class MusicService extends Service {
         }
     }
 
-    //Bkav Thanhnch: thieu ten ai code ham nay -ok
-    //BachNN :ten ham khong dung, ne la load anh cho view Notification
+    //BachNN :ten ham khong dung, no la load anh cho view Notification
     // ham set Anh.
     private void loadImageNotification() {
         byte[] sourceImage = Util.getByteImageSong(getSongPlaying().getPath());
-        if ((sourceImage == null)) return;
+        if (sourceImage == null) return;
         Bitmap imageBitmap = BitmapFactory.decodeByteArray(sourceImage, 0, sourceImage.length);
         mNotificationRemoteSmall.setImageViewBitmap(R.id.icon_music, imageBitmap);
         mNotificationRemoteBig.setImageViewBitmap(R.id.icon_music, imageBitmap);
@@ -323,7 +314,6 @@ public class MusicService extends Service {
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG, "cursor : " + cursor);
         }
-        //Bkav Thanhnch: sao khong chuyen vao trong doan check null?
         if (cursor != null) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -342,6 +332,7 @@ public class MusicService extends Service {
 
     /**
      * BachNN
+     *
      * @return bài hat đang chay
      */
     public Song getSongPlaying() {
@@ -382,12 +373,12 @@ public class MusicService extends Service {
     /**
      * BachNN
      *
-     * @param s là list bài hát
+     * @param song là list bài hát
      *          hàm này dùng để set bài hát .
      */
-    public void setAllSongService(List<Song> s) {
+    public void setAllSongService(List<Song> song) {
         mSongs.clear();
-        mSongs.addAll(s);
+        mSongs.addAll(song);
     }
 
     /**
@@ -432,6 +423,7 @@ public class MusicService extends Service {
     }
 
     /**
+     * BachNN
      * hhàm nay dung để set lại IU cho Notifiaction dó chính là Buttom Play.
      */
     public void setPlayMusicNotification() {

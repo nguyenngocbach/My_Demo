@@ -44,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     private static final int ALL_MUSIC = 0;
     private static final int ALL_FAVOURITE_MUSIC = 1;
     private static final int MUSIC_LIBRARY = 2;
-    //Bkav Thanhnch: sai convention -ok
-    public boolean mIsVertical = false;
+    public boolean mIsVertical;
     private FragmentTransaction mTransaction;
     private Intent mIntent;
     private MusicService mMusicService;
@@ -56,15 +55,12 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     private Toolbar mToolbar;
     //BachNN : ahead of Navigation
     private TextView mListenTextView;
-    //Bkav Thanhnch: Khong dung?
     private TextView mRecentTextView;
     private TextView mMusicLibraryTextView;
     private ImageView mListenImage;
-    //Bkav Thanhnch: Khong dung?
     private ImageView mRecentImage;
     private ImageView mMusicLibraryImage;
     private LinearLayout mListenLayout;
-    //Bkav Thanhnch: Khong dung?
     private LinearLayout mFavouriteLayout;
     private LinearLayout mMusicLibraryLayout;
     private int mPositionAHeader = 0;
@@ -73,9 +69,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            //Bkav Thanhnch: Bien nay la gi? CODE linh tinh?
             mMusicService = ((MusicService.LocalMusic) iBinder).getInstanceService();
-            //Bkav Thanhnch: tao fragment gi day? dat ten khong chinh xac.
             createAllFragmentMusic();
         }
 
@@ -96,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mFragmentManager = getSupportFragmentManager();
         mIntent = new Intent(MainActivity.this, MusicService.class);
         mDatabase = new DataManager(this);
-        //Bkav Thanhnch: Khong co comment ai code
         //BachNN : register BroadCast.
         NotificationBroadCast broadCastNotification;
         broadCastNotification = new NotificationBroadCast(this);
@@ -106,10 +99,9 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mFilter.addAction(Util.ACTION_PLAY);
         mFilter.addAction(Util.ACTION_PREVIOUS);
         mFilter.addAction(Util.ACTION_AUTONEXT);
-        //BachNN đăng ký cac Action qua mFilter;
+        //BachNN : đăng ký cac Action qua mFilter;
         this.registerReceiver(broadCastNotification, mFilter);
 
-        //Bkav Thanhnch: Khong co comment ai code
         //BachNN : kiêm tra xem đã có quyền truy cập hay chưa.
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -120,11 +112,11 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             startService(mIntent);
             bindService(mIntent, mConnection, BIND_AUTO_CREATE);
         }
-
     }
 
-    /**Bkav Thanhnch: Khong co comment ai code
+    /**
      * BachNN
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults ..
@@ -150,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
      * và kính hoạt Fragment , Service , Database
      */
     private void createAllFragmentMusic() {
-        //Bkav Thanhnch: tai sao lai code the nay? -ok
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mIsVertical = false;
@@ -176,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
                 @Override
                 public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
                 }
 
                 @Override
@@ -186,12 +176,10 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
 
                 @Override
                 public void onDrawerClosed(@NonNull View drawerView) {
-
                 }
 
                 @Override
                 public void onDrawerStateChanged(int newState) {
-
                 }
             });
         } else {
@@ -215,10 +203,14 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
      * set sự kiểm có các mục trên aheader Layout.
      */
     private void setAHeaderNavigation() {
+        // Thanhnch todo bach xem lai bai viet nay -ok
         //Bkav Thanhnch: Sao lai get ra gia tri 0.
         //BachNN : get = 0 để lấy cái view của Navigation thì mới ánh xa đc.
         // https://stackoverflow.com/questions/33194594/navigationview-get-find-header-layout
-        View mView = mNavigationView.getHeaderView(0);
+        //https://stackoverflow.com/questions/33199764/android-api-23-change-navigation-view-headerlayout-textview
+//        View mView = mNavigationView.getHeaderView(0);
+        View mView = mNavigationView.findViewById(R.id.ahear_view);
+
         mListenTextView = mView.findViewById(R.id.txt_listen_now);
         mMusicLibraryTextView = mView.findViewById(R.id.txt_music_library);
         mListenImage = mView.findViewById(R.id.icon_listen_now);
@@ -226,13 +218,12 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mListenLayout = mView.findViewById(R.id.listen_now);
         mFavouriteLayout = mView.findViewById(R.id.favourite_layout);
         mMusicLibraryLayout = mView.findViewById(R.id.music_library);
-        mRecentTextView= mView.findViewById(R.id.favourite_textview);
-        mRecentImage= mView.findViewById(R.id.favourite_icon);
+        mRecentTextView = mView.findViewById(R.id.favourite_textview);
+        mRecentImage = mView.findViewById(R.id.favourite_icon);
 
         mListenLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Bkav Thanhnch: Sao lai truyen vao gia tri 0
                 //BachNN : 0 là set backGround cho Music Now Navigation
                 setChangeAHeader(ALL_MUSIC);
                 mDrawerLayout.closeDrawers();
@@ -243,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mFavouriteLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Bkav Thanhnch: Sao lai truyen vao gia tri 1
                 //BachNN : 1 là set backGround cho FavouriteSong Navigation
                 setChangeAHeader(ALL_FAVOURITE_MUSIC);
                 mDrawerLayout.closeDrawers();
@@ -265,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         mMusicLibraryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Bkav Thanhnch: Sao lai truyen vao gia tri 2
                 //BachNN : 2 là set backGround cho Music Library Navigation
                 setChangeAHeader(MUSIC_LIBRARY);
                 mDrawerLayout.closeDrawers();
@@ -286,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
 
     /**
      * BachNN
-     *Bkav Thanhnch: setChangeAheader-> sai ten?
+     *
      * @param i là vị trí mà người dụng chọn trên aheader Layout.
      */
     private void setChangeAHeader(int i) {
@@ -331,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     }
 
 
-    /**Bkav Thanhnch: Ten khong ro rang.
+    /**
      * BachNN
      * hiện thi ra MediaPlaybackFragment.
      */
@@ -365,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mMusicService.setPreviousMusicNotification();
         }
     }
+
     /**
      * BachNN
      * play bài hày hoặc puase
@@ -397,9 +387,8 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
 
     /**
      * BachNN
-     *  hàm nay dung de set lại title lại chi AllSongFragment.
+     * hàm nay dung de set lại title lại chi AllSongFragment.
      */
-    //Bkav Thanhnch:  thieu comment
     @Override
     public void onSeekBar() {
         if (!mIsVertical) {
@@ -425,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             allSongFragment.setUIAllView();
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
-            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             mediaPlaybackFragment.setUIMusic();
         }
         mMusicService.setNextMusicNotification();
@@ -447,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             allSongFragment.setImageMusic();
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
-            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             mediaPlaybackFragment.setUIMusic();
         }
         mMusicService.setPreviousMusicNotification();
@@ -471,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
         }
 
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
-            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             mediaPlaybackFragment.setUIMusic();
         }
         mMusicService.setPlayMusic();
@@ -489,16 +478,17 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             allSongFragment.setButtonIconPlayMusic(true);
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {
-            MediaPlaybackFragment mediaPlaybackFragment= (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            MediaPlaybackFragment mediaPlaybackFragment = (MediaPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             mediaPlaybackFragment.setUIMusic();
         }
         mMusicService.setNextMusicNotification();
     }
 
-    public void setHideToolbar(){
+    public void setHideToolbar() {
         mToolbar.setVisibility(View.GONE);
     }
-    public void setShowToolbar(){
+
+    public void setShowToolbar() {
         mToolbar.setVisibility(View.VISIBLE);
     }
 
