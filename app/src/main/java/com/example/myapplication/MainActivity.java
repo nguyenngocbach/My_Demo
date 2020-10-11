@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.myapplication.fragment.FavoriteSongsFragment;
-import com.example.myapplication.Service.MusicService;
+import com.example.myapplication.service.MusicService;
 import com.example.myapplication.broadcast.NotificationBroadCast;
 import com.example.myapplication.database.DataManager;
 import com.example.myapplication.fragment.AllSongFragment;
@@ -474,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onPlayMusicAutoNextBroadCast() {
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof AllSongFragment) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            allSongFragment.setSelection(mMusicService.getCurrentSong());
+            allSongFragment.setSelectMusic(mMusicService.getCurrentSong());
             allSongFragment.setButtonIconPlayMusic(true);
         }
         if (getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment) instanceof MediaPlaybackFragment) {

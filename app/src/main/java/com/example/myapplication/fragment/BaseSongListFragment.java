@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
-import com.example.myapplication.Service.MusicService;
+import com.example.myapplication.service.MusicService;
 import com.example.myapplication.database.DataManager;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
@@ -125,21 +125,28 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         if (mMainActivity.getVertical()) {
             mMainActivity.setShowToolbar();
         }
-        setDataAllMusic(mMainActivity.getMusicService().getAllSongs());
         // BachNN : mMainActivity.getMusicService().getCurrentSong() == POSITION_MUSIC_DEFAULT -->return
         // thì sẽ ko có Data để set cho các View Thanh hiển thị bài hát đang chay và ảnh ở dưới.
         // POSITION_MUSIC_DEFAULT= -1 vị trí bài hát default.
         if (mMainActivity.getMusicService().getCurrentSong() == POSITION_MUSIC_DEFAULT) return;
-        setSelection(mMainActivity.getMusicService().getCurrentSong());
-        setImageMusic();
-        //BachNN : lần đâu vài chưa set title vị trị.
-        setTitleMusic(mMainActivity.getMusicService().getSongPlaying());
-        setButtonIconPlayMusic(mMainActivity.getMusicService().checkMusicPlaying());
+        setUIAllView();
+        setSelectMusic(mMainActivity.getMusicService().getCurrentSong());
         if (mIsVertical && mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC_DEFAULT) {
             setVisibleDisPlay();
         } else {
             setVisible();
         }
+    }
+
+    /**
+     * BachNN
+     * set lại toàn bị các view trên Fragment này
+     */
+    public void setUIAllView() {
+        setDataAllMusic(mMainActivity.getMusicService().getAllSongs());
+        setTitleMusic(mMainActivity.getMusicService().getSongPlaying());
+        setButtonIconPlayMusic(mMainActivity.getMusicService().checkMusicPlaying());
+        setImageMusic();
     }
 
     public void setDataAllMusic(List<Song> songList) {
@@ -172,7 +179,6 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * @param musicRunning kiểm tra bài hát đang chay hay đang dung để
      *                     sét Icon của bài nhạc.
      */
-    //Thanhnch todo ten khong dung nghia oK
     public void setButtonIconPlayMusic(boolean musicRunning) {
         if (musicRunning) {
             mPlayImageView.setImageResource(R.drawable.ic_pause_black_large);
@@ -203,7 +209,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * @param currentMusic vị trị mà người dụng click vào ban hát
      *                     nó sẽ sưa lại giao diên củâ AllSongFragment
      */
-    public void setSelection(int currentMusic) {
+    public void setSelectMusic(int currentMusic) {
         mMainActivity.getMusicService().setCurrentSong(currentMusic);
         if (mSongs != null) {
             mSongs.clear();
@@ -215,16 +221,6 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         mMainActivity.getMusicService().setChangeNotification();
     }
 
-    /**
-     * BachNN
-     * set lại toàn bị các view trên Fragment này
-     */
-    public void setUIAllView() {
-        setDataAllMusic(mMainActivity.getMusicService().getAllSongs());
-        setTitleMusic(mMainActivity.getMusicService().getSongPlaying());
-        setButtonIconPlayMusic(mMainActivity.getMusicService().checkMusicPlaying());
-        setImageMusic();
-    }
 
     /**
      * BachNN
@@ -248,7 +244,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      */
     @Override
     public void selectMusic(int i) {
-        setSelection(i);
+        setSelectMusic(i);
         setButtonIconPlayMusic(true);
         setImageMusic();
         if (mIsVertical) {
@@ -313,7 +309,7 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      */
     public List<Song> getAllSongDatabase() {
         List<Song> songs = new ArrayList<>();
-        String[] allColoumSong = new String[]{
+        String[] allColumnSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
                 MediaStore.Audio.AudioColumns.DATA,
                 MediaStore.Audio.AudioColumns.ARTIST,
@@ -323,12 +319,11 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
         };
         // BachNN :query các trường trên để lấy thông tin các bàn hát
         Cursor cursor = getActivity().getContentResolver().
-                query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColoumSong, null, null, null, null);
+                query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allColumnSong, null, null, null, null);
         // BachNN :chuyển con trỏ đến đâu bảng
         if (LogSetting.IS_DEBUG) {
             Log.d(MainActivity.TAG, "cursor : " + cursor);
         }
-        //Bkav Thanhnch: sao khong chuyen vao trong doan check null?
         if (cursor != null) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -344,7 +339,6 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      * BachNN
      * hàm này dùng đẻ ghi đề ở lớp con của nó đó là AllSongFragment.
      */
-    //Bkav Thanhnch: thieu comment -ok
     public void loadData() {
     }
 

@@ -1,4 +1,4 @@
-package com.example.myapplication.Service;
+package com.example.myapplication.service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -65,7 +64,7 @@ public class MusicService extends Service {
 
 
     private Handler mHandler = new Handler();
-    private Runnable mRunnable = new Runnable() {
+    private Runnable mUpdateSeekBarAndNextSongIfEndRunnable = new Runnable() {
         @Override
         public void run() {
             if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
@@ -101,7 +100,7 @@ public class MusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        new AllFavouriteMusic().execute();
+        mSongs= getAllSongDatabase();
         //BachNN : anh xem đoạn nay phải sưa ko .
         mSeekBar = new SeekBar(this);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -138,7 +137,7 @@ public class MusicService extends Service {
      * BachNN hàm này dung để chay bài nhạc.
      */
     public void onPlayMusic() {
-        mHandler.postDelayed(mRunnable, TIME_REPEAT);
+        mHandler.postDelayed(mUpdateSeekBarAndNextSongIfEndRunnable, TIME_REPEAT);
         //BachNN : if bài nhạc đang chay mà dừng bài hát lại chuyền bài hát khác thì.
         // đọng sự lý logic dưới.
         if (mStatus == STOP) {
@@ -230,10 +229,10 @@ public class MusicService extends Service {
     /**
      * BachNN
      *
-     * @param CurrentSong lấy bài hát của vi trị trên
+     * @param currentSong lấy bài hát của vi trị trên
      */
-    public void setCurrentSong(int CurrentSong) {
-        mCurrentSong = CurrentSong;
+    public void setCurrentSong(int currentSong) {
+        mCurrentSong = currentSong;
     }
 
     public void setRandom() {
@@ -343,8 +342,8 @@ public class MusicService extends Service {
         return mStatus;
     }
 
-    public void setStatus(int Status) {
-        mStatus = Status;
+    public void setStatus(int status) {
+        mStatus = status;
     }
 
     /**
@@ -437,23 +436,8 @@ public class MusicService extends Service {
         mNotificationManager.notify(ID_NOTIFICATION, mBuilder.build());
     }
 
-    /**
-     * BachNN
-     * Hàm này dùng để lấy lại allSong khi quay lại list bài hát từ FavouriteSongFragment.
-     */
-    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
-        @Override
-        protected List<Song> doInBackground(Void... voids) {
-            return getAllSongDatabase();
-        }
 
-        @Override
-        protected void onPostExecute(List<Song> songs) {
-            mSongs = songs;
-        }
-    }
-
-    public class LocalMusic extends Binder implements Serializable {
+    public class LocalMusic extends Binder {
         public MusicService getInstanceService() {
             return MusicService.this;
         }

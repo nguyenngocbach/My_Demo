@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import com.example.myapplication.model.Song;
+
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -24,22 +26,33 @@ public class AllSongFragment extends BaseSongListFragment {
 
     @Override
     public void loadData() {
-        new LoadAllMusic().execute();
+        new LoadAllMusic(AllSongFragment.this).execute();
     }
 
     /**
      * BachNN
      * tạo một luồng để lấy một list bài hát về.
      */
-    class LoadAllMusic extends AsyncTask<Void, Void, List<Song>> {
+    static class LoadAllMusic extends AsyncTask<Void, Void, List<Song>> {
+        private final WeakReference<AllSongFragment> mAllSongReference;
+
+        public LoadAllMusic(AllSongFragment allSongFragment) {
+            mAllSongReference = new WeakReference<>(allSongFragment);
+        }
+
         @Override
         protected List<Song> doInBackground(Void... voids) {
-            return getAllSongDatabase();
+            if (mAllSongReference.get() == null) {
+                return null;
+            }
+            return mAllSongReference.get().getAllSongDatabase();
         }
 
         @Override
         protected void onPostExecute(List<Song> songs) {
-            setDataAllMusic(songs);
+            if (songs != null && mAllSongReference.get() != null) {
+                mAllSongReference.get().setDataAllMusic(songs);
+            }
             super.onPostExecute(songs);
         }
     }

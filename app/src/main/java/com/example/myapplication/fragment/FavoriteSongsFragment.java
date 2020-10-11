@@ -7,6 +7,7 @@ import com.example.myapplication.MainActivity;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.util.LogSetting;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class FavoriteSongsFragment extends AllSongFragment {
@@ -22,7 +23,7 @@ public class FavoriteSongsFragment extends AllSongFragment {
         if (mMainActivity.getMusicService().getCurrentSong() != POSITION_MUSIC_DEFAULT) {
             mIDMusic = mMainActivity.getMusicService().getSongPlaying().getId();
         }
-        new AllFavouriteMusic().execute();
+        new AllFavouriteMusic(FavoriteSongsFragment.this).execute();
         mMainActivity.getMusicService().setCurrentSong(POSITION_MUSIC_DEFAULT);
     }
 
@@ -48,7 +49,6 @@ public class FavoriteSongsFragment extends AllSongFragment {
      * BachNN
      * hàm này dụng để set lại vị trị của bài hát cho AllSongFragment.
      */
-    //chua fomat code
     public void resetCurrentSong() {
         for (int i = 0; i < mMainActivity.getMusicService().getAllSongs().size(); i++) {
             if (mMainActivity.getMusicService().getAllSongs().get(i).getId().equals(mIDMusic)) {
@@ -61,16 +61,30 @@ public class FavoriteSongsFragment extends AllSongFragment {
      * BachNN
      * Tạo ra một Thread khác để đọc các bài hát yêu thích từ CSDL về.
      */
-    class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+    static class AllFavouriteMusic extends AsyncTask<Void, Void, List<Song>> {
+        private final WeakReference<FavoriteSongsFragment> mFavoriteSongsFragmentReference;
+
+        public AllFavouriteMusic(FavoriteSongsFragment favoriteSongsFragment) {
+            mFavoriteSongsFragmentReference = new WeakReference<>(favoriteSongsFragment);
+        }
+
         @Override
         protected List<Song> doInBackground(Void... voids) {
-            return mDatabaseManager.getAllMusicFavourite();
+            if (mFavoriteSongsFragmentReference.get() == null) {
+                return null;
+            }
+            return mFavoriteSongsFragmentReference.get().
+                    mDatabaseManager.getAllMusicFavourite();
         }
 
         @Override
         protected void onPostExecute(List<Song> songs) {
-            setDataAllMusic(songs);
-            mMainActivity.getMusicService().setAllSongService(songs);
+            if (songs != null && mFavoriteSongsFragmentReference.get() != null) {
+                mFavoriteSongsFragmentReference.get().setDataAllMusic(songs);
+                mFavoriteSongsFragmentReference.get().
+                        mMainActivity.getMusicService().setAllSongService(songs);
+            }
+
         }
     }
 }

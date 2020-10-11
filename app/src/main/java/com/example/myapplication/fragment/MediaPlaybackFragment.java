@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.model.Song;
 import com.example.myapplication.R;
-import com.example.myapplication.Service.MusicService;
+import com.example.myapplication.service.MusicService;
 import com.example.myapplication.util.LogSetting;
 import com.example.myapplication.util.Util;
 
@@ -53,7 +53,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * BachNN
      * để lặp lại set giời gian chạy thực cho bài hát.
      */
-    private Runnable mRunnable = new Runnable() {
+    private Runnable mSetTimeSeekBarRunnable = new Runnable() {
         @Override
         public void run() {
             if (mActivity.getMusicService() != null) {
@@ -93,7 +93,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.media_play_back_fragment, container, false);
-        anhXa(view);
+        initView(view);
         mMoreIcon.setOnClickListener(this);
         mListMusicIcon.setOnClickListener(this);
         mLikeIcon.setOnClickListener(this);
@@ -149,7 +149,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         return view;
     }
 
-    private void anhXa(View view) {
+    private void initView(View view) {
         mMusicImageView = view.findViewById(R.id.img_music);
         mAvatarImageView = view.findViewById(R.id.icon_avata);
         mMoreIcon = view.findViewById(R.id.icon_more);
@@ -183,11 +183,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (mActivity.getMusicService() != null) {
             if (mActivity.getMusicService().getCurrentSong() == BaseSongListFragment.POSITION_MUSIC_DEFAULT)
                 return;
-            setTile(mActivity.getMusicService().getSongPlaying());
-            setSeekBar();
-            setStatusIcon(mActivity.getMusicService().checkMusicPlaying());
-            setRepeat();
-
+            setUIMusic();
             if (checkSongFavourite(mActivity.getMusicService().getSongPlaying())) {
                 if (LogSetting.IS_DEBUG) {
                     Log.d(MainActivity.TAG, "Like To ");
@@ -200,7 +196,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mLikeIcon.setImageResource(R.drawable.ic_thumbs_up_default);
             }
         }
-        loadImageMusicAvatar();
     }
 
     /**
@@ -227,6 +222,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         setTile(mActivity.getMusicService().getSongPlaying());
         setStatusIcon(mActivity.getMusicService().checkMusicPlaying());
         loadImageMusicAvatar();
+        setRepeat();
     }
 
     /**
@@ -248,7 +244,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      */
     private void setSeekBar() {
         mSeekBar.setMax(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getDuration()));
-        mHandler.postDelayed(mRunnable, TIME_REPEAT);
+        mHandler.postDelayed(mSetTimeSeekBarRunnable, TIME_REPEAT);
     }
 
     /**
@@ -327,10 +323,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             case R.id.icon_Previous:
                 //BachNN : quay lại bài và set lại các giá trị.
                 mActivity.getMusicService().onPreviousMusic();
-                setTile(mActivity.getMusicService().getSongPlaying());
-                setSeekBar();
+                setUIMusic();
                 mMediaListener.onPrevious();
-                loadImageMusicAvatar();
                 mActivity.getMusicService().setChangeNotification();
                 break;
             case R.id.icon_Play:
@@ -355,13 +349,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             case R.id.icon_Next:
                 //BachNN : next bài và set lại các giá trị.
                 mActivity.getMusicService().onNextMusic();
-                setTile(mActivity.getMusicService().getSongPlaying());
-                setSeekBar();
                 mMediaListener.onNext();
-                loadImageMusicAvatar();
                 mActivity.getMusicService().setChangeNotification();
+                setUIMusic();
                 break;
             case R.id.icon_Dislike:
+                mActivity.getDatabase().
+                        removeMusicFavourite(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId()));
                 break;
             case R.id.icon_shuffle:
                 mActivity.getMusicService().setShuff();
@@ -438,7 +432,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onStop() {
         super.onStop();
         //BachNN : dừng runnable để nó ko cập nhật UI cho fragment này nữa.
-        mHandler.removeCallbacks(mRunnable);
+        mHandler.removeCallbacks(mSetTimeSeekBarRunnable);
     }
 
     /**
@@ -448,7 +442,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-        mHandler.postDelayed(mRunnable, TIME_REPEAT);
+        mHandler.postDelayed(mSetTimeSeekBarRunnable, TIME_REPEAT);
     }
 
     /**
