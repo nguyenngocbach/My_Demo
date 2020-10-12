@@ -358,7 +358,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                         removeMusicFavourite(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId()));
                 break;
             case R.id.icon_shuffle:
-                mActivity.getMusicService().setShuff();
+                mActivity.getMusicService().setShuffle();
                 // BachNN : kỉểm tra xem trạng thái của Service hiện tại có bằng REPEAT không.
                 if (mActivity.getMusicService().getStatueRepeat() == MusicService.REPEAT) {
                     mShuffleIcon.setImageResource(R.drawable.ic_baseline_shuffle_24);

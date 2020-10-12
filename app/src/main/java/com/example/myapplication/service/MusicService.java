@@ -68,9 +68,9 @@ public class MusicService extends Service {
         @Override
         public void run() {
             if (getCurrentSong() != POSITION_DEFAULT_MUSIC) {
-                int index = (Integer.parseInt(getSongPlaying().getDuration()));
-                mSeekBar.setMax(index);
-                if (mSeekBar.getProgress() / 100 == index / 100) {
+                int totalDurationMusic = (Integer.parseInt(getSongPlaying().getDuration()));
+                mSeekBar.setMax(totalDurationMusic);
+                if (mSeekBar.getProgress() / 100 == totalDurationMusic / 100) {
                     onNextMusic();
                     if (LogSetting.IS_DEBUG) {
                         Log.d(MainActivity.TAG, "Next Bai");
@@ -241,7 +241,7 @@ public class MusicService extends Service {
         } else mStatueRepeat = RANDOM;
     }
 
-    public void setShuff() {
+    public void setShuffle() {
         if (mStatueRepeat == REPEAT) {
             mStatueRepeat = NORMAL;
         } else mStatueRepeat = REPEAT;

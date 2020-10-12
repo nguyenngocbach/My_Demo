@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     private MusicService mMusicService;
     private FragmentManager mFragmentManager;
     private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
     //BachNN : ahead of Navigation
@@ -149,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mIsVertical = true;
         }
         if (mIsVertical) {
+             ActionBarDrawerToggle toggle;
             AllSongFragment allSongFragment = new AllSongFragment();
             FragmentTransaction ft = mFragmentManager.beginTransaction();
             ft.replace(R.id.all_Song_Fragment, allSongFragment);
@@ -157,12 +157,12 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
             mToolbar = findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
             mDrawerLayout = findViewById(R.id.vertical_Screen);
-            mToggle = new ActionBarDrawerToggle(MainActivity.this
+            toggle = new ActionBarDrawerToggle(MainActivity.this
                     , mDrawerLayout, mToolbar, R.string.open_navigation, R.string.close_navigetion);
-            mDrawerLayout.addDrawerListener(mToggle);
+            mDrawerLayout.addDrawerListener(toggle);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
-            mToggle.syncState();
+            toggle.syncState();
             mNavigationView = findViewById(R.id.navigation_Vew);
             mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
                 @Override
@@ -348,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     public void onPrevious() {
         if (!mIsVertical) {
             AllSongFragment allSongFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
-            // todo xoa di nhe
             allSongFragment.setDataAllMusic(mMusicService.getAllSongs());
             allSongFragment.setImageMusic();
             mMusicService.setPreviousMusicNotification();
@@ -392,7 +391,8 @@ public class MainActivity extends AppCompatActivity implements AllSongFragment.I
     @Override
     public void onSeekBar() {
         if (!mIsVertical) {
-            AllSongFragment songFragment = (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
+            AllSongFragment songFragment =
+                    (AllSongFragment) getSupportFragmentManager().findFragmentById(R.id.all_Song_Fragment);
             songFragment.setTitleMusic(mMusicService.getSongPlaying());
         }
     }
