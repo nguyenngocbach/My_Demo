@@ -10,6 +10,15 @@ public class Util {
     public static final String ACTION_PREVIOUS = "com.example.myapplication.unit.previousMusic";
     public static final String ACTION_PLAY = "com.example.myapplication.unit.playMusic";
     public static final String ACTION_AUTONEXT = "com.example.myapplication.unit.autoNextMusic";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String IS_LOGIN = "password";
+
+
+    public static final String DATA ="DATA";
+    public static final String ARTIST ="ARTIST";
+    public static final String DISPLAY_NAME ="DISPLAY_NAME";
+    public static final String TITLE ="TITLE";
 
     /**
      * BachNN

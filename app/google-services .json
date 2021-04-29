@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "122472544571",
+    "project_id": "mymusicserver-4a784",
+    "storage_bucket": "mymusicserver-4a784.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122472544571:android:c91d131e1ac325145a5f1e",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122472544571-rfkt2smutmcpgq91ntjbhdpchunlvksf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8efPQ3F3QOIr4TIwpseHGyXe8dQaYs2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "122472544571-rfkt2smutmcpgq91ntjbhdpchunlvksf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

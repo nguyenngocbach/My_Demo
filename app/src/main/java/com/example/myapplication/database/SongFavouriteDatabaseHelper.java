@@ -11,6 +11,7 @@ public class SongFavouriteDatabaseHelper extends SQLiteOpenHelper {
     public static final String NAME_DATABASE = "SongFavourite.db";
     public static final int VERSION = 1;
     public static final String TABLE_NAME = "MY_SONG_FAVOURITE";
+    public static final String TABLE_NAME_ONLINE = "ONLINE_SONG";
     public static final String ID = "_id";
     public static final String PATH = "_path";
     public static final String AUTHOR = "_author";
@@ -19,6 +20,13 @@ public class SongFavouriteDatabaseHelper extends SQLiteOpenHelper {
     public static final String DURATION = "_duration";
 
     public static final String CREATE_SONG_TABLE = "CREATE TABLE  " + TABLE_NAME+" ( "+ ID +" INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            + PATH +" TEXT,"
+            + AUTHOR +" TEXT,"
+            + TITLE +" TEXT,"
+            + DISPLAY_NAME +" TEXT,"
+            + DURATION +" TEXT )";
+
+    public static final String CREATE_SONG_ONLINE_TABLE = "CREATE TABLE  " + TABLE_NAME_ONLINE+" ( "+ ID +" INTEGER PRIMARY KEY AUTOINCREMENT ,"
             + PATH +" TEXT,"
             + AUTHOR +" TEXT,"
             + TITLE +" TEXT,"
@@ -33,6 +41,7 @@ public class SongFavouriteDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //BachNN : Coast.CREATE_SONG_TABLE là chuỗi String để tảo bảng.
         sqLiteDatabase.execSQL(CREATE_SONG_TABLE);
+        sqLiteDatabase.execSQL(CREATE_SONG_ONLINE_TABLE);
     }
 
     @Override

@@ -300,10 +300,10 @@ public class MusicService extends Service {
         List<Song> songs = new ArrayList<>();
         String[] allColoumSong = new String[]{
                 MediaStore.Audio.AudioColumns._ID,
-                MediaStore.Audio.AudioColumns.DATA,
+                        MediaStore.Audio.AudioColumns.DATA,
                 MediaStore.Audio.AudioColumns.ARTIST,
                 MediaStore.Audio.AudioColumns.TITLE,
-                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+                        MediaStore.Audio.AudioColumns.DISPLAY_NAME,
                 MediaStore.Audio.AudioColumns.DURATION
         };
         // BachNN :query các trường trên để lấy thông tin các bàn hát
