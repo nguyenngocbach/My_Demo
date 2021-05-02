@@ -312,7 +312,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.icon_more:
-                displayPopupMenu(view);
+//                displayPopupMenu(view);
                 break;
             case R.id.icon_queue:
                 getActivity().onBackPressed();
@@ -388,27 +388,27 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
      * @param view view khi user click vào
      *             hàm dung để hiện thi nên để like hay ko like.
      */
-    private void displayPopupMenu(View view) {
-        PopupMenu mPopupMen = new PopupMenu(getContext(), view);
-        mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
-        mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.like_music:
-                        mActivity.getDatabase()
-                                .addMusicFavourite(mActivity.getMusicService().getAllSongs().get(mActivity.getMusicService().getCurrentSong()));
-                        break;
-                    case R.id.dislike_music:
-                        mActivity.getDatabase()
-                                .removeMusicFavourite(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId()));
-                        break;
-                }
-                return true;
-            }
-        });
-        mPopupMen.show();
-    }
+//    private void displayPopupMenu(View view) {
+//        PopupMenu mPopupMen = new PopupMenu(getContext(), view);
+//        mPopupMen.getMenuInflater().inflate(R.menu.more_menu, mPopupMen.getMenu());
+//        mPopupMen.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                switch (menuItem.getItemId()) {
+//                    case R.id.like_music:
+//                        mActivity.getDatabase()
+//                                .addMusicFavourite(mActivity.getMusicService().getAllSongs().get(mActivity.getMusicService().getCurrentSong()));
+//                        break;
+//                    case R.id.dislike_music:
+//                        mActivity.getDatabase()
+//                                .removeMusicFavourite(Integer.parseInt(mActivity.getMusicService().getSongPlaying().getId()));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+//        mPopupMen.show();
+//    }
 
 
     /**

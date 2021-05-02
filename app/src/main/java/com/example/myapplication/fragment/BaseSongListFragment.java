@@ -277,29 +277,44 @@ public class BaseSongListFragment extends Fragment implements IMusicListenner {
      */
     @Override
     public void selectMoreMusic(final int i, View view) {
-        PopupMenu popupMenuFavouriteSong = new PopupMenu(getActivity(), view);
-        popupMenuFavouriteSong.getMenuInflater().inflate(R.menu.more_menu, popupMenuFavouriteSong.getMenu());
-        //BachNN : set mau text cho một Item.
-        MenuItem menuItem = popupMenuFavouriteSong.getMenu().getItem(0);
-        SpannableString textColor = new SpannableString("Like");
-        textColor.setSpan(new ForegroundColorSpan(Color.RED), 0, textColor.length(), 0);
-        menuItem.setTitle(textColor);
+        OfflineDialog dialog = new OfflineDialog(this,mMainActivity.getMusicService().getAllSongs().get(i));
+        dialog.show(getFragmentManager(),"Offline");
+        //dung dialog.
+//        PopupMenu popupMenuFavouriteSong = new PopupMenu(getActivity(), view);
+//        popupMenuFavouriteSong.getMenuInflater().inflate(R.menu.more_menu, popupMenuFavouriteSong.getMenu());
+//        //BachNN : set mau text cho một Item.
+//        MenuItem menuItem = popupMenuFavouriteSong.getMenu().getItem(0);
+//        SpannableString textColor = new SpannableString("Like");
+//        textColor.setSpan(new ForegroundColorSpan(Color.RED), 0, textColor.length(), 0);
+//        menuItem.setTitle(textColor);
+//
+//        popupMenuFavouriteSong.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                switch (menuItem.getItemId()) {
+//                    case R.id.like_music:
+//                        mDatabaseManager.addMusicFavourite(mMainActivity.getMusicService().getAllSongs().get(i));
+//                        break;
+//                    case R.id.dislike_music:
+//                        mDatabaseManager.removeMusicFavourite(Integer.parseInt(mSongs.get(i).getId()));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+//        popupMenuFavouriteSong.show();
+    }
 
-        popupMenuFavouriteSong.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.like_music:
-                        mDatabaseManager.addMusicFavourite(mMainActivity.getMusicService().getAllSongs().get(i));
-                        break;
-                    case R.id.dislike_music:
-                        mDatabaseManager.removeMusicFavourite(Integer.parseInt(mSongs.get(i).getId()));
-                        break;
-                }
-                return true;
-            }
-        });
-        popupMenuFavouriteSong.show();
+    public void onLike(Song song){
+        mDatabaseManager.addMusicFavourite(song);
+    }
+
+    public void onDisLike(Song song){
+        mDatabaseManager.removeMusicFavourite(Integer.parseInt(song.getId()));
+    }
+
+    public void onDownloadMusic(Song song){
+
     }
 
 

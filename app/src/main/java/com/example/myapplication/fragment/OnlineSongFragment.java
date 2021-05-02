@@ -1,6 +1,7 @@
 package com.example.myapplication.fragment;
 
 import android.os.AsyncTask;
+import android.view.View;
 
 import com.example.myapplication.model.Song;
 
@@ -43,5 +44,11 @@ class OnlineSongFragment extends AllSongFragment {
             }
 
         }
+    }
+
+    @Override
+    public void selectMoreMusic(int i, View view) {
+        OnlineDialog dialog = new OnlineDialog(this,mMainActivity.getMusicService().getAllSongs().get(i));
+        dialog.show(getFragmentManager(),"Offline");
     }
 }
